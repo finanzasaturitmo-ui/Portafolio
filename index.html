@@ -73,21 +73,21 @@ main{padding:14px 18px;max-width:1300px;margin:0 auto}
 .bhdr.sw{color:#79c0ff;background:linear-gradient(90deg,#1a3a5c22,transparent)}
 .bhdr.xt{color:#56d364;background:linear-gradient(90deg,#1a5c3a22,transparent)}
 .tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-th{color:var(--sub);padding:6px 8px;text-align:right;font-weight:500;font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
-th:first-child,th:nth-child(2){text-align:left}
-td{padding:4px 5px;border-bottom:1px solid #0d111766;text-align:right;white-space:nowrap}
-td:first-child{text-align:left;padding-left:10px}
+table{width:100%;border-collapse:collapse;text-align:center;} /* Justify table content centrally by default */
+th{color:var(--sub);padding:6px 8px;font-weight:500;font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap;}
+th:first-child{text-align:left;} /* Left align first column header */
+td{padding:4px 5px;border-bottom:1px solid #0d111766;white-space:nowrap;}
+td:first-child{text-align:left;padding-left:10px;} /* Left align first column data */
 tr:hover td{background:#1c212855}
 tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--border);border-bottom:none;font-size:.8rem}
 
-.ci{background:#0d1117;border:1px solid var(--border);color:#e6edf3;border-radius:5px;padding:4px 7px;width:90px;text-align:right;font-size:.8rem;outline:none;transition:.15s}
+.ci{background:#0d1117;border:1px solid var(--border);color:#e6edf3;border-radius:5px;padding:4px 7px;width:90px;font-size:.8rem;outline:none;transition:.15s;}
 .ci:focus{border-color:var(--b);background:#0d1c2e}
 .ci.ticker{width:85px;text-align:left;text-transform:uppercase;font-weight:700;color:var(--b)}
 .pending .ci{color:var(--sub)}
 .pending .ticker-cell{color:var(--sub);font-style:italic}
 
-.action-btns { display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
+.action-btns { display: flex; gap: 4px; justify-content: center; align-items: center; } /* Center action buttons */
 .icon-btn { background:transparent; border:none; cursor:pointer; padding:2px 5px; font-size:.9rem; transition:.15s; opacity: 0.7; }
 .icon-btn:hover { opacity: 1; transform: scale(1.1); }
 .btn-del { color: #ff4444; opacity: 1; }
@@ -95,9 +95,6 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 
 .badge{display:inline-block;background:#21262d;color:var(--sub);font-size:.62rem;padding:1px 5px;border-radius:9px;margin-left:4px;vertical-align:middle}
 .computed{font-size:.8rem;padding:5px 8px}
-
-.alert-glow { color: #ff3333 !important; font-weight: 900 !important; text-shadow: 0 0 8px rgba(255, 0, 0, 0.8); animation: pulse-red 1.2s infinite alternate; }
-@keyframes pulse-red { 0% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); } 100% { text-shadow: 0 0 15px rgba(255, 50, 50, 1), 0 0 20px rgba(255, 0, 0, 0.8); } }
 
 .bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .sum-box,.skandia-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
@@ -217,11 +214,11 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
         <div style="display:flex;flex-direction:column;gap:7px">
           <div class="sum-row">
             <span class="sum-lbl">Capital Invertido (COP)</span>
-            <input class="ci" id="skInv" value="14.613.200" data-raw="14613200" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b);">
+            <input class="ci computable" id="skInv" value="14.613.200" data-raw="14613200" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b); text-align: right;">
           </div>
           <div class="sum-row">
             <span class="sum-lbl">Valor Actual (COP)</span>
-            <input class="ci" id="skCur" value="12.627.217" data-raw="12627217" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b);">
+            <input class="ci computable" id="skCur" value="12.627.217" data-raw="12627217" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b); text-align: right;">
           </div>
           <div class="sum-row"><span class="sum-lbl">P&L</span><span class="sum-val" id="skPnl">—</span></div>
           <div class="sum-row"><span class="sum-lbl">Retorno</span><span class="sum-val" id="skRet">—</span></div>
@@ -263,8 +260,8 @@ const COLS=['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364
 const f = (n,d=2) => isNaN(n)?'—':new Intl.NumberFormat('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
 const fCOP = n => new Intl.NumberFormat('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0}).format(n)+' COP';
 const fU = (n,d=2) => { const s='$'+f(Math.abs(n),d); return `<span class="${n<0?'r':''}">${n<0?'-':''}${s}</span>`; };
-const fP = (n, isAlert) => `<span class="${isAlert ? 'alert-glow' : (n>=0?'g':'r')}">${n>=0?'+':''}${f(n,2)}%</span>`;
-const r = (s,d=4) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
+const fP = (n) => `<span class="${n>=0?'g':'r'}">${n>=0?'+':''}${f(n,2)}%</span>`;
+const r = (s) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => r(document.getElementById('rateInput').value)||4180;
 
 // ── MANEJO DE SESIÓN FIREBASE ──────────────
@@ -442,11 +439,12 @@ function calculateSumFromFormula(fStr) {
 
 function investFocus(el) { const raw = el.getAttribute('data-raw-formula'); if (raw) el.value = raw; }
 function investBlur(el, tid, id) {
-  const sum = calculateSumFromFormula(el.value);
-  el.setAttribute('data-raw-formula', el.value); 
-  el.value = f(sum); el.title = `Fórmula activa: ${el.value}`; 
+  const inputValue = el.value;
+  const sum = calculateSumFromFormula(inputValue);
+  el.setAttribute('data-raw-formula', inputValue); 
+  el.value = f(sum); el.title = `Fórmula: ${inputValue}`; // Set tooltip with complete formula
   const row = (tid === 'sw' ? SW : XT).find(x => x.id === id);
-  if (row) { row.inv = sum; row.invFormula = el.value; }
+  if (row) { row.inv = sum; row.invFormula = inputValue; }
   recalc();
 }
 function skFocus(el) { el.value = el.dataset.raw || el.value.replace(/\./g, ''); }
@@ -470,19 +468,16 @@ function calc(row) {
 
 function renderTable(data, tid) {
   const rows = data.map(calc);
-  const thead = `<thead><tr><th style="text-align:left">Activo</th><th style="text-align:left">Cant.</th><th>Precio Prom</th><th>Precio Actual</th><th>Valor USD</th><th>Invertido USD</th><th>% G/L</th><th>Profit</th><th></th></tr></thead>`;
+  const thead = `<thead><tr><th style="text-align:left">Activo</th><th>Cant.</th><th>Precio Prom</th><th>Precio Actual</th><th>Valor USD</th><th>Invertido USD</th><th>% G/L</th><th>Profit</th><th></th></tr></thead>`; // cantidad centrally justified by default table style
   const tbody = rows.map(row => {
     const isPend = row.p || !row.qty;
-    const isAlert = !isPend && row.gl <= -10; 
     return `<tr class="${isPend?'pending':''}">
-      <td class="ticker-cell"><input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t || ''}" placeholder="TICKER" onblur="upd('${tid}',${row.id},'t',this.value)">${isPend?'<span class="badge">próximo</span>':''}</td>
-      <td><input class="ci" value="${row.qty || 0}" onblur="upd('${tid}',${row.id},'qty',this.value)"></td>
-      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
-      <td class="computed ${isAlert ? 'alert-glow' : ''}" style="font-weight: 700;">${row.px || 0}</td>
+      <td class="ticker-cell"><input class="ci ticker" value="${row.t || ''}" placeholder="TICKER" onblur="upd('${tid}',${row.id},'t',this.value)">${isPend?'<span class="badge">próximo</span>':''}</td>
+      <td><input class="ci" value="${row.qty || 0}" style="text-align: center;" onblur="upd('${tid}',${row.id},'qty',this.value)"></td> <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
+      <td class="computed" style="font-weight: 700;">${row.px || 0}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
       <td><input type="text" class="ci invested-usd" value="${f(row.inv)}" data-raw-formula="${row.invFormula || row.inv || 0}" onfocus="investFocus(this)" onblur="investBlur(this, '${tid}', ${row.id})" title="Fórmula: ${row.invFormula || row.inv || 0}"></td>
-      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl, isAlert)}</td>
-      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
+      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl)}</td> <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
       <td class="action-btns"><button class="icon-btn" onmousedown="sellRow('${tid}',${row.id})" title="Registrar Venta">💰</button><button class="icon-btn btn-del" onmousedown="delRow('${tid}',${row.id})" title="Eliminar">✕</button></td>
     </tr>`;
   }).join('');
@@ -492,7 +487,13 @@ function renderTable(data, tid) {
 function upd(tid, id, field, val) {
   const row = (tid==='sw'?SW:XT).find(x=>x.id===id);
   if (!row) return;
-  row[field] = (field==='t') ? val.toUpperCase().trim() : r(val);
+  
+  if (field === 't') {
+      row[field] = val.toUpperCase().trim();
+  } else {
+      row[field] = r(val);
+  }
+  
   if (field==='qty' && r(val)>0) row.p = false;
   recalc();
 }
@@ -612,9 +613,45 @@ function renderCharts() {
 
   if (bChart) bChart.destroy();
   if(labels.length > 0) {
+      // Definimos un plugin para dibujar porcentajes
+      const percentagePlugin = {
+          id: 'percentagePlugin',
+          afterDraw: (chart) => {
+              const ctx = chart.ctx;
+              chart.data.datasets.forEach((dataset, i) => {
+                  const meta = chart.getDatasetMeta(i);
+                  if (!meta.hidden) {
+                      meta.data.forEach((element, index) => {
+                          ctx.fillStyle = dataset.borderColor[index];
+                          ctx.textBaseline = 'middle';
+                          ctx.textAlign = 'center';
+                          ctx.font = '10px sans-serif';
+                          const value = dataset.data[index];
+                          const percentage = f(value, 2) + '%';
+                          const padding = 5;
+                          const textHeight = 10;
+                          
+                          let position;
+                          const barHeight = Math.abs(element.y - chart.scales.y.getPixelForValue(0));
+                          if (barHeight > textHeight + padding * 2) {
+                              // Dentro si hay espacio
+                              position = element.y + (value >= 0 ? padding : -padding - textHeight);
+                          } else {
+                              // Arriba si es muy chica
+                              position = element.y - (value >= 0 ? textHeight + padding : -padding);
+                          }
+                          
+                          ctx.fillText(percentage, element.x, position);
+                      });
+                  }
+              });
+          }
+      };
+
       bChart = new Chart(document.getElementById('bar'),{
         type:'bar',
         data:{labels,datasets:[{data:gls,backgroundColor:gls.map(g=>g>=0?'#3fb95055':'#f7816655'),borderColor:gls.map(g=>g>=0?'#3fb950':'#f78166'),borderWidth:1}]},
+        plugins: [percentagePlugin], // Registramos el plugin
         options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{ticks:{color:'#e6edf3',font:{size:10}},grid:{color:'#21262d'}},y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}} }
       });
   }
@@ -646,13 +683,18 @@ async function fetchRealTimeData() {
     await Promise.all([...swPromises, ...xtPromises]);
   } catch(e) {}
 
-  recalc(false); // La lectura de internet no crea un nuevo estado de historial
+  recalc(false); 
   document.getElementById('rateBox').classList.remove('updating');
 }
 
 setInterval(fetchRealTimeData, 60000);
 
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+
+// Funciones vacías para evitar errores si se hace clic en tabs de IA
+function setTab(t, el) {}
+function runAI() {}
+function askAI() {}
 </script>
 </body>
 </html>
