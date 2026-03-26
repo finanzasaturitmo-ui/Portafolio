@@ -41,16 +41,14 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-siz
 .rate-box.updating { border-color: var(--g); box-shadow: 0 0 5px var(--g); }
 .rate-box label{color:var(--sub);font-size:.72rem;white-space:nowrap}
 .hdr input{background:transparent;border:none;color:var(--b);font-weight:700;font-size:.88rem;width:85px;outline:none;text-align:right}
-.btn{border:none;padding:7px 14px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;transition:.2s}
+.opp-inp{width: 35px !important; text-align: center !important; color: var(--g) !important; padding: 0 !important;}
 
-/* 🔥 BOTONES HISTORIAL UI/UX 🔥 */
+.btn{border:none;padding:7px 14px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;transition:.2s}
 .btn-undo-redo { background: #21262d; color: var(--sub); border: 1px solid var(--border); font-size: .68rem; padding: 5px 8px; border-radius: 5px; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: .2s; white-space: nowrap; }
 .btn-undo-redo:hover:not(:disabled) { background: var(--border); color: #fff; }
 .btn-undo-redo:disabled { opacity: 0.4; cursor: not-allowed; }
-
 .btn-logout { background: #f7816622; color: var(--r); border: 1px solid #f7816655; font-size: .68rem; padding: 5px 10px; border-radius: 5px; }
 .btn-logout:hover { background: var(--r); color: #fff; }
-
 .btn-add { background: var(--g); color: #fff; border: none; font-size: .75rem; padding: 5px 12px; font-weight: 600; box-shadow: 0 0 5px rgba(63,185,80,0.3);}
 .btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63,185,80,0.6); transform: scale(1.03); }
 
@@ -73,11 +71,11 @@ main{padding:14px 18px;max-width:1300px;margin:0 auto}
 .bhdr.sw{color:#79c0ff;background:linear-gradient(90deg,#1a3a5c22,transparent)}
 .bhdr.xt{color:#56d364;background:linear-gradient(90deg,#1a5c3a22,transparent)}
 .tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;text-align:center;} /* Justify table content centrally by default */
+table{width:100%;border-collapse:collapse;text-align:center;}
 th{color:var(--sub);padding:6px 8px;font-weight:500;font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap;}
-th:first-child{text-align:left;} /* Left align first column header */
+th:first-child{text-align:left;}
 td{padding:4px 5px;border-bottom:1px solid #0d111766;white-space:nowrap;}
-td:first-child{text-align:left;padding-left:10px;} /* Left align first column data */
+td:first-child{text-align:left;padding-left:10px;}
 tr:hover td{background:#1c212855}
 tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--border);border-bottom:none;font-size:.8rem}
 
@@ -87,7 +85,7 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .pending .ci{color:var(--sub)}
 .pending .ticker-cell{color:var(--sub);font-style:italic}
 
-.action-btns { display: flex; gap: 4px; justify-content: center; align-items: center; } /* Center action buttons */
+.action-btns { display: flex; gap: 4px; justify-content: center; align-items: center; }
 .icon-btn { background:transparent; border:none; cursor:pointer; padding:2px 5px; font-size:.9rem; transition:.15s; opacity: 0.7; }
 .icon-btn:hover { opacity: 1; transform: scale(1.1); }
 .btn-del { color: #ff4444; opacity: 1; }
@@ -95,6 +93,10 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 
 .badge{display:inline-block;background:#21262d;color:var(--sub);font-size:.62rem;padding:1px 5px;border-radius:9px;margin-left:4px;vertical-align:middle}
 .computed{font-size:.8rem;padding:5px 8px}
+
+/* 🔥 NUEVO: HIGHLIGHT VERDE PARA OPORTUNIDAD DE COMPRA 🔥 */
+.opp-glow { color: #3fb950 !important; font-weight: 900 !important; text-shadow: 0 0 8px rgba(63, 185, 80, 0.8); animation: pulse-green 1.2s infinite alternate; }
+@keyframes pulse-green { 0% { text-shadow: 0 0 5px rgba(63, 185, 80, 0.5); } 100% { text-shadow: 0 0 15px rgba(63, 185, 80, 1), 0 0 20px rgba(63, 185, 80, 0.8); } }
 
 .bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .sum-box,.skandia-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
@@ -114,12 +116,9 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
   main { padding: 10px; }
   .hdr { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px; }
   .hdr-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
-  
-  /* Ocultamos las palabras de botones en celular para ahorrar espacio */
   .hide-mob { display: none; }
   .btn-undo-redo { padding: 4px 6px; font-size: 0.75rem; }
   .btn-logout { padding: 4px 8px; }
-
   .cards { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
   .card { padding: 8px; }
   .card .lbl { font-size: 0.6rem; margin-bottom: 1px; }
@@ -172,11 +171,18 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
           ↪️ <span class="hide-mob">Rehacer</span> (<span id="redo-cnt">0</span>)
         </button>
       </div>
-      <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
+      
+      <div class="rate-box" title="Si el precio cae este % o más, se resalta en verde">
+        <label>🎯 Oportunidad</label>
+        <input id="oppInput" class="opp-inp" value="10" type="text" onfocus="saveStateToHistory()" onblur="recalc()">
+        <span style="color:var(--sub); font-size:.7rem">%</span>
+      </div>
+
       <div class="rate-box" id="rateBox">
-        <label>💱 COP/USD (Auto)</label>
+        <label>💱 COP/USD</label>
         <input id="rateInput" value="4180" readonly>
       </div>
+      <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
     </div>
   </div>
 
@@ -299,6 +305,7 @@ function loadFromFirebase() {
       if (allRows.length > 0) nid = Math.max(...allRows.map(row => row.id)) + 1;
       
       if (data.rate) document.getElementById('rateInput').value = data.rate;
+      if (data.opp) document.getElementById('oppInput').value = data.opp; // Cargar la Oportunidad guardada
       if (data.skInv) {
         document.getElementById('skInv').dataset.raw = data.skInv;
         document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(data.skInv);
@@ -310,7 +317,6 @@ function loadFromFirebase() {
       if (data.ts) document.getElementById('lastSaved').textContent = 'Nube OK: '+new Date(data.ts).toLocaleTimeString('es-CO');
       showToast('☁️ Datos cargados de la nube');
     } else {
-      // Data inicial si la cuenta es nueva
       SW = [
         {id:1, t:'BABA', qty:19, inv:1460.91, invFormula: '1460.91', px:129.87, p:false},
         {id:2, t:'BRK-B', qty:7.5562, inv:2974.72, invFormula: '2974.72', px:476.19, p:false}
@@ -321,7 +327,7 @@ function loadFromFirebase() {
       nid = 20;
     }
     fetchRealTimeData(); 
-    recalc(true); // El true guarda el estado base 0 en el historial
+    recalc(true); 
   }).catch(e => { console.error("Error leyendo DB:", e); showToast('❌ Error de conexión'); });
 }
 
@@ -330,6 +336,7 @@ function saveDataToFirebase() {
   const dataObj = {
     SW, XT, 
     rate: document.getElementById('rateInput').value,
+    opp: document.getElementById('oppInput').value,
     skInv: document.getElementById('skInv').dataset.raw || "14613200",
     skCur: document.getElementById('skCur').dataset.raw || "12627217",
     ts: new Date().toISOString()
@@ -349,21 +356,19 @@ function saveStateToHistory() {
     SW: JSON.parse(JSON.stringify(SW)), 
     XT: JSON.parse(JSON.stringify(XT)),
     rate: document.getElementById('rateInput').value,
+    opp: document.getElementById('oppInput').value,
     skInv: document.getElementById('skInv').dataset.raw || "14613200",
     skCur: document.getElementById('skCur').dataset.raw || "12627217"
   });
   
-  // Ignora si no hubo un cambio real
   if (historyIndex >= 0 && historyArr[historyIndex] === currentState) return;
 
-  // Si retrocediste e hiciste un cambio nuevo, descarta el futuro alterno
   if (historyIndex < historyArr.length - 1) {
     historyArr = historyArr.slice(0, historyIndex + 1);
   }
 
   historyArr.push(currentState);
   
-  // Límite de 10 acciones para deshacer (11 contando el presente)
   if (historyArr.length > 11) {
     historyArr.shift();
   }
@@ -387,12 +392,13 @@ function applyState(stateJSON) {
   SW = prevState.SW;
   XT = prevState.XT;
   document.getElementById('rateInput').value = prevState.rate;
+  document.getElementById('oppInput').value = prevState.opp;
   document.getElementById('skInv').dataset.raw = prevState.skInv;
   document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(prevState.skInv);
   document.getElementById('skCur').dataset.raw = prevState.skCur;
   document.getElementById('skCur').value = new Intl.NumberFormat('es-CO').format(prevState.skCur);
 
-  recalc(false); // False para que no guarde esto como una acción nueva
+  recalc(false); 
 }
 
 function undo() {
@@ -413,7 +419,6 @@ function redo() {
   } else { showToast('Nada más para rehacer'); }
 }
 
-// Atajos de teclado Pro (Cmd+Z, Cmd+Shift+Z, Cmd+Y)
 document.addEventListener('keydown', function(e) {
   if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
   if (e.ctrlKey || e.metaKey) {
@@ -427,7 +432,7 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// ── LÓGICA DE SKANDIA Y FÓRMULAS ──────────────
+// ── LÓGICA DE FÓRMULAS ──────────────
 function calculateSumFromFormula(fStr) {
   if (!fStr || String(fStr).trim() === '') return 0;
   let cleanStr = String(fStr).replace(/\s/g, '').replace(',', '.').replace(/[^\d.+\-]/g, '');
@@ -442,7 +447,7 @@ function investBlur(el, tid, id) {
   const inputValue = el.value;
   const sum = calculateSumFromFormula(inputValue);
   el.setAttribute('data-raw-formula', inputValue); 
-  el.value = f(sum); el.title = `Fórmula: ${inputValue}`; // Set tooltip with complete formula
+  el.value = f(sum); el.title = `Fórmula: ${inputValue}`; 
   const row = (tid === 'sw' ? SW : XT).find(x => x.id === id);
   if (row) { row.inv = sum; row.invFormula = inputValue; }
   recalc();
@@ -467,17 +472,31 @@ function calc(row) {
 }
 
 function renderTable(data, tid) {
+  const oppThreshold = r(document.getElementById('oppInput').value) || 10;
   const rows = data.map(calc);
-  const thead = `<thead><tr><th style="text-align:left">Activo</th><th>Cant.</th><th>Precio Prom</th><th>Precio Actual</th><th>Valor USD</th><th>Invertido USD</th><th>% G/L</th><th>Profit</th><th></th></tr></thead>`; // cantidad centrally justified by default table style
+  const thead = `<thead><tr><th style="text-align:left">Activo</th><th>Cant.</th><th>Precio Prom</th><th>Precio Actual</th><th>Valor USD</th><th>Invertido USD</th><th>% G/L</th><th>Profit</th><th></th></tr></thead>`; 
+  
   const tbody = rows.map(row => {
     const isPend = row.p || !row.qty;
+    
+    // 🔥 LÓGICA PARA DETECTAR OPORTUNIDAD DE COMPRA 🔥
+    let isOpp = false;
+    if (!isPend && row.avg > 0 && row.px > 0) {
+        const dropPct = ((row.avg - row.px) / row.avg) * 100;
+        if (dropPct >= oppThreshold) {
+            isOpp = true;
+        }
+    }
+
     return `<tr class="${isPend?'pending':''}">
-      <td class="ticker-cell"><input class="ci ticker" value="${row.t || ''}" placeholder="TICKER" onblur="upd('${tid}',${row.id},'t',this.value)">${isPend?'<span class="badge">próximo</span>':''}</td>
-      <td><input class="ci" value="${row.qty || 0}" style="text-align: center;" onblur="upd('${tid}',${row.id},'qty',this.value)"></td> <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
-      <td class="computed" style="font-weight: 700;">${row.px || 0}</td>
+      <td class="ticker-cell"><input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t || ''}" placeholder="TICKER" onblur="upd('${tid}',${row.id},'t',this.value)">${isPend?'<span class="badge">próximo</span>':''}</td>
+      <td><input class="ci" value="${row.qty || 0}" style="text-align: center;" onblur="upd('${tid}',${row.id},'qty',this.value)"></td>
+      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
+      <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight: 700;">${row.px || 0}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
       <td><input type="text" class="ci invested-usd" value="${f(row.inv)}" data-raw-formula="${row.invFormula || row.inv || 0}" onfocus="investFocus(this)" onblur="investBlur(this, '${tid}', ${row.id})" title="Fórmula: ${row.invFormula || row.inv || 0}"></td>
-      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl)}</td> <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
+      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl)}</td>
+      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
       <td class="action-btns"><button class="icon-btn" onmousedown="sellRow('${tid}',${row.id})" title="Registrar Venta">💰</button><button class="icon-btn btn-del" onmousedown="delRow('${tid}',${row.id})" title="Eliminar">✕</button></td>
     </tr>`;
   }).join('');
@@ -487,13 +506,7 @@ function renderTable(data, tid) {
 function upd(tid, id, field, val) {
   const row = (tid==='sw'?SW:XT).find(x=>x.id===id);
   if (!row) return;
-  
-  if (field === 't') {
-      row[field] = val.toUpperCase().trim();
-  } else {
-      row[field] = r(val);
-  }
-  
+  if (field === 't') { row[field] = val.toUpperCase().trim(); } else { row[field] = r(val); }
   if (field==='qty' && r(val)>0) row.p = false;
   recalc();
 }
@@ -613,7 +626,7 @@ function renderCharts() {
 
   if (bChart) bChart.destroy();
   if(labels.length > 0) {
-      // Definimos un plugin para dibujar porcentajes
+      // 🔥 PLUGIN MEJORADO: NÚMEROS SIEMPRE AFUERA DE LA BARRA 🔥
       const percentagePlugin = {
           id: 'percentagePlugin',
           afterDraw: (chart) => {
@@ -623,25 +636,22 @@ function renderCharts() {
                   if (!meta.hidden) {
                       meta.data.forEach((element, index) => {
                           ctx.fillStyle = dataset.borderColor[index];
-                          ctx.textBaseline = 'middle';
                           ctx.textAlign = 'center';
-                          ctx.font = '10px sans-serif';
+                          ctx.font = 'bold 10px sans-serif';
                           const value = dataset.data[index];
-                          const percentage = f(value, 2) + '%';
-                          const padding = 5;
-                          const textHeight = 10;
+                          const percentage = f(value, 1) + '%';
+                          const padding = 6;
                           
-                          let position;
-                          const barHeight = Math.abs(element.y - chart.scales.y.getPixelForValue(0));
-                          if (barHeight > textHeight + padding * 2) {
-                              // Dentro si hay espacio
-                              position = element.y + (value >= 0 ? padding : -padding - textHeight);
+                          let positionY;
+                          if (value >= 0) {
+                              ctx.textBaseline = 'bottom';
+                              positionY = element.y - padding; // Siempre arriba de la barra verde
                           } else {
-                              // Arriba si es muy chica
-                              position = element.y - (value >= 0 ? textHeight + padding : -padding);
+                              ctx.textBaseline = 'top';
+                              positionY = element.y + padding; // Siempre abajo de la barra roja
                           }
                           
-                          ctx.fillText(percentage, element.x, position);
+                          ctx.fillText(percentage, element.x, positionY);
                       });
                   }
               });
@@ -651,8 +661,18 @@ function renderCharts() {
       bChart = new Chart(document.getElementById('bar'),{
         type:'bar',
         data:{labels,datasets:[{data:gls,backgroundColor:gls.map(g=>g>=0?'#3fb95055':'#f7816655'),borderColor:gls.map(g=>g>=0?'#3fb950':'#f78166'),borderWidth:1}]},
-        plugins: [percentagePlugin], // Registramos el plugin
-        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{ticks:{color:'#e6edf3',font:{size:10}},grid:{color:'#21262d'}},y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}} }
+        plugins: [percentagePlugin], 
+        options:{ 
+            responsive:true, 
+            maintainAspectRatio:false, 
+            // 🔥 PADDING: Evita que los números de arriba se corten
+            layout: { padding: { top: 25, bottom: 25 } }, 
+            plugins:{legend:{display:false}}, 
+            scales:{
+                x:{ticks:{color:'#e6edf3',font:{size:10}},grid:{color:'#21262d'}},
+                y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}
+            } 
+        }
       });
   }
 }
