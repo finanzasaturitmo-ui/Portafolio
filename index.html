@@ -17,7 +17,22 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-siz
 .rate-box label{color:var(--sub);font-size:.72rem;white-space:nowrap}
 .hdr input{background:transparent;border:none;color:var(--b);font-weight:700;font-size:.88rem;width:85px;outline:none;text-align:right}
 .btn{border:none;padding:7px 14px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;transition:.2s}
-.btn-add{background:#21262d;color:var(--sub);border:1px solid var(--border);font-size:.72rem;padding:4px 10px}.btn-add:hover{background:var(--border);color:#fff}
+
+.btn-add { 
+  background: var(--g); 
+  color: #fff; 
+  border: none; 
+  font-size: .75rem; 
+  padding: 5px 12px; 
+  font-weight: 600; 
+  box-shadow: 0 0 5px rgba(63,185,80,0.3);
+}
+.btn-add:hover { 
+  background: #2ea043; 
+  box-shadow: 0 0 10px rgba(63,185,80,0.6); 
+  transform: scale(1.03); 
+}
+
 .btn-ai{background:#1f6feb;color:#fff}.btn-ai:hover{background:#388bfd}.btn-ai:disabled{background:#21262d;color:var(--sub);cursor:not-allowed}
 
 main{padding:14px 18px;max-width:1300px;margin:0 auto}
@@ -32,7 +47,8 @@ main{padding:14px 18px;max-width:1300px;margin:0 auto}
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .ch{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
 .ch h3{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
-.ch-wrap{height:185px;position:relative}
+/* 🔥 Le dimos más altura a las gráficas para que las leyendas quepan mejor (220px en vez de 185px) */
+.ch-wrap{height:220px;position:relative}
 @media(max-width:620px){.charts{grid-template-columns:1fr}}
 
 .broker{background:var(--card);border:1px solid var(--border);border-radius:9px;margin-bottom:12px;overflow:hidden}
@@ -211,19 +227,11 @@ const rate = () => r(document.getElementById('rateInput').value)||4180;
 
 function calc(row) {
   if (row.inv === undefined) { row.inv = row.qty * (row.avg || 0); }
-  
-  // Valor USD Automático
   const cur = row.qty * row.px; 
-  
   const avg = row.qty > 0 ? row.inv / row.qty : 0;
   row.avg = avg; 
-  
-  // % G/P Automático usando tu fórmula exacta
   const gl = row.inv > 0 ? ((cur - row.inv) / row.inv) * 100 : 0;
-  
-  // P&L Profit
   const pnl = cur - row.inv;
-  
   return { ...row, cur, gl, pnl };
 }
 
@@ -400,15 +408,36 @@ function renderCharts() {
   dChart = new Chart(document.getElementById('donut'),{
     type:'doughnut',
     data:{labels: labelsPct, datasets:[{data:vals,backgroundColor:COLS.slice(0,labels.length),borderWidth:2,borderColor:'#161b22'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8b949e',font:{size:10},boxWidth:9}}}}
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          position:'right',
+          labels:{
+            color:'#e6edf3', // Blanco hielo
+            font:{size:12.5, family: "'Segoe UI', sans-serif"}, // Más grande
+            boxWidth:12,     // Cuadrito de color más grande
+            padding:14       // Más espacio entre cada elemento
+          }
+        }
+      }
+    }
   });
 
   if (bChart) bChart.destroy();
   bChart = new Chart(document.getElementById('bar'),{
     type:'bar',
     data:{labels,datasets:[{data:gls,backgroundColor:gls.map(g=>g>=0?'#3fb95055':'#f7816655'),borderColor:gls.map(g=>g>=0?'#3fb950':'#f78166'),borderWidth:1}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:'#8b949e',font:{size:9}},grid:{color:'#21262d'}},y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}}}
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#e6edf3',font:{size:11}},grid:{color:'#21262d'}}, // Letra más clara abajo
+        y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}
+      }
+    }
   });
 }
 
