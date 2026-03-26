@@ -53,12 +53,16 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .ci.ticker{width:85px;text-align:left;text-transform:uppercase;font-weight:700;color:var(--b)}
 .pending .ci{color:var(--sub)}
 .pending .ticker-cell{color:var(--sub);font-style:italic}
-.del{background:transparent;border:none;color:#f7816633;cursor:pointer;padding:2px 5px;font-size:.88rem;transition:.15s}
-.del:hover{color:var(--r)}
+
+/* Botones de acción */
+.action-btns { display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
+.icon-btn { background:transparent; border:none; cursor:pointer; padding:2px 5px; font-size:.9rem; transition:.15s; opacity: 0.7; }
+.icon-btn:hover { opacity: 1; transform: scale(1.1); }
+.btn-del:hover { color: var(--r); }
+
 .badge{display:inline-block;background:#21262d;color:var(--sub);font-size:.62rem;padding:1px 5px;border-radius:9px;margin-left:4px;vertical-align:middle}
 .computed{font-size:.8rem;padding:5px 8px}
 
-/* 🔥 EFECTO DE ALERTA ROJA BRILLANTE 🔥 */
 .alert-glow {
   color: #ff3333 !important;
   font-weight: 900 !important;
@@ -124,7 +128,7 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
   <div class="broker">
     <div class="bhdr sw">
       <span>🇺🇸 Schwab USA</span>
-      <button class="btn btn-add" onclick="addRow('sw')">+ Agregar activo</button>
+      <button class="btn btn-add" onmousedown="addRow('sw')">+ Agregar activo</button>
     </div>
     <div class="tbl-wrap"><table id="tbl-sw"></table></div>
   </div>
@@ -132,7 +136,7 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
   <div class="broker">
     <div class="bhdr xt">
       <span>🇪🇺 XTB Europe</span>
-      <button class="btn btn-add" onclick="addRow('xt')">+ Agregar activo</button>
+      <button class="btn btn-add" onmousedown="addRow('xt')">+ Agregar activo</button>
     </div>
     <div class="tbl-wrap"><table id="tbl-xt"></table></div>
   </div>
@@ -145,8 +149,8 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
     <div class="skandia-box">
       <div class="box-title" style="color:#56d364">🏦 Skandia IBIT (COP)</div>
       <div style="display:flex;flex-direction:column;gap:7px">
-        <div class="sum-row"><span class="sum-lbl">Capital Invertido (COP)</span><input class="sk-inp" id="skInv" value="14613200" onchange="recalc()"></div>
-        <div class="sum-row"><span class="sum-lbl">Valor Actual (COP)</span><input class="sk-inp" id="skCur" value="12627217" onchange="recalc()"></div>
+        <div class="sum-row"><span class="sum-lbl">Capital Invertido (COP)</span><input class="sk-inp" id="skInv" value="14613200" onblur="recalc()"></div>
+        <div class="sum-row"><span class="sum-lbl">Valor Actual (COP)</span><input class="sk-inp" id="skCur" value="12627217" onblur="recalc()"></div>
         <div class="sum-row"><span class="sum-lbl">P&L</span><span class="sum-val" id="skPnl">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Retorno</span><span class="sum-val" id="skRet">—</span></div>
       </div>
@@ -176,7 +180,6 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 // ── CONFIGURACIÓN DE APIS ──────────────
 const FINNHUB_API_KEY = 'TU_API_KEY_AQUI'; 
 
-// Ajustamos la base de datos inicial para que use Invertido (inv) en lugar de promedio (avg)
 let SW = [
   {id:1, t:'BABA',    qty:19,      inv:1460.91, px:129.87, p:false},
   {id:2, t:'BRK-B',   qty:7.5562,  inv:2974.72, px:476.19, p:false},
@@ -207,14 +210,12 @@ const r = (s,d=4) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => r(document.getElementById('rateInput').value)||4180;
 
 function calc(row) {
-  // Migración automática por si cargas datos viejos de LocalStorage que tenían 'avg'
-  if (row.inv === undefined) {
-    row.inv = row.qty * (row.avg || 0);
-  }
-  
+  if (row.inv === undefined) { row.inv = row.qty * (row.avg || 0); }
   const cur = row.qty * row.px;
+  
+  // La magia del promedio automático: Invertido dividido por Cantidad
   const avg = row.qty > 0 ? row.inv / row.qty : 0;
-  row.avg = avg; // Guardamos el promedio para mostrarlo en texto estático
+  row.avg = avg; 
 
   return { ...row, cur, gl: avg>0?(row.px-avg)/avg*100:0, pnl: cur-row.inv };
 }
@@ -243,21 +244,23 @@ function renderTable(data, tid) {
     const isPend = row.p || row.qty===0;
     const isAlert = !isPend && row.gl <= -10; 
 
-    // Ojo aquí: Cambié oninput por onchange en todos los campos editables
-    // y puse el Invertido USD como input y el Precio Prom como texto.
+    // Ojo: Todo quedó con 'onblur' (al salir de la casilla) en vez de onchange o oninput.
     return `<tr class="${isPend?'pending':''}">
       <td class="ticker-cell">
-        <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t}" onchange="upd('${tid}',${row.id},'t',this.value)">
+        <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t}" onblur="upd('${tid}',${row.id},'t',this.value)">
         ${isPend?'<span class="badge">próximo</span>':''}
       </td>
-      <td><input class="ci" value="${row.qty}" onchange="upd('${tid}',${row.id},'qty',this.value)"></td>
+      <td><input class="ci" value="${row.qty}" onblur="upd('${tid}',${row.id},'qty',this.value)"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
-      <td><input class="ci ${isAlert ? 'alert-glow' : ''}" value="${row.px}" onchange="upd('${tid}',${row.id},'px', this.value)" readonly title="Auto-actualizado"></td>
+      <td><input class="ci ${isAlert ? 'alert-glow' : ''}" value="${row.px}" onblur="upd('${tid}',${row.id},'px', this.value)" readonly title="Auto-actualizado"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
-      <td><input class="ci" value="${row.inv}" onchange="upd('${tid}',${row.id},'inv',this.value)"></td>
+      <td><input class="ci" value="${row.inv}" onblur="upd('${tid}',${row.id},'inv',this.value)"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl, isAlert)}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
-      <td><button class="del" onclick="delRow('${tid}',${row.id})">✕</button></td>
+      <td class="action-btns">
+        <button class="icon-btn" onmousedown="sellRow('${tid}',${row.id})" title="Registrar Venta">💰</button>
+        <button class="icon-btn btn-del" onmousedown="delRow('${tid}',${row.id})" title="Eliminar Activo">✕</button>
+      </td>
     </tr>`;
   }).join('');
 
@@ -285,13 +288,39 @@ function delRow(tid, id) {
   recalc();
 }
 
+function sellRow(tid, id) {
+  const arr = tid === 'sw' ? SW : XT;
+  const row = arr.find(x => x.id === id);
+  if (!row || row.qty <= 0) { alert('No tienes acciones para vender de este activo.'); return; }
+
+  const qtyStr = prompt(`¿Cuántas acciones de ${row.t || 'este activo'} vas a vender?\n(Tienes ${row.qty} disponibles)`);
+  if (qtyStr === null) return; 
+  const sellQty = r(qtyStr);
+  if (sellQty <= 0 || sellQty > row.qty) { alert('Cantidad inválida.'); return; }
+
+  const pxStr = prompt(`¿A qué precio por acción las vendiste?`);
+  if (pxStr === null) return;
+  const sellPx = r(pxStr);
+  if (sellPx <= 0) { alert('Precio inválido.'); return; }
+
+  const avgCost = row.inv / row.qty;
+  const realizedPnL = (sellPx - avgCost) * sellQty; 
+
+  row.qty -= sellQty;
+  row.inv -= (sellQty * avgCost); 
+  if (row.qty < 0.0001) { row.qty = 0; row.inv = 0; }
+
+  recalc();
+  const estadoVenta = realizedPnL >= 0 ? 'Ganancia' : 'Pérdida';
+  showToast(`✅ Venta registrada. ${estadoVenta} realizada: $${f(Math.abs(realizedPnL))} USD`);
+}
+
 function recalc() {
   renderTable(SW,'sw');
   renderTable(XT,'xt');
   renderCards();
   renderSummary();
   renderCharts();
-  
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(saveData, 1000);
 }
@@ -372,8 +401,12 @@ function renderCharts() {
 }
 
 async function fetchRealTimeData() {
+  // ESCUDO: Si estás escribiendo en alguna casilla, la página no se actualiza para no robarte el cursor
+  if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+    return;
+  }
+
   document.getElementById('rateBox').classList.add('updating');
-  
   try {
     const trmRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
     const trmData = await trmRes.json();
@@ -382,23 +415,8 @@ async function fetchRealTimeData() {
     }
   } catch(e) { console.log('Error TRM', e); }
 
-  /* Descomenta cuando pongas tu API Key
-  const fetchPrice = async (ticker) => {
-    const sym = ticker.includes('.UK') ? ticker.replace('.UK', '.L') : ticker; 
-    const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${FINNHUB_API_KEY}`);
-    const data = await res.json();
-    return data.c; 
-  };
-
-  try {
-    for (let row of SW) if (row.t) { const p = await fetchPrice(row.t); if(p) row.px = p; }
-    for (let row of XT) if (row.t) { const p = await fetchPrice(row.t); if(p) row.px = p; }
-  } catch(e) { console.log('Error Stocks', e); }
-  */
-
   recalc();
   document.getElementById('rateBox').classList.remove('updating');
-  showToast('🔄 TRM (y precios) actualizados');
 }
 
 setInterval(fetchRealTimeData, 60000);
@@ -435,9 +453,8 @@ function loadSaved() {
   recalc();
 }
 
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
 
-// IA Mocks (si necesitas configurarlo luego, ya sabes cómo reemplazar esto)
 function setTab(t, el) {}
 function ctx() {}
 async function runAI() {}
