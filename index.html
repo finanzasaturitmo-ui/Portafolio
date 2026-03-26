@@ -361,7 +361,7 @@ function sellRow(tid,id) {
   if(!row||!row.qty||row.qty<=0){alert('No tienes acciones válidas.');return;}
   const qtyStr=prompt('¿Cuántas acciones de '+row.t+' vendiste?\n(Tienes '+row.qty+')'); if(qtyStr===null)return;
   const sellQty=rv(qtyStr); if(sellQty<=0||sellQty>row.qty){alert('Cantidad inválida.');return;}
-  const pxStr=prompt('¿A qué precio las vendiste?'); if(pxStr===null)return;
+  const pxStr=prompt('¿A qué precio por acción las vendiste?'); if(pxStr===null)return;
   const sellPx=rv(pxStr); if(sellPx<=0){alert('Precio inválido.');return;}
   const avg=row.inv/row.qty, pnl=(sellPx-avg)*sellQty;
   row.qty-=sellQty; row.inv-=sellQty*avg; row.invFormula=''+row.inv.toFixed(4);
