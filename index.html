@@ -58,7 +58,7 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .badge{display:inline-block;background:#21262d;color:var(--sub);font-size:.62rem;padding:1px 5px;border-radius:9px;margin-left:4px;vertical-align:middle}
 .computed{font-size:.8rem;padding:5px 8px}
 
-/* 🔥 NUEVO: EFECTO DE ALERTA ROJA BRILLANTE 🔥 */
+/* 🔥 EFECTO DE ALERTA ROJA BRILLANTE 🔥 */
 .alert-glow {
   color: #ff3333 !important;
   font-weight: 900 !important;
@@ -145,8 +145,8 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
     <div class="skandia-box">
       <div class="box-title" style="color:#56d364">🏦 Skandia IBIT (COP)</div>
       <div style="display:flex;flex-direction:column;gap:7px">
-        <div class="sum-row"><span class="sum-lbl">Capital Invertido (COP)</span><input class="sk-inp" id="skInv" value="14613200" oninput="recalc()"></div>
-        <div class="sum-row"><span class="sum-lbl">Valor Actual (COP)</span><input class="sk-inp" id="skCur" value="12627217" oninput="recalc()"></div>
+        <div class="sum-row"><span class="sum-lbl">Capital Invertido (COP)</span><input class="sk-inp" id="skInv" value="14613200" onchange="recalc()"></div>
+        <div class="sum-row"><span class="sum-lbl">Valor Actual (COP)</span><input class="sk-inp" id="skCur" value="12627217" onchange="recalc()"></div>
         <div class="sum-row"><span class="sum-lbl">P&L</span><span class="sum-val" id="skPnl">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Retorno</span><span class="sum-val" id="skRet">—</span></div>
       </div>
@@ -176,21 +176,22 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 // ── CONFIGURACIÓN DE APIS ──────────────
 const FINNHUB_API_KEY = 'TU_API_KEY_AQUI'; 
 
+// Ajustamos la base de datos inicial para que use Invertido (inv) en lugar de promedio (avg)
 let SW = [
-  {id:1, t:'BABA',    qty:19,      avg:76.89,  px:129.87, p:false},
-  {id:2, t:'BRK-B',   qty:7.5562,  avg:393.68, px:476.19, p:false},
-  {id:3, t:'CRCL',    qty:5,       avg:74.72,  px:103.86, p:false},
-  {id:4, t:'GRAB',    qty:473,     avg:5.04,   px:3.73,   p:false},
-  {id:5, t:'IBIT',    qty:18,      avg:39.78,  px:40.17,  p:false},
-  {id:6, t:'NU',      qty:195,     avg:11.97,  px:14.32,  p:false},
-  {id:7, t:'PLTR',    qty:35.2959, avg:43.98,  px:154.96, p:false},
-  {id:8, t:'SPYG',    qty:27.0281, avg:79.02,  px:99.71,  p:false},
-  {id:9, t:'TLT',     qty:21.1635, avg:92.12,  px:86.84,  p:false},
-  {id:10,t:'TSLA',    qty:2.1913,  avg:375.20, px:385.95, p:false},
+  {id:1, t:'BABA',    qty:19,      inv:1460.91, px:129.87, p:false},
+  {id:2, t:'BRK-B',   qty:7.5562,  inv:2974.72, px:476.19, p:false},
+  {id:3, t:'CRCL',    qty:5,       inv:373.60,  px:103.86, p:false},
+  {id:4, t:'GRAB',    qty:473,     inv:2383.92, px:3.73,   p:false},
+  {id:5, t:'IBIT',    qty:18,      inv:716.04,  px:40.17,  p:false},
+  {id:6, t:'NU',      qty:195,     inv:2334.15, px:14.32,  p:false},
+  {id:7, t:'PLTR',    qty:35.2959, inv:1552.31, px:154.96, p:false},
+  {id:8, t:'SPYG',    qty:27.0281, inv:2135.76, px:99.71,  p:false},
+  {id:9, t:'TLT',     qty:21.1635, inv:1949.58, px:86.84,  p:false},
+  {id:10,t:'TSLA',    qty:2.1913,  inv:822.17,  px:385.95, p:false},
 ];
 let XT = [
-  {id:11,t:'EIMI.UK', qty:28.2244, avg:39.86,  px:46.19,  p:false},
-  {id:12,t:'CSPX.UK', qty:2.8771,  avg:655.18, px:703.48, p:false}
+  {id:11,t:'EIMI.UK', qty:28.2244, inv:1125.02, px:46.19,  p:false},
+  {id:12,t:'CSPX.UK', qty:2.8771,  inv:1885.01, px:703.48, p:false}
 ];
 let nid = 20;
 let tab = 'auto';
@@ -206,9 +207,16 @@ const r = (s,d=4) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => r(document.getElementById('rateInput').value)||4180;
 
 function calc(row) {
+  // Migración automática por si cargas datos viejos de LocalStorage que tenían 'avg'
+  if (row.inv === undefined) {
+    row.inv = row.qty * (row.avg || 0);
+  }
+  
   const cur = row.qty * row.px;
-  const inv = row.qty * row.avg;
-  return { ...row, cur, inv, gl: row.avg>0?(row.px-row.avg)/row.avg*100:0, pnl: cur-inv };
+  const avg = row.qty > 0 ? row.inv / row.qty : 0;
+  row.avg = avg; // Guardamos el promedio para mostrarlo en texto estático
+
+  return { ...row, cur, gl: avg>0?(row.px-avg)/avg*100:0, pnl: cur-row.inv };
 }
 
 function renderTable(data, tid) {
@@ -233,20 +241,20 @@ function renderTable(data, tid) {
 
   const tbody = rows.map(row => {
     const isPend = row.p || row.qty===0;
-    
-    // 🔥 AQUÍ DEFINES EL LÍMITE DE LA ALERTA. Actualmente en -10% (-10) 🔥
     const isAlert = !isPend && row.gl <= -10; 
 
+    // Ojo aquí: Cambié oninput por onchange en todos los campos editables
+    // y puse el Invertido USD como input y el Precio Prom como texto.
     return `<tr class="${isPend?'pending':''}">
       <td class="ticker-cell">
-        <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t}" oninput="upd('${tid}',${row.id},'t',this.value)">
+        <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t}" onchange="upd('${tid}',${row.id},'t',this.value)">
         ${isPend?'<span class="badge">próximo</span>':''}
       </td>
-      <td><input class="ci" value="${row.qty}" oninput="upd('${tid}',${row.id},'qty',this.value)"></td>
-      <td><input class="ci" value="${row.avg}" oninput="upd('${tid}',${row.id},'avg',this.value)"></td>
-      <td><input class="ci ${isAlert ? 'alert-glow' : ''}" value="${row.px}"  oninput="upd('${tid}',${row.id},'px', this.value)" readonly title="Auto-actualizado"></td>
+      <td><input class="ci" value="${row.qty}" onchange="upd('${tid}',${row.id},'qty',this.value)"></td>
+      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
+      <td><input class="ci ${isAlert ? 'alert-glow' : ''}" value="${row.px}" onchange="upd('${tid}',${row.id},'px', this.value)" readonly title="Auto-actualizado"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
-      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.inv)}</td>
+      <td><input class="ci" value="${row.inv}" onchange="upd('${tid}',${row.id},'inv',this.value)"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl, isAlert)}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
       <td><button class="del" onclick="delRow('${tid}',${row.id})">✕</button></td>
@@ -267,7 +275,7 @@ function upd(tid, id, field, val) {
 
 function addRow(tid) {
   const arr = tid==='sw'?SW:XT;
-  arr.push({id:nid++, t:'', qty:0, avg:0, px:0, p:true});
+  arr.push({id:nid++, t:'', qty:0, inv:0, px:0, p:true});
   recalc();
 }
 
@@ -429,9 +437,7 @@ function loadSaved() {
 
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
 
-loadSaved();
-
-// Mismo bloque de IA de antes (puedes volver a pegarlo acá si vas a usar esa función)
+// IA Mocks (si necesitas configurarlo luego, ya sabes cómo reemplazar esto)
 function setTab(t, el) {}
 function ctx() {}
 async function runAI() {}
