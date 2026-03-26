@@ -607,14 +607,20 @@ function renderCards() {
     <div class="card" style="border-color:#3fb95033">
       <div class="lbl">🏆 Mejor Activo</div>
       <div class="val g">${best ? best.t : '—'}</div>
-      <div class="s2 g" style="margin-top:3px">${best ? '+'+f(best.gl,1)+'%' : ''}</div>
+      <div class="s2 g" style="margin-top:3px">${best ? '+
+}
++f(best.pnl) : ''}</div>
+      <div class="s2 g" style="margin-top:2px">${best ? '+'+f(best.gl,1)+'%' : ''}</div>
       <div class="s2 hide-mob" style="color:#3fb950;margin-top:2px;font-size:.68rem">${best ? '+'+fCOP(best.pnl*rt) : ''}</div>
     </div>
 
     <div class="card" style="border-color:#f7816633">
       <div class="lbl">⚠️ Más Rezagado</div>
       <div class="val r">${worst ? worst.t : '—'}</div>
-      <div class="s2 r" style="margin-top:3px">${worst ? f(worst.gl,1)+'%' : ''}</div>
+      <div class="s2 r" style="margin-top:3px">${worst ? (worst.pnl>=0?'+':'-')+'
+}
++f(Math.abs(worst.pnl)) : ''}</div>
+      <div class="s2 r" style="margin-top:2px">${worst ? f(worst.gl,1)+'%' : ''}</div>
       <div class="s2 hide-mob" style="color:#f78166;margin-top:2px;font-size:.68rem">${worst ? fCOP(worst.pnl*rt) : ''}</div>
     </div>`;
 }
