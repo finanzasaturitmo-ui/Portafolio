@@ -18,21 +18,12 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-siz
 .hdr input{background:transparent;border:none;color:var(--b);font-weight:700;font-size:.88rem;width:85px;outline:none;text-align:right}
 .btn{border:none;padding:7px 14px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;transition:.2s}
 
-.btn-add { 
-  background: var(--g); 
-  color: #fff; 
-  border: none; 
-  font-size: .75rem; 
-  padding: 5px 12px; 
-  font-weight: 600; 
-  box-shadow: 0 0 5px rgba(63,185,80,0.3);
-}
-.btn-add:hover { 
-  background: #2ea043; 
-  box-shadow: 0 0 10px rgba(63,185,80,0.6); 
-  transform: scale(1.03); 
-}
+/* Botón de Agregar y Deshacer */
+.btn-undo { background: #21262d; color: var(--sub); border: 1px solid var(--border); font-size: .72rem; padding: 5px 10px; }
+.btn-undo:hover { background: var(--border); color: #fff; }
 
+.btn-add { background: var(--g); color: #fff; border: none; font-size: .75rem; padding: 5px 12px; font-weight: 600; box-shadow: 0 0 5px rgba(63,185,80,0.3);}
+.btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63,185,80,0.6); transform: scale(1.03); }
 .btn-ai{background:#1f6feb;color:#fff}.btn-ai:hover{background:#388bfd}.btn-ai:disabled{background:#21262d;color:var(--sub);cursor:not-allowed}
 
 main{padding:14px 18px;max-width:1300px;margin:0 auto}
@@ -47,7 +38,6 @@ main{padding:14px 18px;max-width:1300px;margin:0 auto}
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .ch{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
 .ch h3{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
-/* 🔥 Le dimos más altura a las gráficas para que las leyendas quepan mejor (220px en vez de 185px) */
 .ch-wrap{height:220px;position:relative}
 @media(max-width:620px){.charts{grid-template-columns:1fr}}
 
@@ -98,8 +88,6 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .sum-row:last-child{border-bottom:none;font-weight:700;padding-top:8px}
 .sum-lbl{color:var(--sub);font-size:.78rem}
 .sum-val{font-size:.8rem;font-weight:600}
-.sk-inp{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--b);font-weight:700;font-size:.88rem;width:130px;text-align:right;outline:none;padding:2px 4px}
-.sk-inp:focus{border-color:var(--b)}
 @media(max-width:620px){.bottom{grid-template-columns:1fr}}
 
 .ai-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px}
@@ -126,6 +114,7 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
     <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Sincronizando...</div>
   </div>
   <div class="hdr-right">
+    <button class="btn btn-undo" onclick="undo()" title="Atajo: Cmd+Z o Ctrl+Z">↩️ Deshacer</button>
     <div class="rate-box" id="rateBox">
       <label>💱 COP/USD (Auto)</label>
       <input id="rateInput" value="4180" readonly>
@@ -165,8 +154,14 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
     <div class="skandia-box">
       <div class="box-title" style="color:#56d364">🏦 Skandia IBIT (COP)</div>
       <div style="display:flex;flex-direction:column;gap:7px">
-        <div class="sum-row"><span class="sum-lbl">Capital Invertido (COP)</span><input class="sk-inp" id="skInv" value="14613200" onblur="recalc()"></div>
-        <div class="sum-row"><span class="sum-lbl">Valor Actual (COP)</span><input class="sk-inp" id="skCur" value="12627217" onblur="recalc()"></div>
+        <div class="sum-row">
+          <span class="sum-lbl">Capital Invertido (COP)</span>
+          <input class="ci" id="skInv" value="14613200" onfocus="saveStateToHistory()" onblur="recalc()" style="width:130px; font-weight:700; color:var(--b);">
+        </div>
+        <div class="sum-row">
+          <span class="sum-lbl">Valor Actual (COP)</span>
+          <input class="ci" id="skCur" value="12627217" onfocus="saveStateToHistory()" onblur="recalc()" style="width:130px; font-weight:700; color:var(--b);">
+        </div>
         <div class="sum-row"><span class="sum-lbl">P&L</span><span class="sum-val" id="skPnl">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Retorno</span><span class="sum-val" id="skRet">—</span></div>
       </div>
@@ -225,6 +220,55 @@ const fP = (n, isAlert) => `<span class="${isAlert ? 'alert-glow' : (n>=0?'g':'r
 const r = (s,d=4) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => r(document.getElementById('rateInput').value)||4180;
 
+// ── LÓGICA DE HISTORIAL (DESHACER / UNDO) ──────────────
+let historyStack = [];
+
+function saveStateToHistory() {
+  const currentState = JSON.stringify({
+    SW: JSON.parse(JSON.stringify(SW)), 
+    XT: JSON.parse(JSON.stringify(XT)),
+    rate: document.getElementById('rateInput').value,
+    skInv: document.getElementById('skInv').value,
+    skCur: document.getElementById('skCur').value
+  });
+  
+  if (historyStack.length === 0 || historyStack[historyStack.length - 1] !== currentState) {
+    historyStack.push(currentState);
+    if (historyStack.length > 20) historyStack.shift(); // Guarda máximo los últimos 20 cambios
+  }
+}
+
+function undo() {
+  if (historyStack.length === 0) { 
+    showToast('Nada más para deshacer'); 
+    return; 
+  }
+  
+  const prevStateJSON = historyStack.pop();
+  const prevState = JSON.parse(prevStateJSON);
+
+  SW = prevState.SW;
+  XT = prevState.XT;
+  document.getElementById('rateInput').value = prevState.rate;
+  document.getElementById('skInv').value = prevState.skInv;
+  document.getElementById('skCur').value = prevState.skCur;
+
+  recalc();
+  showToast('↩️ Acción deshecha');
+}
+
+// Atajo de teclado para deshacer (Ctrl+Z o Cmd+Z)
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+    // Si estás escribiendo en una casilla, dejamos que el navegador haga el deshacer normal de texto
+    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+    
+    e.preventDefault();
+    undo();
+  }
+});
+// ────────────────────────────────────────────────────────
+
 function calc(row) {
   if (row.inv === undefined) { row.inv = row.qty * (row.avg || 0); }
   const cur = row.qty * row.px; 
@@ -261,14 +305,14 @@ function renderTable(data, tid) {
 
     return `<tr class="${isPend?'pending':''}">
       <td class="ticker-cell">
-        <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t}" onblur="upd('${tid}',${row.id},'t',this.value)">
+        <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t}" onfocus="saveStateToHistory()" onblur="upd('${tid}',${row.id},'t',this.value)">
         ${isPend?'<span class="badge">próximo</span>':''}
       </td>
-      <td><input class="ci" value="${row.qty}" onblur="upd('${tid}',${row.id},'qty',this.value)"></td>
+      <td><input class="ci" value="${row.qty}" onfocus="saveStateToHistory()" onblur="upd('${tid}',${row.id},'qty',this.value)"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
       <td class="computed ${isAlert ? 'alert-glow' : ''}" style="font-weight: 700;">${row.px}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
-      <td><input class="ci" value="${row.inv}" onblur="upd('${tid}',${row.id},'inv',this.value)"></td>
+      <td><input class="ci" value="${row.inv}" onfocus="saveStateToHistory()" onblur="upd('${tid}',${row.id},'inv',this.value)"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl, isAlert)}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
       <td class="action-btns">
@@ -291,12 +335,14 @@ function upd(tid, id, field, val) {
 }
 
 function addRow(tid) {
+  saveStateToHistory();
   const arr = tid==='sw'?SW:XT;
   arr.push({id:nid++, t:'', qty:0, inv:0, px:0, p:true});
   recalc();
 }
 
 function delRow(tid, id) {
+  saveStateToHistory();
   if (tid==='sw') SW = SW.filter(x=>x.id!==id);
   else            XT = XT.filter(x=>x.id!==id);
   recalc();
@@ -316,6 +362,8 @@ function sellRow(tid, id) {
   if (pxStr === null) return;
   const sellPx = r(pxStr);
   if (sellPx <= 0) { alert('Precio inválido.'); return; }
+
+  saveStateToHistory();
 
   const avgCost = row.inv / row.qty;
   const realizedPnL = (sellPx - avgCost) * sellQty; 
@@ -373,6 +421,14 @@ function renderSummary() {
   const totalActualCOP = tC * rt;
   const totalInvertidoCOP = tI * rt; 
 
+  // Candado por si borran el valor invertido de Skandia
+  let skI=r(document.getElementById('skInv').value);
+  if (skI <= 0) {
+    skI = 14613200; // Valor por defecto
+    document.getElementById('skInv').value = skI;
+  }
+  const skC=r(document.getElementById('skCur').value);
+
   document.getElementById('sum-content').innerHTML=`
     <div class="sum-row"><span class="sum-lbl">🇺🇸 Schwab — Invertido</span><span class="sum-val">$${f(sI)}</span></div>
     <div class="sum-row"><span class="sum-lbl">🇺🇸 Schwab — Actual</span><span class="sum-val">${fU(sC)}</span></div>
@@ -385,8 +441,6 @@ function renderSummary() {
     <div class="sum-row"><span class="sum-lbl">Total Actual USD</span><span class="sum-val b">${fU(tC)}</span></div>
     <div class="sum-row"><span class="sum-lbl">Total Actual COP (Dinámico)</span><span class="sum-val b">${fCOP(totalActualCOP)}</span></div>`;
 
-  const skI=r(document.getElementById('skInv').value);
-  const skC=r(document.getElementById('skCur').value);
   const skPnl=skC-skI, skRet=skI>0?skPnl/skI*100:0;
   document.getElementById('skPnl').innerHTML=`<span class="${skPnl>=0?'g':'r'}">${skPnl>=0?'+':'-'} ${fCOP(Math.abs(skPnl))}</span>`;
   document.getElementById('skRet').innerHTML=`<span class="${skRet>=0?'g':'r'}">${skRet>=0?'+':''}${f(skRet,2)}%</span>`;
@@ -415,10 +469,10 @@ function renderCharts() {
         legend:{
           position:'right',
           labels:{
-            color:'#e6edf3', // Blanco hielo
-            font:{size:12.5, family: "'Segoe UI', sans-serif"}, // Más grande
-            boxWidth:12,     // Cuadrito de color más grande
-            padding:14       // Más espacio entre cada elemento
+            color:'#e6edf3',
+            font:{size:12.5, family: "'Segoe UI', sans-serif"},
+            boxWidth:12,
+            padding:14
           }
         }
       }
@@ -434,7 +488,7 @@ function renderCharts() {
       maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{
-        x:{ticks:{color:'#e6edf3',font:{size:11}},grid:{color:'#21262d'}}, // Letra más clara abajo
+        x:{ticks:{color:'#e6edf3',font:{size:11}},grid:{color:'#21262d'}},
         y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}
       }
     }
@@ -493,7 +547,11 @@ function loadSaved() {
       if (d.SW) SW = d.SW;
       if (d.XT) XT = d.XT;
       if (d.rate) document.getElementById('rateInput').value = d.rate;
-      if (d.skInv) document.getElementById('skInv').value = d.skInv;
+      
+      // Chequeo por si hay un error guardado en memoria
+      if (d.skInv && r(d.skInv) > 0) document.getElementById('skInv').value = d.skInv;
+      else document.getElementById('skInv').value = "14613200"; 
+      
       if (d.skCur) document.getElementById('skCur').value = d.skCur;
       if (d.ts) document.getElementById('lastSaved').textContent = 'Cargado: '+new Date(d.ts).toLocaleTimeString('es-CO');
     }
