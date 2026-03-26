@@ -12,7 +12,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-siz
 .hdr{background:linear-gradient(135deg,#1a2332,#0d1117);padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .hdr h1{font-size:1.15rem;color:var(--b);font-weight:700}
 .hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.rate-box{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:5px 11px; transition: 0.3s;}
+.rate-box{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:77px;padding:5px 11px; transition: 0.3s;}
 .rate-box.updating { border-color: var(--g); box-shadow: 0 0 5px var(--g); }
 .rate-box label{color:var(--sub);font-size:.72rem;white-space:nowrap}
 .hdr input{background:transparent;border:none;color:var(--b);font-weight:700;font-size:.88rem;width:85px;outline:none;text-align:right}
@@ -58,7 +58,15 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .action-btns { display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
 .icon-btn { background:transparent; border:none; cursor:pointer; padding:2px 5px; font-size:.9rem; transition:.15s; opacity: 0.7; }
 .icon-btn:hover { opacity: 1; transform: scale(1.1); }
-.btn-del:hover { color: var(--r); }
+
+/* 🔥 NUEVO: Mejorar visibilidad de la 'X' de eliminar 🔥 */
+.btn-del { 
+  color: #ff4444; /* Un rojo brillante para fondo oscuro */
+  opacity: 1;    /* Asegurar que se vea sin transparencia de fondo */
+}
+.btn-del:hover { 
+  color: #ff6666; /* Un rojo un poco más claro al pasar el mouse */
+}
 
 .badge{display:inline-block;background:#21262d;color:var(--sub);font-size:.62rem;padding:1px 5px;border-radius:9px;margin-left:4px;vertical-align:middle}
 .computed{font-size:.8rem;padding:5px 8px}
@@ -178,7 +186,7 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 
 <script>
 // ── CONFIGURACIÓN DE APIS ──────────────
-const FINNHUB_API_KEY = 'TU_API_KEY_AQUI'; 
+const FINNHUB_API_KEY = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg'; // Tu llave quedó bien puesta
 
 let SW = [
   {id:1, t:'BABA',    qty:19,      inv:1460.91, px:129.87, p:false},
@@ -212,11 +220,8 @@ const rate = () => r(document.getElementById('rateInput').value)||4180;
 function calc(row) {
   if (row.inv === undefined) { row.inv = row.qty * (row.avg || 0); }
   const cur = row.qty * row.px;
-  
-  // La magia del promedio automático: Invertido dividido por Cantidad
   const avg = row.qty > 0 ? row.inv / row.qty : 0;
   row.avg = avg; 
-
   return { ...row, cur, gl: avg>0?(row.px-avg)/avg*100:0, pnl: cur-row.inv };
 }
 
@@ -244,7 +249,6 @@ function renderTable(data, tid) {
     const isPend = row.p || row.qty===0;
     const isAlert = !isPend && row.gl <= -10; 
 
-    // Ojo: Todo quedó con 'onblur' (al salir de la casilla) en vez de onchange o oninput.
     return `<tr class="${isPend?'pending':''}">
       <td class="ticker-cell">
         <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t}" onblur="upd('${tid}',${row.id},'t',this.value)">
@@ -252,7 +256,7 @@ function renderTable(data, tid) {
       </td>
       <td><input class="ci" value="${row.qty}" onblur="upd('${tid}',${row.id},'qty',this.value)"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
-      <td><input class="ci ${isAlert ? 'alert-glow' : ''}" value="${row.px}" onblur="upd('${tid}',${row.id},'px', this.value)" readonly title="Auto-actualizado"></td>
+      <td class="computed ${isAlert ? 'alert-glow' : ''}" style="font-weight: 700;">${row.px}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
       <td><input class="ci" value="${row.inv}" onblur="upd('${tid}',${row.id},'inv',this.value)"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl, isAlert)}</td>
@@ -401,10 +405,7 @@ function renderCharts() {
 }
 
 async function fetchRealTimeData() {
-  // ESCUDO: Si estás escribiendo en alguna casilla, la página no se actualiza para no robarte el cursor
-  if (document.activeElement && document.activeElement.tagName === 'INPUT') {
-    return;
-  }
+  if (document.activeElement && document.activeElement.tagName === 'INPUT') { return; }
 
   document.getElementById('rateBox').classList.add('updating');
   try {
@@ -414,6 +415,20 @@ async function fetchRealTimeData() {
        document.getElementById('rateInput').value = trmData.rates.COP.toFixed(2);
     }
   } catch(e) { console.log('Error TRM', e); }
+
+  // Ya tu llave está bien puesta, así que esto se ejecutará solito.
+  // Borré los comentarios /* y */ para que la función corra de una.
+  const fetchPrice = async (ticker) => {
+    const sym = ticker.includes('.UK') ? ticker.replace('.UK', '.L') : ticker; 
+    const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${FINNHUB_API_KEY}`);
+    const data = await res.json();
+    return data.c; 
+  };
+
+  try {
+    for (let row of SW) if (row.t) { const p = await fetchPrice(row.t); if(p) row.px = p; }
+    for (let row of XT) if (row.t) { const p = await fetchPrice(row.t); if(p) row.px = p; }
+  } catch(e) { console.log('Error Stocks', e); }
 
   recalc();
   document.getElementById('rateBox').classList.remove('updating');
