@@ -46,7 +46,6 @@ main{padding:14px 18px;max-width:1300px;margin:0 auto}
 .card .val{font-size:1.2rem;font-weight:700}
 .card .s2{font-size:.72rem;color:var(--sub);margin-top:2px}
 
-/* 🔥 FIX DE COLORES: Usamos !important para que el gris no anule el verde o el rojo 🔥 */
 .g{color:var(--g) !important}
 .r{color:var(--r) !important}
 .b{color:var(--b)}
@@ -84,14 +83,15 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .opp-glow{color:#3fb950 !important;font-weight:900 !important;text-shadow:0 0 8px rgba(63,185,80,0.8);animation:pulse-green 1.2s infinite alternate}
 @keyframes pulse-green{0%{text-shadow:0 0 5px rgba(63,185,80,0.5)}100%{text-shadow:0 0 15px rgba(63,185,80,1),0 0 20px rgba(63,185,80,0.8)}}
 
-.bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.sum-box,.skandia-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
-.skandia-box{border-color:#3fb95033}
+/* 🔥 DISEÑO CONSOLIDADO PARA EL RESUMEN 🔥 */
+.bottom{display:block;margin-bottom:14px}
+.sum-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:16px}
 .box-title{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
-.sum-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #21262d22}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #21262d22}
 .sum-row:last-child{border-bottom:none;font-weight:700;padding-top:8px}
-.sum-lbl{color:var(--sub);font-size:.78rem}
-.sum-val{font-size:.8rem;font-weight:600}
+.sum-lbl{color:var(--sub);font-size:.8rem}
+.sum-val{font-size:.85rem;font-weight:600}
+
 .toast{position:fixed;bottom:18px;right:18px;background:#1f6feb;color:#fff;padding:9px 16px;border-radius:7px;font-size:.78rem;opacity:0;transition:.3s;pointer-events:none;z-index:99999}
 .toast.show{opacity:1}
 
@@ -112,8 +112,7 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
   table th,table td{font-size:0.75rem;padding:4px 3px}
   .ci{padding:3px 5px;width:75px;font-size:0.75rem}
   .ci.ticker{width:70px}
-  .bottom{grid-template-columns:1fr;gap:10px;margin-bottom:10px}
-  .sum-box,.skandia-box{padding:8px}
+  .sum-box{padding:10px}
   .box-title{font-size:0.65rem}
 }
 @media(max-width:480px){.cards{grid-template-columns:1fr}}
@@ -172,25 +171,11 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
       <div class="bhdr xt"><span>🇪🇺 XTB Europe</span><button class="btn btn-add" onmousedown="addRow('xt')">+ Agregar activo</button></div>
       <div class="tbl-wrap"><table id="tbl-xt"></table></div>
     </div>
+    
     <div class="bottom">
       <div class="sum-box">
-        <div class="box-title">📋 Resumen por Broker</div>
+        <div class="box-title">📋 Resumen Consolidado por Broker</div>
         <div id="sum-content"></div>
-      </div>
-      <div class="skandia-box">
-        <div class="box-title" style="color:#56d364">🏦 Skandia IBIT (COP)</div>
-        <div style="display:flex;flex-direction:column;gap:7px">
-          <div class="sum-row">
-            <span class="sum-lbl">Capital Invertido (COP)</span>
-            <input class="ci" id="skInv" value="14.613.200" data-raw="14613200" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px;font-weight:700;color:var(--b);text-align:right">
-          </div>
-          <div class="sum-row">
-            <span class="sum-lbl">Valor Actual (COP)</span>
-            <input class="ci" id="skCur" value="12.627.217" data-raw="12627217" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px;font-weight:700;color:var(--b);text-align:right">
-          </div>
-          <div class="sum-row"><span class="sum-lbl">P&L</span><span class="sum-val" id="skPnl">—</span></div>
-          <div class="sum-row"><span class="sum-lbl">Retorno</span><span class="sum-val" id="skRet">—</span></div>
-        </div>
       </div>
     </div>
   </main>
@@ -213,7 +198,12 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 let currentUser = null;
+
 let SW = [], XT = [], nid = 1;
+// Variables globales nativas para Skandia
+let skInvVal = 14613200;
+let skCurVal = 12627217;
+
 let dChart = null, bChart = null, saveTimeout = null;
 const COLS = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc'];
 
@@ -255,10 +245,14 @@ function loadFromFirebase() {
       SW = d.SW || []; XT = d.XT || [];
       const all = [...SW,...XT];
       if (all.length) nid = Math.max(...all.map(r=>r.id))+1;
+      
       if (d.rate) document.getElementById('rateInput').value = d.rate;
       if (d.opp)  document.getElementById('oppInput').value  = d.opp;
-      if (d.skInv) { document.getElementById('skInv').dataset.raw = d.skInv; document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(d.skInv); }
-      if (d.skCur) { document.getElementById('skCur').dataset.raw = d.skCur; document.getElementById('skCur').value = new Intl.NumberFormat('es-CO').format(d.skCur); }
+      
+      // Cargar Skandia a las variables globales
+      if (d.skInv) skInvVal = parseFloat(d.skInv);
+      if (d.skCur) skCurVal = parseFloat(d.skCur);
+      
       if (d.ts) document.getElementById('lastSaved').textContent = 'Nube OK: '+new Date(d.ts).toLocaleTimeString('es-CO');
       showToast('☁️ Datos cargados de la nube');
     } else {
@@ -277,8 +271,8 @@ function saveDataToFirebase() {
     SW, XT,
     rate: document.getElementById('rateInput').value,
     opp:  document.getElementById('oppInput').value,
-    skInv: document.getElementById('skInv').dataset.raw || '14613200',
-    skCur: document.getElementById('skCur').dataset.raw || '12627217',
+    skInv: skInvVal,
+    skCur: skCurVal,
     ts: new Date().toISOString()
   }).then(() => {
     document.getElementById('lastSaved').textContent = 'Nube sincronizada: '+new Date().toLocaleTimeString('es-CO');
@@ -287,7 +281,14 @@ function saveDataToFirebase() {
 
 let historyArr = [], historyIndex = -1;
 function saveStateToHistory() {
-  const s = JSON.stringify({SW:JSON.parse(JSON.stringify(SW)),XT:JSON.parse(JSON.stringify(XT)),rate:document.getElementById('rateInput').value,opp:document.getElementById('oppInput').value,skInv:document.getElementById('skInv').dataset.raw||'14613200',skCur:document.getElementById('skCur').dataset.raw||'12627217'});
+  const s = JSON.stringify({
+      SW:JSON.parse(JSON.stringify(SW)),
+      XT:JSON.parse(JSON.stringify(XT)),
+      rate:document.getElementById('rateInput').value,
+      opp:document.getElementById('oppInput').value,
+      skInv: skInvVal,
+      skCur: skCurVal
+  });
   if (historyIndex>=0 && historyArr[historyIndex]===s) return;
   if (historyIndex<historyArr.length-1) historyArr=historyArr.slice(0,historyIndex+1);
   historyArr.push(s);
@@ -305,8 +306,8 @@ function applyState(s) {
   const p=JSON.parse(s); SW=p.SW; XT=p.XT;
   document.getElementById('rateInput').value=p.rate;
   document.getElementById('oppInput').value=p.opp;
-  document.getElementById('skInv').dataset.raw=p.skInv; document.getElementById('skInv').value=new Intl.NumberFormat('es-CO').format(p.skInv);
-  document.getElementById('skCur').dataset.raw=p.skCur; document.getElementById('skCur').value=new Intl.NumberFormat('es-CO').format(p.skCur);
+  skInvVal = p.skInv;
+  skCurVal = p.skCur;
   recalc(false);
 }
 function undo() { if(historyIndex>0){historyIndex--;applyState(historyArr[historyIndex]);showToast('↩️ Deshecho');updateUndoRedoButtons();} }
@@ -331,10 +332,16 @@ function investBlur(el,tid,id) {
   const row=(tid==='sw'?SW:XT).find(x=>x.id===id);
   if(row){row.inv=sum;row.invFormula=v;} recalc();
 }
-function skFocus(el) { el.value=el.dataset.raw||el.value.replace(/\./g,''); }
-function skBlur(el) {
-  let raw=parseFloat(String(el.value).replace(/\./g,''))||0;
-  el.dataset.raw=raw; el.value=new Intl.NumberFormat('es-CO').format(raw); recalc();
+
+// Controladores nativos para los inputs de Skandia
+function skFocus(el) { 
+    saveStateToHistory();
+    el.value = el.id === 'skInv' ? skInvVal : skCurVal; 
+}
+function skBlur(el, type) {
+  let raw = parseFloat(String(el.value).replace(/\./g,''))||0;
+  if (type === 'inv') skInvVal = raw; else skCurVal = raw;
+  recalc();
 }
 
 function calc(row) {
@@ -401,18 +408,16 @@ function renderCards() {
   const tInv = all.reduce((s,x)=>s+x.inv,0);
   const tPnl = tCur-tInv;
   const tPct = tInv>0?tPnl/tInv*100:0;
-  const rawSkCur = parseFloat(document.getElementById('skCur').dataset.raw||12627217);
-  const rawSkInv = parseFloat(document.getElementById('skInv').dataset.raw||14613200);
-  const skUSD  = rawSkCur/rt;
-  const skIUSD = rawSkInv/rt;
+  
+  const skUSD  = skCurVal/rt;
+  const skIUSD = skInvVal/rt;
   const gC = tCur+skUSD;
-  const gI = tInv+skIUSD;
+  
   const assets = all.filter(x=>x.t);
   const best  = assets.length?[...assets].sort((a,b)=>b.gl-a.gl)[0]:null;
   const worst = assets.length?[...assets].sort((a,b)=>a.gl-b.gl)[0]:null;
   const lastUpd = document.getElementById('lastSaved').textContent.includes('Nube')?new Date().toLocaleTimeString('es-CO'):'—';
 
-  // 🔥 ASIGNACIÓN DE COLOR DINÁMICA (VERDE/ROJO) PARA LAS TARJETAS 🔥
   const bCls = best && best.gl >= 0 ? 'g' : 'r';
   const wCls = worst && worst.gl >= 0 ? 'g' : 'r';
 
@@ -468,10 +473,18 @@ function renderSummary() {
   const sA=SW.map(calc).filter(x=>x.qty>0), xA=XT.map(calc).filter(x=>x.qty>0);
   const sI=sA.reduce((s,x)=>s+x.inv,0), sC=sA.reduce((s,x)=>s+x.cur,0);
   const xI=xA.reduce((s,x)=>s+x.inv,0), xC=xA.reduce((s,x)=>s+x.cur,0);
-  const tI=sI+xI, tC=sC+xC;
-  let skI=parseFloat(document.getElementById('skInv').dataset.raw||14613200);
-  if(skI<=0){skI=14613200;document.getElementById('skInv').dataset.raw=skI;document.getElementById('skInv').value=new Intl.NumberFormat('es-CO').format(skI);}
-  const skC=parseFloat(document.getElementById('skCur').dataset.raw||12627217);
+  
+  if(skInvVal<=0) skInvVal=14613200;
+
+  const skI_USD = skInvVal / rt;
+  const skC_USD = skCurVal / rt;
+  const tI_USD = sI + xI + skI_USD;
+  const tC_USD = sC + xC + skC_USD;
+  const tI_COP = (sI + xI) * rt + skInvVal;
+  const tC_COP = (sC + xC) * rt + skCurVal;
+
+  const skPnl=skCurVal-skInvVal, skRet=skInvVal>0?skPnl/skInvVal*100:0;
+
   document.getElementById('sum-content').innerHTML=
     '<div class="sum-row"><span class="sum-lbl">🇺🇸 Schwab — Invertido</span><span class="sum-val">$'+f(sI)+'</span></div>'+
     '<div class="sum-row"><span class="sum-lbl">🇺🇸 Schwab — Actual</span><span class="sum-val">'+fU(sC)+'</span></div>'+
@@ -479,13 +492,19 @@ function renderSummary() {
     '<div class="sum-row"><span class="sum-lbl">🇪🇺 XTB — Invertido</span><span class="sum-val">$'+f(xI)+'</span></div>'+
     '<div class="sum-row"><span class="sum-lbl">🇪🇺 XTB — Actual</span><span class="sum-val">'+fU(xC)+'</span></div>'+
     '<div style="margin:5px 0;border-top:1px solid var(--border)"></div>'+
-    '<div class="sum-row"><span class="sum-lbl">Total Invertido USD</span><span class="sum-val">$'+f(tI)+'</span></div>'+
-    '<div class="sum-row"><span class="sum-lbl">Total Invertido COP</span><span class="sum-val">'+fCOP(tI*rt)+'</span></div>'+
-    '<div class="sum-row"><span class="sum-lbl">Total Actual USD</span><span class="sum-val b">'+fU(tC)+'</span></div>'+
-    '<div class="sum-row"><span class="sum-lbl">Total Actual COP</span><span class="sum-val b">'+fCOP(tC*rt)+'</span></div>';
-  const skPnl=skC-skI, skRet=skI>0?skPnl/skI*100:0;
-  document.getElementById('skPnl').innerHTML='<span class="'+(skPnl>=0?'g':'r')+'">'+(skPnl>=0?'+':'-')+' '+fCOP(Math.abs(skPnl))+'</span>';
-  document.getElementById('skRet').innerHTML='<span class="'+(skRet>=0?'g':'r')+'">'+(skRet>=0?'+':'')+f(skRet,2)+'%</span>';
+    
+    // 🔥 SKANDIA INTEGRADO A LA TABLA 🔥
+    '<div class="sum-row"><span class="sum-lbl">🇨🇴 Skandia — Invertido <span style="font-size:.68rem;font-weight:normal;color:var(--sub)">($'+f(skI_USD)+')</span></span>'+
+      '<input class="ci" id="skInv" value="'+new Intl.NumberFormat('es-CO').format(skInvVal)+'" onfocus="skFocus(this)" onblur="skBlur(this, \'inv\')" style="width:130px;font-weight:700;color:var(--b);text-align:right;background:transparent;border-color:transparent;padding-right:0;"></div>'+
+    '<div class="sum-row"><span class="sum-lbl">🇨🇴 Skandia — Actual <span style="font-size:.68rem;font-weight:normal;color:var(--sub)">('+fU(skC_USD)+')</span></span>'+
+      '<input class="ci" id="skCur" value="'+new Intl.NumberFormat('es-CO').format(skCurVal)+'" onfocus="skFocus(this)" onblur="skBlur(this, \'cur\')" style="width:130px;font-weight:700;color:var(--b);text-align:right;background:transparent;border-color:transparent;padding-right:0;"></div>'+
+    '<div class="sum-row"><span class="sum-lbl" style="padding-left:22px;font-size:.7rem;color:var(--sub)">↳ Rendimiento Skandia</span><span class="sum-val"><span class="'+(skPnl>=0?'g':'r')+'">'+(skPnl>=0?'+':'-')+' '+fCOP(Math.abs(skPnl))+' ('+(skRet>=0?'+':'')+f(skRet,2)+'%)</span></span></div>'+
+    
+    '<div style="margin:5px 0;border-top:1px solid var(--border)"></div>'+
+    '<div class="sum-row"><span class="sum-lbl" style="color:var(--e6edf3)">Total Invertido USD</span><span class="sum-val">$'+f(tI_USD)+'</span></div>'+
+    '<div class="sum-row"><span class="sum-lbl" style="color:var(--e6edf3)">Total Invertido COP</span><span class="sum-val">'+fCOP(tI_COP)+'</span></div>'+
+    '<div class="sum-row" style="margin-top:4px"><span class="sum-lbl" style="color:var(--b);font-weight:700">Total Actual USD</span><span class="sum-val b" style="font-size:.95rem">'+fU(tC_USD)+'</span></div>'+
+    '<div class="sum-row"><span class="sum-lbl" style="color:#3fb950;font-weight:700">Total Actual COP</span><span class="sum-val g" style="font-size:.95rem">'+fCOP(tC_COP)+'</span></div>';
 }
 
 function renderCharts() {
