@@ -1,615 +1,1400 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mi Portafolio Pro | Sincronizado</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi Portafolio Pro | Sincronizado</title>
 
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpath d='M16 3 L29 16 L22 16 L22 29 L10 29 L10 16 L3 16 Z' fill='%233fb950' opacity='0.2'/%3E%3Cpolyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='20' fill='%2358a6ff' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpolyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='20' fill='%2358a6ff' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+  <style>
+    /* =========================================
+       VARIABLES Y RESET GLOBAL
+       ========================================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-size:13px}
-:root{--g:#3fb950;--r:#f78166;--b:#58a6ff;--border:#21262d;--card:#161b22;--sub:#8b949e}
+    :root {
+      --g: #3fb950;
+      --r: #f78166;
+      --b: #58a6ff;
+      --border: #21262d;
+      --card: #161b22;
+      --sub: #8b949e;
+    }
 
-#login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:#0d1117;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:20px;text-align:center}
-.btn-google{background:#ffffff;color:#1f2328;border:none;padding:12px 24px;border-radius:8px;font-weight:700;font-size:1rem;cursor:pointer;margin-top:25px;transition:0.2s;display:flex;align-items:center;gap:10px;box-shadow:0 4px 15px rgba(255,255,255,0.1)}
-.btn-google:hover{background:#e6edf3;transform:scale(1.05)}
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      font-size: 13px;
+    }
 
-.hdr{background:linear-gradient(135deg,#1a2332,#0d1117);padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.hdr h1{font-size:1.15rem;color:var(--b);font-weight:700}
-.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.rate-box{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:5px 11px;transition:0.3s}
-.rate-box label{color:var(--sub);font-size:.72rem;white-space:nowrap}
-.hdr input{background:transparent;border:none;color:var(--b);font-weight:700;font-size:.88rem;width:85px;outline:none;text-align:right}
-.opp-inp{width:35px !important;text-align:center !important;color:var(--g) !important;padding:0 !important}
+    /* =========================================
+       PANTALLA DE LOGIN
+       ========================================= */
+    #login-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0d1117;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      text-align: center;
+    }
 
-.btn{border:none;padding:7px 14px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;transition:.2s}
-.btn-undo-redo{background:#21262d;color:var(--sub);border:1px solid var(--border);font-size:.68rem;padding:5px 8px;border-radius:5px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:.2s;white-space:nowrap}
-.btn-undo-redo:hover:not(:disabled){background:var(--border);color:#fff}
-.btn-undo-redo:disabled{opacity:0.4;cursor:not-allowed}
-.btn-logout{background:#f7816622;color:var(--r);border:1px solid #f7816655;font-size:.68rem;padding:5px 10px;border-radius:5px}
-.btn-logout:hover{background:var(--r);color:#fff}
-.btn-add{background:var(--g);color:#fff;border:none;font-size:.75rem;padding:5px 12px;font-weight:600;box-shadow:0 0 5px rgba(63,185,80,0.3)}
-.btn-add:hover{background:#2ea043;box-shadow:0 0 10px rgba(63,185,80,0.6);transform:scale(1.03)}
+    .btn-google {
+      background: #ffffff;
+      color: #1f2328;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 25px;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    }
 
-main{padding:14px 18px;max-width:1300px;margin:0 auto}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:14px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px}
-.card .lbl{font-size:.68rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
-.card .val{font-size:1.2rem;font-weight:700}
-.card .s2{font-size:.72rem;color:var(--sub);margin-top:2px}
+    .btn-google:hover {
+      background: #e6edf3;
+      transform: scale(1.05);
+    }
 
-.g{color:var(--g) !important}
-.r{color:var(--r) !important}
-.b{color:var(--b)}
+    /* =========================================
+       HEADER Y CONTROLES SUPERIORES
+       ========================================= */
+    .hdr {
+      background: linear-gradient(135deg, #1a2332, #0d1117);
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.ch{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
-.ch h3{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
-.ch-wrap{height:200px;position:relative}
+    .hdr h1 {
+      font-size: 1.15rem;
+      color: var(--b);
+      font-weight: 700;
+    }
 
-.broker{background:var(--card);border:1px solid var(--border);border-radius:9px;margin-bottom:12px;overflow:hidden}
-.bhdr{padding:9px 14px;font-weight:700;font-size:.82rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.bhdr.sw{color:#79c0ff;background:linear-gradient(90deg,#1a3a5c22,transparent)}
-.bhdr.xt{color:#56d364;background:linear-gradient(90deg,#1a5c3a22,transparent)}
-.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;text-align:center}
-th{color:var(--sub);padding:6px 8px;font-weight:500;font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
-th:first-child{text-align:left}
-td{padding:4px 5px;border-bottom:1px solid #0d111766;white-space:nowrap}
-td:first-child{text-align:left;padding-left:10px}
-tr:hover td{background:#1c212855}
-tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--border);border-bottom:none;font-size:.8rem}
+    .hdr-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-.ci{background:#0d1117;border:1px solid var(--border);color:#e6edf3;border-radius:5px;padding:4px 7px;width:90px;font-size:.8rem;outline:none;transition:.15s}
-.ci:focus{border-color:var(--b);background:#0d1c2e}
-.ci.ticker{width:85px;text-align:left;text-transform:uppercase;font-weight:700;color:var(--b)}
-.pending .ci{color:var(--sub)}
-.action-btns{display:flex;gap:4px;justify-content:center;align-items:center}
-.icon-btn{background:transparent;border:none;cursor:pointer;padding:2px 5px;font-size:.9rem;transition:.15s;opacity:0.7}
-.icon-btn:hover{opacity:1;transform:scale(1.1)}
-.btn-del{color:#ff4444;opacity:1}
-.btn-del:hover{color:#ff6666}
+    .rate-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 5px 11px;
+      transition: 0.3s;
+    }
 
-.badge{display:inline-block;background:#21262d;color:var(--sub);font-size:.62rem;padding:1px 5px;border-radius:9px;margin-left:4px;vertical-align:middle}
-.computed{font-size:.8rem;padding:5px 8px}
-.opp-glow{color:#3fb950 !important;font-weight:900 !important;text-shadow:0 0 8px rgba(63,185,80,0.8);animation:pulse-green 1.2s infinite alternate}
-@keyframes pulse-green{0%{text-shadow:0 0 5px rgba(63,185,80,0.5)}100%{text-shadow:0 0 15px rgba(63,185,80,1),0 0 20px rgba(63,185,80,0.8)}}
+    .rate-box label {
+      color: var(--sub);
+      font-size: .72rem;
+      white-space: nowrap;
+    }
 
-/* 🔥 NUEVO DISEÑO UI DEL RESUMEN CONSOLIDADO 🔥 */
-.bottom{display:block;margin-bottom:14px}
-.sum-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
-.box-title{font-size:.85rem;color:#e6edf3;font-weight:700;letter-spacing:.3px;margin-bottom:15px; display:flex; align-items:center; gap:8px;}
+    .hdr input {
+      background: transparent;
+      border: none;
+      color: var(--b);
+      font-weight: 700;
+      font-size: .88rem;
+      width: 85px;
+      outline: none;
+      text-align: right;
+    }
 
-/* Grid para minitarjetas de brokers */
-.sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px}
-.sum-card{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:12px}
+    .opp-inp {
+      width: 35px !important;
+      text-align: center !important;
+      color: var(--g) !important;
+      padding: 0 !important;
+    }
 
-/* Módulo especial de Skandia */
-.sk-panel{background:#0d1117;border:1px dashed #3fb95066;border-radius:8px;padding:16px;margin-bottom:18px;position:relative}
-.sk-title-badge{position:absolute;top:-9px;left:12px;background:var(--card);padding:0 8px;font-size:.68rem;color:#3fb950;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-radius:4px}
-.sk-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+    /* =========================================
+       BOTONES GENERALES
+       ========================================= */
+    .btn {
+      border: none;
+      padding: 7px 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: .78rem;
+      font-weight: 600;
+      transition: .2s;
+    }
 
-/* Inputs visuales tipo fórmula */
-.sk-edit-group{position:relative;margin-top:5px}
-.sk-edit-badge{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.7rem;color:var(--sub);font-weight:700;background:#21262d;padding:3px 6px;border-radius:4px; pointer-events:none;}
-.sk-edit-input{width:100%;background:#161b22;border:1px solid #30363d;color:var(--b);font-weight:700;text-align:right;padding:8px 10px 8px 50px;border-radius:6px;font-size:.95rem;outline:none;transition:.2s;box-shadow:inset 0 1px 3px rgba(0,0,0,0.3)}
-.sk-edit-input:hover{border-color:#58a6ff66}
-.sk-edit-input:focus{border-color:#3fb950;box-shadow:0 0 0 2px rgba(63,185,80,0.2);background:#0d1117}
+    .btn-undo-redo {
+      background: #21262d;
+      color: var(--sub);
+      border: 1px solid var(--border);
+      font-size: .68rem;
+      padding: 5px 8px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: .2s;
+      white-space: nowrap;
+    }
 
-/* Tarjeta de totales finales */
-.totals-panel{background:linear-gradient(135deg,#161b22,#0d1117);border:1px solid #58a6ff44;border-radius:8px;padding:16px}
+    .btn-undo-redo:hover:not(:disabled) {
+      background: var(--border);
+      color: #fff;
+    }
 
-.toast{position:fixed;bottom:18px;right:18px;background:#1f6feb;color:#fff;padding:9px 16px;border-radius:7px;font-size:.78rem;opacity:0;transition:.3s;pointer-events:none;z-index:99999}
-.toast.show{opacity:1}
+    .btn-undo-redo:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
 
-@media(max-width:768px){
-  body{font-size:11px}
-  main{padding:10px}
-  .hdr{flex-direction:column;align-items:flex-start;gap:5px;padding:10px}
-  .hdr-right{width:100%;justify-content:space-between;flex-wrap:wrap}
-  .hide-mob{display:none}
-  .btn-undo-redo{padding:4px 6px;font-size:0.75rem}
-  .btn-logout{padding:4px 8px}
-  .cards{grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:10px}
-  .card{padding:8px}
-  .card .lbl{font-size:0.6rem;margin-bottom:1px}
-  .card .val{font-size:1rem}
-  .card .s2{font-size:0.65rem}
-  .charts{grid-template-columns:1fr;gap:10px;margin-bottom:10px}
-  .ch-wrap{height:180px}
-  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table th,table td{font-size:0.75rem;padding:4px 3px}
-  .ci{padding:3px 5px;width:75px;font-size:0.75rem}
-  .ci.ticker{width:70px}
-  .sum-box{padding:12px}
-  /* Skandia inputs apilados en celular */
-  .sk-grid{grid-template-columns:1fr;gap:12px}
-}
-@media(max-width:480px){.cards{grid-template-columns:1fr}}
-</style>
+    .btn-logout {
+      background: #f7816622;
+      color: var(--r);
+      border: 1px solid #f7816655;
+      font-size: .68rem;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .btn-logout:hover {
+      background: var(--r);
+      color: #fff;
+    }
+
+    .btn-add {
+      background: var(--g);
+      color: #fff;
+      border: none;
+      font-size: .75rem;
+      padding: 5px 12px;
+      font-weight: 600;
+      box-shadow: 0 0 5px rgba(63, 185, 80, 0.3);
+    }
+
+    .btn-add:hover {
+      background: #2ea043;
+      box-shadow: 0 0 10px rgba(63, 185, 80, 0.6);
+      transform: scale(1.03);
+    }
+
+    /* =========================================
+       ESTRUCTURA PRINCIPAL Y TARJETAS
+       ========================================= */
+    main {
+      padding: 14px 18px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 12px;
+    }
+
+    .card .lbl {
+      font-size: .68rem;
+      color: var(--sub);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 3px;
+    }
+
+    .card .val {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .card .s2 {
+      font-size: .72rem;
+      color: var(--sub);
+      margin-top: 2px;
+    }
+
+    /* Clases de colores dinámicos */
+    .g { color: var(--g) !important; }
+    .r { color: var(--r) !important; }
+    .b { color: var(--b); }
+
+    /* =========================================
+       GRÁFICAS
+       ========================================= */
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .ch {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 13px;
+    }
+
+    .ch h3 {
+      font-size: .72rem;
+      color: var(--sub);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 9px;
+    }
+
+    .ch-wrap {
+      height: 200px;
+      position: relative;
+    }
+
+    /* =========================================
+       TABLAS DE BROKERS
+       ========================================= */
+    .broker {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .bhdr {
+      padding: 9px 14px;
+      font-weight: 700;
+      font-size: .82rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bhdr.sw { color: #79c0ff; background: linear-gradient(90deg, #1a3a5c22, transparent); }
+    .bhdr.xt { color: #56d364; background: linear-gradient(90deg, #1a5c3a22, transparent); }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+    }
+
+    th {
+      color: var(--sub);
+      padding: 6px 8px;
+      font-weight: 500;
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th:first-child { text-align: left; }
+    td { padding: 4px 5px; border-bottom: 1px solid #0d111766; white-space: nowrap; }
+    td:first-child { text-align: left; padding-left: 10px; }
+    
+    tr:hover td { background: #1c212855; }
+    
+    .ci {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      color: #e6edf3;
+      border-radius: 5px;
+      padding: 4px 7px;
+      width: 90px;
+      font-size: .8rem;
+      outline: none;
+      transition: .15s;
+    }
+
+    .ci:focus {
+      border-color: var(--b);
+      background: #0d1c2e;
+    }
+
+    .ci.ticker {
+      width: 85px;
+      text-align: left;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--b);
+    }
+
+    .pending .ci { color: var(--sub); }
+    
+    .action-btns {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 2px 5px;
+      font-size: .9rem;
+      transition: .15s;
+      opacity: 0.7;
+    }
+
+    .icon-btn:hover { opacity: 1; transform: scale(1.1); }
+    .btn-del { color: #ff4444; opacity: 1; }
+    .btn-del:hover { color: #ff6666; }
+
+    .badge {
+      display: inline-block;
+      background: #21262d;
+      color: var(--sub);
+      font-size: .62rem;
+      padding: 1px 5px;
+      border-radius: 9px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    .computed { font-size: .8rem; padding: 5px 8px; }
+
+    /* Efecto Verde para Oportunidad de Compra */
+    .opp-glow {
+      color: #3fb950 !important;
+      font-weight: 900 !important;
+      text-shadow: 0 0 8px rgba(63, 185, 80, 0.8);
+      animation: pulse-green 1.2s infinite alternate;
+    }
+
+    @keyframes pulse-green {
+      0% { text-shadow: 0 0 5px rgba(63, 185, 80, 0.5); }
+      100% { text-shadow: 0 0 15px rgba(63, 185, 80, 1), 0 0 20px rgba(63, 185, 80, 0.8); }
+    }
+
+    /* =========================================
+       RESUMEN CONSOLIDADO (BOTTOM)
+       ========================================= */
+    .bottom {
+      display: block;
+      margin-bottom: 14px;
+    }
+
+    .sum-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .box-title {
+      font-size: .85rem;
+      color: #e6edf3;
+      font-weight: 700;
+      letter-spacing: .3px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sum-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .sum-card {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    /* Panel especial de Skandia */
+    .sk-panel {
+      background: #0d1117;
+      border: 1px dashed #3fb95066;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .sk-title-badge {
+      position: absolute;
+      top: -9px;
+      left: 12px;
+      background: var(--card);
+      padding: 0 8px;
+      font-size: .68rem;
+      color: #3fb950;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-radius: 4px;
+    }
+
+    .sk-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 8px;
+    }
+
+    .sk-edit-group {
+      position: relative;
+      margin-top: 5px;
+    }
+
+    .sk-edit-badge {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: .7rem;
+      color: var(--sub);
+      font-weight: 700;
+      background: #21262d;
+      padding: 3px 6px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .sk-edit-input {
+      width: 100%;
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: var(--b);
+      font-weight: 700;
+      text-align: right;
+      padding: 8px 10px 8px 50px;
+      border-radius: 6px;
+      font-size: .95rem;
+      outline: none;
+      transition: .2s;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .sk-edit-input:hover { border-color: #58a6ff66; }
+    .sk-edit-input:focus { border-color: #3fb950; box-shadow: 0 0 0 2px rgba(63, 185, 80, 0.2); background: #0d1117; }
+
+    /* Panel de Totales */
+    .totals-panel {
+      background: linear-gradient(135deg, #161b22, #0d1117);
+      border: 1px solid #58a6ff44;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    /* Notificaciones emergentes */
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      background: #1f6feb;
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 7px;
+      font-size: .78rem;
+      opacity: 0;
+      transition: .3s;
+      pointer-events: none;
+      z-index: 99999;
+    }
+
+    .toast.show { opacity: 1; }
+
+    /* =========================================
+       MEDIA QUERIES (RESPONSIVE CELULAR)
+       ========================================= */
+    @media(max-width: 768px) {
+      body { font-size: 11px; }
+      main { padding: 10px; }
+      .hdr { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px; }
+      .hdr-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+      .hide-mob { display: none; }
+      .btn-undo-redo { padding: 4px 6px; font-size: 0.75rem; }
+      .btn-logout { padding: 4px 8px; }
+      .cards { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
+      .card { padding: 8px; }
+      .card .lbl { font-size: 0.6rem; margin-bottom: 1px; }
+      .card .val { font-size: 1rem; }
+      .card .s2 { font-size: 0.65rem; }
+      .charts { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
+      .ch-wrap { height: 180px; }
+      .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      table th, table td { font-size: 0.75rem; padding: 4px 3px; }
+      .ci { padding: 3px 5px; width: 75px; font-size: 0.75rem; }
+      .ci.ticker { width: 70px; }
+      .sum-box { padding: 12px; }
+      .box-title { font-size: 0.65rem; }
+      .sk-grid { grid-template-columns: 1fr; gap: 12px; }
+    }
+
+    @media(max-width: 480px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-<div id="login-screen">
-  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width="80" height="80" style="margin-bottom:20px">
-    <rect width='32' height='32' rx='7' fill='#161b22'/>
-    <polyline points='5,26 12,18 18,22 27,8' fill='none' stroke='#3fb950' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>
-    <path d='M21,8 L27,8 L27,14' fill='none' stroke='#3fb950' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>
-    <text x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='19' fill='#58a6ff' text-anchor='middle'>$</text>
-  </svg>
-  <h1 style="font-size:2.2rem;color:var(--b);margin-bottom:10px">Mi Portafolio Pro</h1>
-  <p style="color:var(--sub);max-width:300px">Bóveda personal sincronizada en la nube segura de Google Firebase.</p>
-  <button class="btn-google" onclick="iniciarSesion()">
-    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.7 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-    Entrar con Google
-  </button>
-  <p style="color:#444;font-size:0.7rem;margin-top:50px">Solo acceso autorizado.</p>
-</div>
-
-<div id="app-content" style="display:none">
-  <input id="rateInput" value="4180" type="hidden">
-  <div class="hdr">
-    <div>
-      <h1>📊 Mi Portafolio Pro</h1>
-      <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Conectando a la nube...</div>
-    </div>
-    <div class="hdr-right">
-      <div style="display:flex;gap:6px">
-        <button class="btn-undo-redo" id="btnUndo" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span id="undo-cnt">0</span>)</button>
-        <button class="btn-undo-redo" id="btnRedo" onclick="redo()" disabled>↪️ <span class="hide-mob">Rehacer</span> (<span id="redo-cnt">0</span>)</button>
-      </div>
-      <div class="rate-box" title="Si el precio cae este % o más, se resalta en verde">
-        <label>🎯 Oportunidad</label>
-        <input id="oppInput" class="opp-inp" value="10" type="text" onfocus="saveStateToHistory()" onblur="recalc()">
-        <span style="color:var(--sub);font-size:.7rem">%</span>
-      </div>
-      <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
-    </div>
+  <div id="login-screen">
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width="80" height="80" style="margin-bottom:20px">
+      <rect width='32' height='32' rx='7' fill='#161b22'/>
+      <polyline points='5,26 12,18 18,22 27,8' fill='none' stroke='#3fb950' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>
+      <path d='M21,8 L27,8 L27,14' fill='none' stroke='#3fb950' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>
+      <text x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='19' fill='#58a6ff' text-anchor='middle'>$</text>
+    </svg>
+    <h1 style="font-size:2.2rem; color:var(--b); margin-bottom:10px">Mi Portafolio Pro</h1>
+    <p style="color:var(--sub); max-width:300px">Bóveda personal sincronizada en la nube segura de Google Firebase.</p>
+    <button class="btn-google" onclick="iniciarSesion()">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.7 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Entrar con Google
+    </button>
+    <p style="color:#444; font-size:0.7rem; margin-top:50px">Solo acceso autorizado.</p>
   </div>
 
-  <main>
-    <div class="cards" id="cards"></div>
-    <div class="charts">
-      <div class="ch"><h3>Distribución del Portafolio</h3><div class="ch-wrap"><canvas id="donut"></canvas></div></div>
-      <div class="ch"><h3>Rendimiento % G/L</h3><div class="ch-wrap"><canvas id="bar"></canvas></div></div>
-    </div>
-    <div class="broker">
-      <div class="bhdr sw"><span>🇺🇸 Schwab USA</span><button class="btn btn-add" onmousedown="addRow('sw')">+ Agregar activo</button></div>
-      <div class="tbl-wrap"><table id="tbl-sw"></table></div>
-    </div>
-    <div class="broker">
-      <div class="bhdr xt"><span>🇪🇺 XTB Europe</span><button class="btn btn-add" onmousedown="addRow('xt')">+ Agregar activo</button></div>
-      <div class="tbl-wrap"><table id="tbl-xt"></table></div>
-    </div>
+  <div id="app-content" style="display:none">
+    <input id="rateInput" value="4180" type="hidden">
     
-    <div class="bottom">
-      <div class="sum-box">
-        <div class="box-title">📋 Resumen Consolidado del Portafolio</div>
-        <div id="sum-content"></div>
+    <div class="hdr">
+      <div>
+        <h1>📊 Mi Portafolio Pro</h1>
+        <div style="font-size:.68rem; color:var(--sub)" id="lastSaved">Conectando a la nube...</div>
+      </div>
+      <div class="hdr-right">
+        <div style="display:flex; gap:6px">
+          <button class="btn-undo-redo" id="btnUndo" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span id="undo-cnt">0</span>)</button>
+          <button class="btn-undo-redo" id="btnRedo" onclick="redo()" disabled>↪️ <span class="hide-mob">Rehacer</span> (<span id="redo-cnt">0</span>)</button>
+        </div>
+        <div class="rate-box" title="Si el precio cae este % o más, se resalta en verde">
+          <label>🎯 Oportunidad</label>
+          <input id="oppInput" class="opp-inp" value="10" type="text" onfocus="saveStateToHistory()" onblur="recalc()">
+          <span style="color:var(--sub); font-size:.7rem">%</span>
+        </div>
+        <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
       </div>
     </div>
-  </main>
-</div>
 
-<div class="toast" id="toast"></div>
-
-<script>
-const FINNHUB_API_KEY = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
-const firebaseConfig = {
-  apiKey: "AIzaSyDAPrYB2pyJ7fQcMoC72DojH1ZKdzLgKwY",
-  authDomain: "mi-portafolio-cristhian.firebaseapp.com",
-  databaseURL: "https://mi-portafolio-cristhian-default-rtdb.firebaseio.com",
-  projectId: "mi-portafolio-cristhian",
-  storageBucket: "mi-portafolio-cristhian.firebasestorage.app",
-  messagingSenderId: "857924881558",
-  appId: "1:857924881558:web:091fa5c2fb44b0a650c6b7"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-let currentUser = null;
-
-let SW = [], XT = [], nid = 1;
-let skInvVal = 14613200;
-let skCurVal = 12627217;
-
-let dChart = null, bChart = null, saveTimeout = null;
-const COLS = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc'];
-
-const f    = (n,d=2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
-const fCOP = n => new Intl.NumberFormat('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0}).format(n)+' COP';
-const fU   = (n,d=2) => (n<0?'-':'') + '$' + f(Math.abs(n),d); 
-const fGain = (n,d=2) => '<span class="'+(n>=0?'g':'r')+'">'+(n>=0?'+':'-')+'$'+f(Math.abs(n),d)+'</span>'; 
-const fP   = n => '<span class="'+(n>=0?'g':'r')+'">'+(n>=0?'+':'')+f(n,2)+'%</span>'; 
-const rv   = s => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
-const rate = () => rv(document.getElementById('rateInput').value)||4180;
-
-auth.onAuthStateChanged(user => {
-  if (user) {
-    currentUser = user;
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-content').style.display = 'block';
-    loadFromFirebase();
-  } else {
-    currentUser = null;
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('app-content').style.display = 'none';
-  }
-});
-
-function iniciarSesion() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(err => {
-    console.error('Error login:', err);
-    alert('Error al iniciar sesión: ' + err.message);
-  });
-}
-function cerrarSesion() { auth.signOut(); }
-
-function loadFromFirebase() {
-  if (!currentUser) return;
-  document.getElementById('lastSaved').textContent = 'Sincronizando...';
-  db.ref('users/'+currentUser.uid).once('value').then(snap => {
-    if (snap.exists()) {
-      const d = snap.val();
-      SW = d.SW || []; XT = d.XT || [];
-      const all = [...SW,...XT];
-      if (all.length) nid = Math.max(...all.map(r=>r.id))+1;
+    <main>
+      <div class="cards" id="cards"></div>
       
-      if (d.rate) document.getElementById('rateInput').value = d.rate;
-      if (d.opp)  document.getElementById('oppInput').value  = d.opp;
-      if (d.skInv) skInvVal = parseFloat(d.skInv);
-      if (d.skCur) skCurVal = parseFloat(d.skCur);
+      <div class="charts">
+        <div class="ch"><h3>Distribución del Portafolio</h3><div class="ch-wrap"><canvas id="donut"></canvas></div></div>
+        <div class="ch"><h3>Rendimiento % G/L</h3><div class="ch-wrap"><canvas id="bar"></canvas></div></div>
+      </div>
       
-      if (d.ts) document.getElementById('lastSaved').textContent = 'Nube OK: '+new Date(d.ts).toLocaleTimeString('es-CO');
-      showToast('☁️ Datos cargados de la nube');
-    } else {
-      SW = [{id:1,t:'BABA',qty:19,inv:1460.91,invFormula:'1460.91',px:129.87,p:false},{id:2,t:'BRK-B',qty:7.5562,inv:2974.72,invFormula:'2974.72',px:476.19,p:false}];
-      XT = [{id:11,t:'EIMI.UK',qty:28.2244,inv:1125.02,invFormula:'1125.02',px:46.19,p:false}];
-      nid = 20;
+      <div class="broker">
+        <div class="bhdr sw"><span>🇺🇸 Schwab USA</span><button class="btn btn-add" onmousedown="addRow('sw')">+ Agregar activo</button></div>
+        <div class="tbl-wrap"><table id="tbl-sw"></table></div>
+      </div>
+      <div class="broker">
+        <div class="bhdr xt"><span>🇪🇺 XTB Europe</span><button class="btn btn-add" onmousedown="addRow('xt')">+ Agregar activo</button></div>
+        <div class="tbl-wrap"><table id="tbl-xt"></table></div>
+      </div>
+      
+      <div class="bottom">
+        <div class="sum-box">
+          <div class="box-title">📋 Resumen Consolidado del Portafolio</div>
+          <div id="sum-content"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* ==========================================================================
+       1. CONFIGURACIÓN Y VARIABLES GLOBALES
+       ========================================================================== */
+    const FINNHUB_API_KEY = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyDAPrYB2pyJ7fQcMoC72DojH1ZKdzLgKwY",
+      authDomain: "mi-portafolio-cristhian.firebaseapp.com",
+      databaseURL: "https://mi-portafolio-cristhian-default-rtdb.firebaseio.com",
+      projectId: "mi-portafolio-cristhian",
+      storageBucket: "mi-portafolio-cristhian.firebasestorage.app",
+      messagingSenderId: "857924881558",
+      appId: "1:857924881558:web:091fa5c2fb44b0a650c6b7"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    
+    let currentUser = null;
+    let SW = [];
+    let XT = [];
+    let nid = 1;
+    let skInvVal = 14613200;
+    let skCurVal = 12627217;
+
+    let dChart = null;
+    let bChart = null;
+    let saveTimeout = null;
+    const COLS = ['#58a6ff', '#3fb950', '#f78166', '#d2a8ff', '#ffa657', '#79c0ff', '#56d364', '#ff7b72', '#bc8cff', '#ffb347', '#63d3fb', '#a8dadc'];
+
+    /* ==========================================================================
+       2. FUNCIONES UTILITARIAS Y DE FORMATEO
+       ========================================================================== */
+    const f = (n, d = 2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
+    const fCOP = n => new Intl.NumberFormat('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n) + ' COP';
+    const fU = (n, d = 2) => (n < 0 ? '-' : '') + '$' + f(Math.abs(n), d); 
+    const fGain = (n, d = 2) => `<span class="${n >= 0 ? 'g' : 'r'}">${n >= 0 ? '+' : '-'}$${f(Math.abs(n), d)}</span>`; 
+    const fP = n => `<span class="${n >= 0 ? 'g' : 'r'}">${n >= 0 ? '+' : ''}${f(n, 2)}%</span>`; 
+    const rv = s => parseFloat(String(s).replace(/[^0-9.\-]/g, '')) || 0;
+    const rate = () => rv(document.getElementById('rateInput').value) || 4180;
+
+    function showToast(message) {
+      const toastEl = document.getElementById('toast');
+      toastEl.textContent = message;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 3000);
     }
-    fetchRealTimeData();
-    recalc(true);
-  }).catch(e => { console.error(e); showToast('❌ Error de conexión'); });
-}
 
-function saveDataToFirebase() {
-  if (!currentUser) return;
-  db.ref('users/'+currentUser.uid).set({
-    SW, XT,
-    rate: document.getElementById('rateInput').value,
-    opp:  document.getElementById('oppInput').value,
-    skInv: skInvVal,
-    skCur: skCurVal,
-    ts: new Date().toISOString()
-  }).then(() => {
-    document.getElementById('lastSaved').textContent = 'Nube sincronizada: '+new Date().toLocaleTimeString('es-CO');
-  });
-}
+    /* ==========================================================================
+       3. AUTENTICACIÓN FIREBASE
+       ========================================================================== */
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+        loadFromFirebase();
+      } else {
+        currentUser = null;
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app-content').style.display = 'none';
+      }
+    });
 
-let historyArr = [], historyIndex = -1;
-function saveStateToHistory() {
-  const s = JSON.stringify({
-      SW:JSON.parse(JSON.stringify(SW)),
-      XT:JSON.parse(JSON.stringify(XT)),
-      rate:document.getElementById('rateInput').value,
-      opp:document.getElementById('oppInput').value,
-      skInv: skInvVal,
-      skCur: skCurVal
-  });
-  if (historyIndex>=0 && historyArr[historyIndex]===s) return;
-  if (historyIndex<historyArr.length-1) historyArr=historyArr.slice(0,historyIndex+1);
-  historyArr.push(s);
-  if (historyArr.length>11) historyArr.shift();
-  historyIndex=historyArr.length-1;
-  updateUndoRedoButtons();
-}
-function updateUndoRedoButtons() {
-  document.getElementById('undo-cnt').textContent = historyIndex>0?historyIndex:0;
-  document.getElementById('redo-cnt').textContent = historyArr.length-1-historyIndex>0?historyArr.length-1-historyIndex:0;
-  document.getElementById('btnUndo').disabled = historyIndex<=0;
-  document.getElementById('btnRedo').disabled = historyIndex>=historyArr.length-1;
-}
-function applyState(s) {
-  const p=JSON.parse(s); SW=p.SW; XT=p.XT;
-  document.getElementById('rateInput').value=p.rate;
-  document.getElementById('oppInput').value=p.opp;
-  skInvVal = p.skInv;
-  skCurVal = p.skCur;
-  recalc(false);
-}
-function undo() { if(historyIndex>0){historyIndex--;applyState(historyArr[historyIndex]);showToast('↩️ Deshecho');updateUndoRedoButtons();} }
-function redo() { if(historyIndex<historyArr.length-1){historyIndex++;applyState(historyArr[historyIndex]);showToast('↪️ Rehecho');updateUndoRedoButtons();} }
-document.addEventListener('keydown', e => {
-  if (document.activeElement&&document.activeElement.tagName==='INPUT') return;
-  if (e.ctrlKey||e.metaKey) {
-    if (e.key.toLowerCase()==='z') { e.preventDefault(); e.shiftKey?redo():undo(); }
-    if (e.key.toLowerCase()==='y') { e.preventDefault(); redo(); }
-  }
-});
+    function iniciarSesion() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(err => {
+        console.error('Error al iniciar sesión:', err);
+        alert('Error al iniciar sesión: ' + err.message);
+      });
+    }
 
-function calculateSumFromFormula(fStr) {
-  if (!fStr||String(fStr).trim()==='') return 0;
-  let s=String(fStr).replace(/\s/g,'').replace(',','.').replace(/[^\d.+\-]/g,'');
-  let sum=0; s.split('+').forEach(p=>{if(p)sum+=parseFloat(p)||0;}); return sum;
-}
-function investFocus(el) { const r=el.getAttribute('data-raw-formula'); if(r) el.value=r; }
-function investBlur(el,tid,id) {
-  const v=el.value, sum=calculateSumFromFormula(v);
-  el.setAttribute('data-raw-formula',v); el.value=f(sum); el.title='Fórmula: '+v;
-  const row=(tid==='sw'?SW:XT).find(x=>x.id===id);
-  if(row){row.inv=sum;row.invFormula=v;} recalc();
-}
+    function cerrarSesion() {
+      auth.signOut();
+    }
 
-function skFocus(el) { 
-    saveStateToHistory();
-    el.value = el.id === 'skInv' ? skInvVal : skCurVal; 
-}
-function skBlur(el, type) {
-  let raw = parseFloat(String(el.value).replace(/\./g,''))||0;
-  if (type === 'inv') skInvVal = raw; else skCurVal = raw;
-  recalc();
-}
-
-function calc(row) {
-  if(row.inv===undefined) row.inv=calculateSumFromFormula(row.invFormula)||0;
-  const cur=(row.qty||0)*(row.px||0);
-  const avg=row.qty>0?row.inv/row.qty:0; row.avg=avg;
-  return {...row, cur, gl:row.inv>0?(cur-row.inv)/row.inv*100:0, pnl:cur-row.inv};
-}
-
-function renderTable(data,tid) {
-  const opp=rv(document.getElementById('oppInput').value)||10;
-  const rows=data.map(calc);
-  const thead='<thead><tr><th style="text-align:left">Activo</th><th>Cant.</th><th>Precio Prom</th><th>Precio Actual</th><th>Valor USD</th><th>Invertido USD</th><th>% G/L</th><th>Profit</th><th></th></tr></thead>';
-  const tbody=rows.map(row=>{
-    const isPend=row.p||!row.qty;
-    const isOpp=!isPend&&row.avg>0&&row.px>0&&((row.avg-row.px)/row.avg*100)>=opp;
-    
-    return '<tr class="'+(isPend?'pending':'')+'">'+
-      '<td><input class="ci ticker '+(isOpp?'opp-glow':'')+'" value="'+(row.t||'')+'" placeholder="TICKER" onblur="upd(\''+tid+'\','+row.id+',\'t\',this.value)">'+(isPend?'<span class="badge">próximo</span>':'')+'</td>'+
-      '<td><input class="ci" value="'+(row.qty||0)+'" style="text-align:center" onblur="upd(\''+tid+'\','+row.id+',\'qty\',this.value)"></td>'+
-      '<td class="computed">'+(isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg))+'</td>'+
-      '<td class="computed '+(isOpp?'opp-glow':'')+'" style="font-weight:700">'+(row.px||0)+'</td>'+
-      '<td class="computed">'+(isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur))+'</td>'+
-      '<td><input type="text" class="ci invested-usd" value="'+f(row.inv)+'" data-raw-formula="'+(row.invFormula||row.inv||0)+'" onfocus="investFocus(this)" onblur="investBlur(this,\''+tid+'\','+row.id+')" title="Fórmula: '+(row.invFormula||row.inv||0)+'"></td>'+
-      '<td class="computed">'+(isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl))+'</td>'+
-      '<td class="computed">'+(isPend?'<span style="color:var(--sub)">—</span>':fGain(row.pnl))+'</td>'+
-      '<td class="action-btns"><button class="icon-btn" onmousedown="sellRow(\''+tid+'\','+row.id+')" title="Registrar Venta">💰</button><button class="icon-btn btn-del" onmousedown="delRow(\''+tid+'\','+row.id+')" title="Eliminar">✕</button></td>'+
-      '</tr>';
-  }).join('');
-  document.getElementById('tbl-'+tid).innerHTML=thead+'<tbody>'+tbody+'</tbody>';
-}
-
-function upd(tid,id,field,val) {
-  const row=(tid==='sw'?SW:XT).find(x=>x.id===id); if(!row)return;
-  row[field]=field==='t'?val.toUpperCase().trim():rv(val);
-  if(field==='qty'&&rv(val)>0) row.p=false;
-  recalc();
-}
-function addRow(tid) { (tid==='sw'?SW:XT).push({id:nid++,t:'',qty:0,inv:0,invFormula:'0',px:0,p:true}); recalc(); }
-function delRow(tid,id) { if(!confirm('¿Eliminar este activo?'))return; if(tid==='sw')SW=SW.filter(x=>x.id!==id);else XT=XT.filter(x=>x.id!==id); recalc(); }
-function sellRow(tid,id) {
-  const row=(tid==='sw'?SW:XT).find(x=>x.id===id);
-  if(!row||!row.qty||row.qty<=0){alert('No tienes acciones válidas.');return;}
-  const qtyStr=prompt('¿Cuántas acciones de '+row.t+' vendiste?\n(Tienes '+row.qty+')'); if(qtyStr===null)return;
-  const sellQty=rv(qtyStr); if(sellQty<=0||sellQty>row.qty){alert('Cantidad inválida.');return;}
-  const pxStr=prompt('¿A qué precio las vendiste?'); if(pxStr===null)return;
-  const sellPx=rv(pxStr); if(sellPx<=0){alert('Precio inválido.');return;}
-  const avg=row.inv/row.qty, pnl=(sellPx-avg)*sellQty;
-  row.qty-=sellQty; row.inv-=sellQty*avg; row.invFormula=''+row.inv.toFixed(4);
-  if(row.qty<0.0001){row.qty=0;row.inv=0;row.invFormula='0';}
-  recalc(); showToast('✅ Venta registrada. '+(pnl>=0?'Ganancia':'Pérdida')+': $'+f(Math.abs(pnl))+' USD');
-}
-
-function recalc(pushToHistory=true) {
-  renderTable(SW,'sw'); renderTable(XT,'xt');
-  renderCards(); renderSummary(); renderCharts();
-  if(pushToHistory) saveStateToHistory();
-  clearTimeout(saveTimeout); saveTimeout=setTimeout(saveDataToFirebase,1500);
-}
-
-function renderCards() {
-  const rt = rate();
-  const all = [...SW.map(calc),...XT.map(calc)].filter(x=>x.qty>0);
-  const tCur = all.reduce((s,x)=>s+x.cur,0);
-  const tInv = all.reduce((s,x)=>s+x.inv,0);
-  const tPnl = tCur-tInv;
-  const tPct = tInv>0?tPnl/tInv*100:0;
-  
-  const skUSD  = skCurVal/rt;
-  const skIUSD = skInvVal/rt;
-  const gC = tCur+skUSD;
-  
-  const assets = all.filter(x=>x.t);
-  const best  = assets.length?[...assets].sort((a,b)=>b.gl-a.gl)[0]:null;
-  const worst = assets.length?[...assets].sort((a,b)=>a.gl-b.gl)[0]:null;
-  const lastUpd = document.getElementById('lastSaved').textContent.includes('Nube')?new Date().toLocaleTimeString('es-CO'):'—';
-
-  const bCls = best && best.gl >= 0 ? 'g' : 'r';
-  const wCls = worst && worst.gl >= 0 ? 'g' : 'r';
-
-  const bPnlUSD  = best  ? (best.pnl>=0?'+':'-')+'$'+f(Math.abs(best.pnl))  : '';
-  const bPnlCOP  = best  ? (best.pnl>=0?'+':'-')+fCOP(Math.abs(best.pnl)*rt): '';
-  const bGl      = best  ? (best.gl>=0?'+':'')+f(best.gl,1)+'%'              : '';
-  const wPnlUSD  = worst ? (worst.pnl>=0?'+':'-')+'$'+f(Math.abs(worst.pnl)) : '';
-  const wPnlCOP  = worst ? (worst.pnl>=0?'+':'-')+fCOP(Math.abs(worst.pnl)*rt): '';
-  const wGl      = worst ? f(worst.gl,1)+'%'                                 : '';
-
-  document.getElementById('cards').innerHTML =
-    '<div class="card" style="border-color:#58a6ff33">'+
-      '<div class="lbl">💼 Portafolio Global</div>'+
-      '<div class="val b">$'+f(gC)+'</div>'+
-      '<div class="s2" style="color:#8b949e;margin-top:3px">Brokers <span style="color:#e6edf3;font-weight:600">$'+f(tCur)+'</span> · Skandia <span style="color:#e6edf3;font-weight:600">$'+f(skUSD)+'</span></div>'+
-      '<div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">'+fCOP(gC*rt)+'</div>'+
-    '</div>'+
-    '<div class="card">'+
-      '<div class="lbl">📥 Capital Invertido</div>'+
-      '<div class="val">$'+f(tInv+skIUSD)+'</div>'+
-      '<div class="s2" style="color:#8b949e;margin-top:3px">'+fCOP((tInv+skIUSD)*rt)+'</div>'+
-    '</div>'+
-    '<div class="card" style="border-color:'+(tPnl>=0?'#3fb95033':'#f7816633')+'">'+
-      '<div class="lbl">📈 Retorno Total</div>'+
-      '<div class="val '+(tPnl>=0?'g':'r')+'">'+(tPnl>=0?'+':'-')+' $'+f(Math.abs(tPnl))+'</div>'+
-      '<div class="s2 '+(tPct>=0?'g':'r')+'" style="margin-top:3px">'+(tPct>=0?'+':'')+f(tPct,1)+'% sobre invertido</div>'+
-      '<div class="s2 '+(tPnl>=0?'g':'r')+'" style="margin-top:2px;font-weight:600">'+(tPnl>=0?'+':'-')+' '+fCOP(Math.abs(tPnl)*rt)+'</div>'+
-    '</div>'+
-    '<div class="card" style="border-color:#ffa65733">'+
-      '<div class="lbl">💱 TRM en Vivo</div>'+
-      '<div class="val" style="color:#ffa657">'+f(rt,0)+' <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div>'+
-      '<div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">1 USD = '+f(rt,0)+' COP</div>'+
-      '<div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">Act: '+lastUpd+'</div>'+
-    '</div>'+
-    '<div class="card" style="border-color:'+(best&&best.gl>=0?'#3fb95033':'#f7816633')+'">'+
-      '<div class="lbl">🏆 Mejor Activo</div>'+
-      '<div class="val '+bCls+'">'+(best?best.t:'—')+'</div>'+
-      '<div class="s2 '+bCls+'" style="margin-top:3px">'+bPnlUSD+'</div>'+
-      '<div class="s2 '+bCls+'" style="margin-top:2px">'+bGl+'</div>'+
-      '<div class="s2 hide-mob '+bCls+'" style="margin-top:2px;font-size:.68rem">'+bPnlCOP+'</div>'+
-    '</div>'+
-    '<div class="card" style="border-color:'+(worst&&worst.gl>=0?'#3fb95033':'#f7816633')+'">'+
-      '<div class="lbl">⚠️ Más Rezagado</div>'+
-      '<div class="val '+wCls+'">'+(worst?worst.t:'—')+'</div>'+
-      '<div class="s2 '+wCls+'" style="margin-top:3px">'+wPnlUSD+'</div>'+
-      '<div class="s2 '+wCls+'" style="margin-top:2px">'+wGl+'</div>'+
-      '<div class="s2 hide-mob '+wCls+'" style="margin-top:2px;font-size:.68rem">'+wPnlCOP+'</div>'+
-    '</div>';
-}
-
-function renderSummary() {
-  const rt=rate();
-  const sA=SW.map(calc).filter(x=>x.qty>0), xA=XT.map(calc).filter(x=>x.qty>0);
-  const sI=sA.reduce((s,x)=>s+x.inv,0), sC=sA.reduce((s,x)=>s+x.cur,0);
-  const xI=xA.reduce((s,x)=>s+x.inv,0), xC=xA.reduce((s,x)=>s+x.cur,0);
-  
-  if(skInvVal<=0) skInvVal=14613200;
-
-  const skI_USD = skInvVal / rt;
-  const skC_USD = skCurVal / rt;
-  const tI_USD = sI + xI + skI_USD;
-  const tC_USD = sC + xC + skC_USD;
-  const tI_COP = (sI + xI) * rt + skInvVal;
-  const tC_COP = (sC + xC) * rt + skCurVal;
-
-  const skPnl=skCurVal-skInvVal, skRet=skInvVal>0?skPnl/skInvVal*100:0;
-
-  // 🔥 RENDER UI DEL NUEVO RESUMEN CONSOLIDADO 🔥
-  document.getElementById('sum-content').innerHTML= `
-    <div class="sum-grid">
-      <div class="sum-card">
-        <div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇺🇸 Schwab USA</div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(sI)}</span></div>
-        <div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(sC)}</span></div>
-      </div>
-      <div class="sum-card">
-        <div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇪🇺 XTB Europe</div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(xI)}</span></div>
-        <div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(xC)}</span></div>
-      </div>
-    </div>
-
-    <div class="sk-panel">
-      <div class="sk-title-badge">🇨🇴 Skandia Portafolio BITCOIN ₿ </div>
+    /* ==========================================================================
+       4. MANEJO DE DATOS FIREBASE
+       ========================================================================== */
+    function loadFromFirebase() {
+      if (!currentUser) return;
       
-      <div class="sk-grid">
-        <div>
-          <label style="font-size:.7rem; color:var(--sub);">Capital Invertido</label>
-          <div class="sk-edit-group">
-            <span class="sk-edit-badge">COP</span>
-            <input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'inv')">
+      document.getElementById('lastSaved').textContent = 'Sincronizando...';
+      
+      db.ref('users/' + currentUser.uid).once('value').then(snap => {
+        if (snap.exists()) {
+          const data = snap.val();
+          SW = data.SW || []; 
+          XT = data.XT || [];
+          
+          const allData = [...SW, ...XT];
+          if (allData.length) {
+            nid = Math.max(...allData.map(r => r.id)) + 1;
+          }
+          
+          if (data.rate) document.getElementById('rateInput').value = data.rate;
+          if (data.opp) document.getElementById('oppInput').value = data.opp;
+          if (data.skInv) skInvVal = parseFloat(data.skInv);
+          if (data.skCur) skCurVal = parseFloat(data.skCur);
+          
+          if (data.ts) {
+            document.getElementById('lastSaved').textContent = 'Nube OK: ' + new Date(data.ts).toLocaleTimeString('es-CO');
+          }
+          showToast('☁️ Datos cargados de la nube');
+        } else {
+          // Plantilla inicial para usuarios nuevos
+          SW = [
+            { id: 1, t: 'BABA', qty: 19, inv: 1460.91, invFormula: '1460.91', px: 129.87, p: false },
+            { id: 2, t: 'BRK-B', qty: 7.5562, inv: 2974.72, invFormula: '2974.72', px: 476.19, p: false }
+          ];
+          XT = [
+            { id: 11, t: 'EIMI.UK', qty: 28.2244, inv: 1125.02, invFormula: '1125.02', px: 46.19, p: false }
+          ];
+          nid = 20;
+        }
+        
+        fetchRealTimeData();
+        recalc(true);
+      }).catch(e => {
+        console.error(e);
+        showToast('❌ Error de conexión con la nube');
+      });
+    }
+
+    function saveDataToFirebase() {
+      if (!currentUser) return;
+      
+      db.ref('users/' + currentUser.uid).set({
+        SW: SW, 
+        XT: XT,
+        rate: document.getElementById('rateInput').value,
+        opp: document.getElementById('oppInput').value,
+        skInv: skInvVal,
+        skCur: skCurVal,
+        ts: new Date().toISOString()
+      }).then(() => {
+        document.getElementById('lastSaved').textContent = 'Nube sincronizada: ' + new Date().toLocaleTimeString('es-CO');
+      });
+    }
+
+    /* ==========================================================================
+       5. SISTEMA DE HISTORIAL (DESHACER / REHACER)
+       ========================================================================== */
+    let historyArr = [];
+    let historyIndex = -1;
+
+    function saveStateToHistory() {
+      const stateString = JSON.stringify({
+        SW: JSON.parse(JSON.stringify(SW)),
+        XT: JSON.parse(JSON.stringify(XT)),
+        rate: document.getElementById('rateInput').value,
+        opp: document.getElementById('oppInput').value,
+        skInv: skInvVal,
+        skCur: skCurVal
+      });
+      
+      if (historyIndex >= 0 && historyArr[historyIndex] === stateString) return;
+      
+      if (historyIndex < historyArr.length - 1) {
+        historyArr = historyArr.slice(0, historyIndex + 1);
+      }
+      
+      historyArr.push(stateString);
+      if (historyArr.length > 11) historyArr.shift();
+      
+      historyIndex = historyArr.length - 1;
+      updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+      document.getElementById('undo-cnt').textContent = historyIndex > 0 ? historyIndex : 0;
+      document.getElementById('redo-cnt').textContent = historyArr.length - 1 - historyIndex > 0 ? historyArr.length - 1 - historyIndex : 0;
+      
+      document.getElementById('btnUndo').disabled = historyIndex <= 0;
+      document.getElementById('btnRedo').disabled = historyIndex >= historyArr.length - 1;
+    }
+
+    function applyState(stateString) {
+      const parsedState = JSON.parse(stateString);
+      SW = parsedState.SW;
+      XT = parsedState.XT;
+      document.getElementById('rateInput').value = parsedState.rate;
+      document.getElementById('oppInput').value = parsedState.opp;
+      skInvVal = parsedState.skInv;
+      skCurVal = parsedState.skCur;
+      
+      recalc(false);
+    }
+
+    function undo() {
+      if (historyIndex > 0) {
+        historyIndex--;
+        applyState(historyArr[historyIndex]);
+        showToast('↩️ Acción deshecha');
+        updateUndoRedoButtons();
+      }
+    }
+
+    function redo() {
+      if (historyIndex < historyArr.length - 1) {
+        historyIndex++;
+        applyState(historyArr[historyIndex]);
+        showToast('↪️ Acción rehecha');
+        updateUndoRedoButtons();
+      }
+    }
+
+    // Atajos de teclado
+    document.addEventListener('keydown', e => {
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key.toLowerCase() === 'z') {
+          e.preventDefault();
+          e.shiftKey ? redo() : undo();
+        }
+        if (e.key.toLowerCase() === 'y') {
+          e.preventDefault();
+          redo();
+        }
+      }
+    });
+
+    /* ==========================================================================
+       6. LÓGICA DE FÓRMULAS Y SKANDIA
+       ========================================================================== */
+    function calculateSumFromFormula(formulaStr) {
+      if (!formulaStr || String(formulaStr).trim() === '') return 0;
+      let cleanStr = String(formulaStr).replace(/\s/g, '').replace(',', '.').replace(/[^\d.+\-]/g, '');
+      let sum = 0;
+      cleanStr.split('+').forEach(part => {
+        if (part) sum += parseFloat(part) || 0;
+      });
+      return sum;
+    }
+
+    function investFocus(element) {
+      const rawFormula = element.getAttribute('data-raw-formula');
+      if (rawFormula) element.value = rawFormula;
+    }
+
+    function investBlur(element, tableId, rowId) {
+      const inputValue = element.value;
+      const sum = calculateSumFromFormula(inputValue);
+      
+      element.setAttribute('data-raw-formula', inputValue);
+      element.value = f(sum);
+      element.title = 'Fórmula: ' + inputValue;
+      
+      const row = (tableId === 'sw' ? SW : XT).find(x => x.id === rowId);
+      if (row) {
+        row.inv = sum;
+        row.invFormula = inputValue;
+      }
+      recalc();
+    }
+
+    function skFocus(element) {
+      saveStateToHistory();
+      element.value = element.id === 'skInv' ? skInvVal : skCurVal;
+    }
+
+    function skBlur(element, type) {
+      let rawValue = parseFloat(String(element.value).replace(/\./g, '')) || 0;
+      if (type === 'inv') {
+        skInvVal = rawValue;
+      } else {
+        skCurVal = rawValue;
+      }
+      recalc();
+    }
+
+    /* ==========================================================================
+       7. CÁLCULOS Y RENDERIZADO PRINCIPAL
+       ========================================================================== */
+    function calc(row) {
+      if (row.inv === undefined) {
+        row.inv = calculateSumFromFormula(row.invFormula) || 0;
+      }
+      const cur = (row.qty || 0) * (row.px || 0);
+      const avg = row.qty > 0 ? row.inv / row.qty : 0;
+      row.avg = avg;
+      
+      const gl = row.inv > 0 ? ((cur - row.inv) / row.inv) * 100 : 0;
+      const pnl = cur - row.inv;
+      
+      return { ...row, cur, gl, pnl };
+    }
+
+    function renderTable(data, tableId) {
+      const oppThreshold = rv(document.getElementById('oppInput').value) || 10;
+      const rows = data.map(calc);
+      
+      const thead = `
+        <thead>
+          <tr>
+            <th style="text-align:left">Activo</th>
+            <th>Cant.</th>
+            <th>Precio Prom</th>
+            <th>Precio Actual</th>
+            <th>Valor USD</th>
+            <th>Invertido USD</th>
+            <th>% G/L</th>
+            <th>Profit</th>
+            <th></th>
+          </tr>
+        </thead>
+      `;
+      
+      const tbody = rows.map(row => {
+        const isPend = row.p || !row.qty;
+        const isOpp = !isPend && row.avg > 0 && row.px > 0 && (((row.avg - row.px) / row.avg) * 100) >= oppThreshold;
+        
+        return `
+          <tr class="${isPend ? 'pending' : ''}">
+            <td>
+              <input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t || ''}" placeholder="TICKER" onblur="upd('${tableId}', ${row.id}, 't', this.value)">
+              ${isPend ? '<span class="badge">próximo</span>' : ''}
+            </td>
+            <td>
+              <input class="ci" value="${row.qty || 0}" style="text-align:center" onblur="upd('${tableId}', ${row.id}, 'qty', this.value)">
+            </td>
+            <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg)}</td>
+            <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700">${row.px || 0}</td>
+            <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.cur)}</td>
+            <td>
+              <input type="text" class="ci invested-usd" value="${f(row.inv)}" data-raw-formula="${row.invFormula || row.inv || 0}" onfocus="investFocus(this)" onblur="investBlur(this, '${tableId}', ${row.id})" title="Fórmula: ${row.invFormula || row.inv || 0}">
+            </td>
+            <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fP(row.gl)}</td>
+            <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fGain(row.pnl)}</td>
+            <td class="action-btns">
+              <button class="icon-btn" onmousedown="sellRow('${tableId}', ${row.id})" title="Registrar Venta">💰</button>
+              <button class="icon-btn btn-del" onmousedown="delRow('${tableId}', ${row.id})" title="Eliminar">✕</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      document.getElementById('tbl-' + tableId).innerHTML = thead + '<tbody>' + tbody + '</tbody>';
+    }
+
+    /* ==========================================================================
+       8. ACCIONES DE TABLAS (ACTUALIZAR, AÑADIR, ELIMINAR, VENDER)
+       ========================================================================== */
+    function upd(tableId, rowId, field, val) {
+      const row = (tableId === 'sw' ? SW : XT).find(x => x.id === rowId);
+      if (!row) return;
+      
+      row[field] = field === 't' ? val.toUpperCase().trim() : rv(val);
+      if (field === 'qty' && rv(val) > 0) row.p = false;
+      
+      recalc();
+    }
+
+    function addRow(tableId) {
+      (tableId === 'sw' ? SW : XT).push({
+        id: nid++,
+        t: '',
+        qty: 0,
+        inv: 0,
+        invFormula: '0',
+        px: 0,
+        p: true
+      });
+      recalc();
+    }
+
+    function delRow(tableId, rowId) {
+      if (!confirm('¿Estás seguro de eliminar este activo?')) return;
+      if (tableId === 'sw') {
+        SW = SW.filter(x => x.id !== rowId);
+      } else {
+        XT = XT.filter(x => x.id !== rowId);
+      }
+      recalc();
+    }
+
+    function sellRow(tableId, rowId) {
+      const row = (tableId === 'sw' ? SW : XT).find(x => x.id === rowId);
+      if (!row || !row.qty || row.qty <= 0) {
+        alert('No tienes acciones válidas para vender.');
+        return;
+      }
+      
+      const qtyStr = prompt(`¿Cuántas acciones de ${row.t} vendiste?\n(Tienes ${row.qty} disponibles)`);
+      if (qtyStr === null) return;
+      
+      const sellQty = rv(qtyStr);
+      if (sellQty <= 0 || sellQty > row.qty) {
+        alert('Cantidad inválida.');
+        return;
+      }
+      
+      const pxStr = prompt(`¿A qué precio por acción las vendiste?`);
+      if (pxStr === null) return;
+      
+      const sellPx = rv(pxStr);
+      if (sellPx <= 0) {
+        alert('Precio inválido.');
+        return;
+      }
+      
+      const avgCost = row.inv / row.qty;
+      const realizedPnL = (sellPx - avgCost) * sellQty;
+      
+      row.qty -= sellQty;
+      row.inv -= (sellQty * avgCost);
+      row.invFormula = '' + row.inv.toFixed(4);
+      
+      if (row.qty < 0.0001) {
+        row.qty = 0;
+        row.inv = 0;
+        row.invFormula = '0';
+      }
+      
+      recalc();
+      const estadoVenta = realizedPnL >= 0 ? 'Ganancia' : 'Pérdida';
+      showToast(`✅ Venta registrada. ${estadoVenta}: $${f(Math.abs(realizedPnL))} USD`);
+    }
+
+    /* ==========================================================================
+       9. ACTUALIZACIÓN GLOBAL (RECALCULAR)
+       ========================================================================== */
+    function recalc(pushToHistory = true) {
+      renderTable(SW, 'sw');
+      renderTable(XT, 'xt');
+      renderCards();
+      renderSummary();
+      renderCharts();
+      
+      if (pushToHistory) saveStateToHistory();
+      
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(saveDataToFirebase, 1500);
+    }
+
+    function renderCards() {
+      const rt = rate();
+      const allData = [...SW.map(calc), ...XT.map(calc)].filter(x => x.qty > 0);
+      
+      const tCur = allData.reduce((s, x) => s + x.cur, 0);
+      const tInv = allData.reduce((s, x) => s + x.inv, 0);
+      const tPnl = tCur - tInv;
+      const tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
+      
+      const skUSD = skCurVal / rt;
+      const skIUSD = skInvVal / rt;
+      const gC = tCur + skUSD;
+      
+      const assets = allData.filter(x => x.t);
+      const best = assets.length ? [...assets].sort((a, b) => b.gl - a.gl)[0] : null;
+      const worst = assets.length ? [...assets].sort((a, b) => a.gl - b.gl)[0] : null;
+      
+      const lastUpd = document.getElementById('lastSaved').textContent.includes('Nube') 
+        ? new Date().toLocaleTimeString('es-CO') 
+        : '—';
+
+      const bCls = best && best.gl >= 0 ? 'g' : 'r';
+      const wCls = worst && worst.gl >= 0 ? 'g' : 'r';
+
+      const bPnlUSD = best ? (best.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(best.pnl)) : '';
+      const bPnlCOP = best ? (best.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(best.pnl) * rt) : '';
+      const bGl = best ? (best.gl >= 0 ? '+' : '') + f(best.gl, 1) + '%' : '';
+      
+      const wPnlUSD = worst ? (worst.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(worst.pnl)) : '';
+      const wPnlCOP = worst ? (worst.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(worst.pnl) * rt) : '';
+      const wGl = worst ? f(worst.gl, 1) + '%' : '';
+
+      document.getElementById('cards').innerHTML = `
+        <div class="card" style="border-color:#58a6ff33">
+          <div class="lbl">💼 Portafolio Global</div>
+          <div class="val b">$${f(gC)}</div>
+          <div class="s2" style="color:#8b949e;margin-top:3px">Brokers <span style="color:#e6edf3;font-weight:600">$${f(tCur)}</span> · Skandia <span style="color:#e6edf3;font-weight:600">$${f(skUSD)}</span></div>
+          <div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">${fCOP(gC * rt)}</div>
+        </div>
+        <div class="card">
+          <div class="lbl">📥 Capital Invertido</div>
+          <div class="val">$${f(tInv + skIUSD)}</div>
+          <div class="s2" style="color:#8b949e;margin-top:3px">${fCOP((tInv + skIUSD) * rt)}</div>
+        </div>
+        <div class="card" style="border-color:${tPnl >= 0 ? '#3fb95033' : '#f7816633'}">
+          <div class="lbl">📈 Retorno Total</div>
+          <div class="val ${tPnl >= 0 ? 'g' : 'r'}">${tPnl >= 0 ? '+' : '-'} $${f(Math.abs(tPnl))}</div>
+          <div class="s2 ${tPct >= 0 ? 'g' : 'r'}" style="margin-top:3px">${tPct >= 0 ? '+' : ''}${f(tPct, 1)}% sobre invertido</div>
+          <div class="s2 ${tPnl >= 0 ? 'g' : 'r'}" style="margin-top:2px;font-weight:600">${tPnl >= 0 ? '+' : '-'} ${fCOP(Math.abs(tPnl) * rt)}</div>
+        </div>
+        <div class="card" style="border-color:#ffa65733">
+          <div class="lbl">💱 TRM en Vivo</div>
+          <div class="val" style="color:#ffa657">${f(rt, 0)} <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div>
+          <div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">1 USD = ${f(rt, 0)} COP</div>
+          <div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">Act: ${lastUpd}</div>
+        </div>
+        <div class="card" style="border-color:${best && best.gl >= 0 ? '#3fb95033' : '#f7816633'}">
+          <div class="lbl">🏆 Mejor Activo</div>
+          <div class="val ${bCls}">${best ? best.t : '—'}</div>
+          <div class="s2 ${bCls}" style="margin-top:3px">${bPnlUSD}</div>
+          <div class="s2 ${bCls}" style="margin-top:2px">${bGl}</div>
+          <div class="s2 hide-mob ${bCls}" style="margin-top:2px;font-size:.68rem">${bPnlCOP}</div>
+        </div>
+        <div class="card" style="border-color:${worst && worst.gl >= 0 ? '#3fb95033' : '#f7816633'}">
+          <div class="lbl">⚠️ Más Rezagado</div>
+          <div class="val ${wCls}">${worst ? worst.t : '—'}</div>
+          <div class="s2 ${wCls}" style="margin-top:3px">${wPnlUSD}</div>
+          <div class="s2 ${wCls}" style="margin-top:2px">${wGl}</div>
+          <div class="s2 hide-mob ${wCls}" style="margin-top:2px;font-size:.68rem">${wPnlCOP}</div>
+        </div>
+      `;
+    }
+
+    function renderSummary() {
+      const rt = rate();
+      const sA = SW.map(calc).filter(x => x.qty > 0);
+      const xA = XT.map(calc).filter(x => x.qty > 0);
+      
+      const sI = sA.reduce((s, x) => s + x.inv, 0);
+      const sC = sA.reduce((s, x) => s + x.cur, 0);
+      const xI = xA.reduce((s, x) => s + x.inv, 0);
+      const xC = xA.reduce((s, x) => s + x.cur, 0);
+      
+      if (skInvVal <= 0) skInvVal = 14613200;
+
+      const skI_USD = skInvVal / rt;
+      const skC_USD = skCurVal / rt;
+      
+      const tI_USD = sI + xI + skI_USD;
+      const tC_USD = sC + xC + skC_USD;
+      const tI_COP = (sI + xI) * rt + skInvVal;
+      const tC_COP = (sC + xC) * rt + skCurVal;
+
+      const skPnl = skCurVal - skInvVal;
+      const skRet = skInvVal > 0 ? (skPnl / skInvVal) * 100 : 0;
+
+      document.getElementById('sum-content').innerHTML = `
+        <div class="sum-grid">
+          <div class="sum-card">
+            <div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇺🇸 Schwab USA</div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(sI)}</span></div>
+            <div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(sC)}</span></div>
           </div>
-          <div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ $${f(skI_USD)} USD</div>
-        </div>
-        <div>
-          <label style="font-size:.7rem; color:var(--sub);">Valor Actual</label>
-          <div class="sk-edit-group">
-            <span class="sk-edit-badge">COP</span>
-            <input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'cur')">
+          <div class="sum-card">
+            <div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇪🇺 XTB Europe</div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(xI)}</span></div>
+            <div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(xC)}</span></div>
           </div>
-          <div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ ${fU(skC_USD)} USD</div>
         </div>
-      </div>
 
-      <div style="margin-top:12px; padding-top:12px; border-top:1px solid #3fb95022; display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:.7rem; color:var(--sub)">Rendimiento Skandia</span>
-          <span style="font-size:.8rem; font-weight:700;" class="${skPnl>=0?'g':'r'}">${skPnl>=0?'+':'-'} ${fCOP(Math.abs(skPnl))} (${skRet>=0?'+':''}${f(skRet,2)}%)</span>
-      </div>
-    </div>
-
-    <div class="totals-panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <div>
-          <div style="font-size:.75rem; color:var(--sub); margin-bottom:2px;">Total Invertido</div>
-          <div style="font-size:1.15rem; font-weight:700; color:#e6edf3; letter-spacing:.5px;">${fCOP(tI_COP)}</div>
+        <div class="sk-panel">
+          <div class="sk-title-badge">🇨🇴 Skandia Portafolio BITCOIN ₿ </div>
+          <div class="sk-grid">
+            <div>
+              <label style="font-size:.7rem; color:var(--sub);">Capital Invertido</label>
+              <div class="sk-edit-group">
+                <span class="sk-edit-badge">COP</span>
+                <input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'inv')">
+              </div>
+              <div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ $${f(skI_USD)} USD</div>
+            </div>
+            <div>
+              <label style="font-size:.7rem; color:var(--sub);">Valor Actual</label>
+              <div class="sk-edit-group">
+                <span class="sk-edit-badge">COP</span>
+                <input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'cur')">
+              </div>
+              <div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ ${fU(skC_USD)} USD</div>
+            </div>
+          </div>
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid #3fb95022; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:.7rem; color:var(--sub)">Rendimiento Skandia</span>
+              <span style="font-size:.8rem; font-weight:700;" class="${skPnl >= 0 ? 'g' : 'r'}">${skPnl >= 0 ? '+' : '-'} ${fCOP(Math.abs(skPnl))} (${skRet >= 0 ? '+' : ''}${f(skRet, 2)}%)</span>
+          </div>
         </div>
-        <div style="text-align:right;">
-          <div style="font-size:.7rem; color:var(--sub); margin-bottom:2px;">Equivalente USD</div>
-          <div style="font-size:.9rem; font-weight:600; color:var(--sub);">$${f(tI_USD)}</div>
-        </div>
-      </div>
-      <div style="border-top:1px solid var(--border); margin:12px 0;"></div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <div style="font-size:.8rem; color:#3fb950; font-weight:700; margin-bottom:2px;">Total Actual COP</div>
-          <div style="font-size:1.5rem; font-weight:800; color:#3fb950; letter-spacing:.5px; text-shadow:0 0 10px rgba(63,185,80,0.2);">${fCOP(tC_COP)}</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:.75rem; color:var(--b); font-weight:600; margin-bottom:2px;">Total Actual USD</div>
-          <div style="font-size:1.2rem; font-weight:800; color:var(--b);">$${f(tC_USD)}</div>
-        </div>
-      </div>
-    </div>
-  `;
-}
 
-function renderCharts() {
-  const all=[...SW.map(calc),...XT.map(calc)].filter(x=>x.qty>0&&x.t);
-  const labels=all.map(x=>x.t), vals=all.map(x=>x.cur), gls=all.map(x=>x.gl);
-  const totalVal=vals.reduce((a,b)=>a+b,0);
-  const labelsPct=labels.map((t,i)=>t+' ('+(totalVal>0?(vals[i]/totalVal*100).toFixed(1):0)+'%)');
-  if(dChart) dChart.destroy();
-  if(labels.length) dChart=new Chart(document.getElementById('donut'),{type:'doughnut',data:{labels:labelsPct,datasets:[{data:vals,backgroundColor:COLS.slice(0,labels.length),borderWidth:2,borderColor:'#161b22'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#e6edf3',font:{size:11},boxWidth:10,padding:8}}}}});
-  if(bChart) bChart.destroy();
-  if(labels.length) {
-    const pctPlugin={id:'pct',afterDraw:chart=>{const ctx=chart.ctx;chart.data.datasets.forEach((ds,i)=>{const meta=chart.getDatasetMeta(i);if(!meta.hidden)meta.data.forEach((el,j)=>{ctx.fillStyle=ds.borderColor[j];ctx.textAlign='center';ctx.font='bold 10px sans-serif';const v=ds.data[j];ctx.textBaseline=v>=0?'bottom':'top';ctx.fillText(f(v,1)+'%',el.x,el.y+(v>=0?-6:6));});});}};
-    bChart=new Chart(document.getElementById('bar'),{type:'bar',data:{labels,datasets:[{data:gls,backgroundColor:gls.map(g=>g>=0?'#3fb95055':'#f7816655'),borderColor:gls.map(g=>g>=0?'#3fb950':'#f78166'),borderWidth:1}]},plugins:[pctPlugin],options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:25,bottom:25}},plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#e6edf3',font:{size:10}},grid:{color:'#21262d'}},y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}}}});
-  }
-}
+        <div class="totals-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div>
+              <div style="font-size:.75rem; color:var(--sub); margin-bottom:2px;">Total Invertido</div>
+              <div style="font-size:1.15rem; font-weight:700; color:#e6edf3; letter-spacing:.5px;">${fCOP(tI_COP)}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:.7rem; color:var(--sub); margin-bottom:2px;">Equivalente USD</div>
+              <div style="font-size:.9rem; font-weight:600; color:var(--sub);">$${f(tI_USD)}</div>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--border); margin:12px 0;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:.8rem; color:#3fb950; font-weight:700; margin-bottom:2px;">Total Actual COP</div>
+              <div style="font-size:1.5rem; font-weight:800; color:#3fb950; letter-spacing:.5px; text-shadow:0 0 10px rgba(63,185,80,0.2);">${fCOP(tC_COP)}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:.75rem; color:var(--b); font-weight:600; margin-bottom:2px;">Total Actual USD</div>
+              <div style="font-size:1.2rem; font-weight:800; color:var(--b);">$${f(tC_USD)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
 
-async function fetchRealTimeData() {
-  if(document.activeElement&&document.activeElement.tagName==='INPUT') return;
-  if(!currentUser) return;
-  try {
-    const res=await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-    const d=await res.json();
-    if(d.rates&&d.rates.COP) document.getElementById('rateInput').value=d.rates.COP.toFixed(2);
-  } catch(e){console.log('Error TRM',e);}
-  const fetchPrice=async ticker=>{
-    try {
-      const sym=ticker.includes('.UK')?ticker.replace('.UK','.L'):ticker;
-      const res=await fetch('https://finnhub.io/api/v1/quote?symbol='+sym+'&token='+FINNHUB_API_KEY);
-      const d=await res.json(); return d.c;
-    } catch(e){return null;}
-  };
-  try {
-    await Promise.all([
-      ...SW.filter(r=>r.t).map(async r=>{const p=await fetchPrice(r.t);if(p)r.px=p;}),
-      ...XT.filter(r=>r.t).map(async r=>{const p=await fetchPrice(r.t);if(p)r.px=p;})
-    ]);
-  } catch(e){}
-  recalc(false);
-}
-setInterval(fetchRealTimeData,60000);
+    function renderCharts() {
+      const allData = [...SW.map(calc), ...XT.map(calc)].filter(x => x.qty > 0 && x.t);
+      const labels = allData.map(x => x.t);
+      const vals = allData.map(x => x.cur);
+      const gls = allData.map(x => x.gl);
+      const totalVal = vals.reduce((a, b) => a + b, 0);
+      const labelsPct = labels.map((t, i) => `${t} (${totalVal > 0 ? (vals[i] / totalVal * 100).toFixed(1) : 0}%)`);
 
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
-</script>
+      // Gráfica de Anillo (Distribución)
+      if (dChart) dChart.destroy();
+      if (labels.length) {
+        dChart = new Chart(document.getElementById('donut'), {
+          type: 'doughnut',
+          data: {
+            labels: labelsPct,
+            datasets: [{
+              data: vals,
+              backgroundColor: COLS.slice(0, labels.length),
+              borderWidth: 2,
+              borderColor: '#161b22'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: {
+                  color: '#e6edf3',
+                  font: { size: 11 },
+                  boxWidth: 10,
+                  padding: 8
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Gráfica de Barras (Rendimiento)
+      if (bChart) bChart.destroy();
+      if (labels.length) {
+        const pctPlugin = {
+          id: 'pct',
+          afterDraw: chart => {
+            const ctx = chart.ctx;
+            chart.data.datasets.forEach((ds, i) => {
+              const meta = chart.getDatasetMeta(i);
+              if (!meta.hidden) {
+                meta.data.forEach((el, j) => {
+                  ctx.fillStyle = ds.borderColor[j];
+                  ctx.textAlign = 'center';
+                  ctx.font = 'bold 10px sans-serif';
+                  const v = ds.data[j];
+                  ctx.textBaseline = v >= 0 ? 'bottom' : 'top';
+                  ctx.fillText(f(v, 1) + '%', el.x, el.y + (v >= 0 ? -6 : 6));
+                });
+              }
+            });
+          }
+        };
+
+        bChart = new Chart(document.getElementById('bar'), {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: gls,
+              backgroundColor: gls.map(g => g >= 0 ? '#3fb95055' : '#f7816655'),
+              borderColor: gls.map(g => g >= 0 ? '#3fb950' : '#f78166'),
+              borderWidth: 1
+            }]
+          },
+          plugins: [pctPlugin],
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+              padding: { top: 25, bottom: 25 }
+            },
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              x: {
+                ticks: { color: '#e6edf3', font: { size: 10 } },
+                grid: { color: '#21262d' }
+              },
+              y: {
+                ticks: { color: '#8b949e', callback: v => v + '%' },
+                grid: { color: '#21262d' }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    /* ==========================================================================
+       10. CONEXIONES API (FINNHUB Y TRM)
+       ========================================================================== */
+    async function fetchRealTimeData() {
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+      if (!currentUser) return;
+      
+      // Obtener TRM
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const d = await res.json();
+        if (d.rates && d.rates.COP) {
+          document.getElementById('rateInput').value = d.rates.COP.toFixed(2);
+        }
+      } catch (e) {
+        console.log('Error TRM', e);
+      }
+      
+      // Obtener Precios Finnhub
+      const fetchPrice = async ticker => {
+        try {
+          const sym = ticker.includes('.UK') ? ticker.replace('.UK', '.L') : ticker;
+          const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${FINNHUB_API_KEY}`);
+          const d = await res.json();
+          return d.c;
+        } catch (e) {
+          return null;
+        }
+      };
+      
+      try {
+        await Promise.all([
+          ...SW.filter(r => r.t).map(async r => {
+            const p = await fetchPrice(r.t);
+            if (p) r.px = p;
+          }),
+          ...XT.filter(r => r.t).map(async r => {
+            const p = await fetchPrice(r.t);
+            if (p) r.px = p;
+          })
+        ]);
+      } catch (e) {
+        console.log("Error al sincronizar las APIs de las acciones", e);
+      }
+      
+      recalc(false);
+    }
+    
+    // Actualizar datos cada 60 segundos
+    setInterval(fetchRealTimeData, 60000);
+
+  </script>
 </body>
 </html>
