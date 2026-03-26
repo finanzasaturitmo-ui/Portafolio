@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mi Portafolio Pro | Sincronizado</title>
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpath d='M16 3 L29 16 L22 16 L22 29 L10 29 L10 16 L3 16 Z' fill='%233fb950' opacity='0.2'/%3E%3Cpolyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='20' fill='%2358a6ff' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -19,11 +23,13 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-siz
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: #0d1117; display: flex; flex-direction: column;
   align-items: center; justify-content: center; z-index: 9999;
+  padding: 20px; text-align: center;
 }
 .btn-google {
   background: #ffffff; color: #1f2328; border: none; padding: 12px 24px;
   border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer;
-  margin-top: 20px; transition: 0.2s; display: flex; align-items: center; gap: 10px;
+  margin-top: 25px; transition: 0.2s; display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 4px 15px rgba(255,255,255,0.1);
 }
 .btn-google:hover { background: #e6edf3; transform: scale(1.05); }
 
@@ -44,7 +50,6 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-siz
 
 .btn-add { background: var(--g); color: #fff; border: none; font-size: .75rem; padding: 5px 12px; font-weight: 600; box-shadow: 0 0 5px rgba(63,185,80,0.3);}
 .btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63,185,80,0.6); transform: scale(1.03); }
-.btn-ai{background:#1f6feb;color:#fff}.btn-ai:hover{background:#388bfd}.btn-ai:disabled{background:#21262d;color:var(--sub);cursor:not-allowed}
 
 main{padding:14px 18px;max-width:1300px;margin:0 auto}
 
@@ -131,18 +136,25 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 <body>
 
 <div id="login-screen">
-  <h1 style="font-size: 2.5rem; color: var(--b); margin-bottom: 10px;">📊 Mi Portafolio</h1>
-  <p style="color: var(--sub);">Sincronizado en la nube privada</p>
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width="80" height="80" style="margin-bottom: 20px;">
+    <rect width='32' height='32' rx='7' fill='%23161b22'/>
+    <polyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>
+    <path d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>
+    <text x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='19' fill='%2358a6ff' text-anchor='middle'>$</text>
+  </svg>
+  <h1 style="font-size: 2.2rem; color: var(--b); margin-bottom: 10px;">Mi Portafolio Pro</h1>
+  <p style="color: var(--sub); max-width: 300px;">Bóveda personal sincronizada en la nube segura de Google Firebase.</p>
   <button class="btn-google" onclick="iniciarSesion()">
     <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.7 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
     Entrar con Google
   </button>
+  <p style="color: #444; font-size: 0.7rem; margin-top: 50px;">Solo acceso autorizado.</p>
 </div>
 
 <div id="app-content" style="display: none;">
   <div class="hdr">
     <div>
-      <h1>📊 Mi Portafolio</h1>
+      <h1>📊 Mi Portafolio Pro</h1>
       <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Conectando a la nube...</div>
     </div>
     <div class="hdr-right">
@@ -225,24 +237,10 @@ const db = firebase.database();
 let currentUser = null;
 
 // ── VARIABLES GLOBALES DEL PORTAFOLIO ──────────────
-// Datos iniciales de ejemplo (Se usarán solo la primera vez si la nube está vacía)
-let SW = [
-  {id:1, t:'BABA',    qty:19,      inv:1460.91, invFormula: '1460.91', px:129.87, p:false},
-  {id:2, t:'BRK-B',   qty:7.5562,  inv:2974.72, invFormula: '2974.72', px:476.19, p:false},
-  {id:3, t:'CRCL',    qty:5,       inv:373.60,  invFormula: '373.60',  px:103.86, p:false},
-  {id:4, t:'GRAB',    qty:473,     inv:2383.92, invFormula: '2383.92', px:3.73,   p:false},
-  {id:5, t:'IBIT',    qty:18,      inv:716.04,  invFormula: '716.04',  px:40.17,  p:false},
-  {id:6, t:'NU',      qty:195,     inv:2334.15, invFormula: '2334.15', px:14.32,  p:false},
-  {id:7, t:'PLTR',    qty:35.2959, inv:1552.31, invFormula: '1552.31', px:154.96, p:false},
-  {id:8, t:'SPYG',    qty:27.0281, inv:2135.76, invFormula: '2135.76', px:99.71,  p:false},
-  {id:9, t:'TLT',     qty:21.1635, inv:1949.58, invFormula: '1949.58', px:86.84,  p:false},
-  {id:10,t:'TSLA',    qty:2.1913,  inv:822.17,  invFormula: '822.17',  px:385.95, p:false},
-];
-let XT = [
-  {id:11,t:'EIMI.UK', qty:28.2244, inv:1125.02, invFormula: '1125.02', px:46.19,  p:false},
-  {id:12,t:'CSPX.UK', qty:2.8771,  inv:1885.01, invFormula: '1885.01', px:703.48, p:false}
-];
-let nid = 20;
+// Datos iniciales vacíos, se llenarán desde Firebase
+let SW = [];
+let XT = [];
+let nid = 1;
 let dChart=null, bChart=null;
 let saveTimeout = null;
 const COLS=['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc'];
@@ -272,7 +270,7 @@ function iniciarSesion() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(error => {
     console.error("Error iniciando sesión:", error);
-    alert("Hubo un error al iniciar sesión. Revisa los dominios autorizados en Firebase.");
+    alert("Hubo un error al iniciar sesión. Revisa la consola y los dominios autorizados en Firebase.");
   });
 }
 
@@ -282,11 +280,18 @@ function cerrarSesion() {
 
 function loadFromFirebase() {
   if (!currentUser) return;
+  document.getElementById('lastSaved').textContent = 'Sincronizando...';
   db.ref('users/' + currentUser.uid).once('value').then(snapshot => {
     if (snapshot.exists()) {
       const data = snapshot.val();
-      if (data.SW) SW = data.SW;
-      if (data.XT) XT = data.XT;
+      SW = data.SW || [];
+      XT = data.XT || [];
+      // Encontrar el ID más alto para el nid
+      const allRows = [...SW, ...XT];
+      if (allRows.length > 0) {
+          nid = Math.max(...allRows.map(row => row.id)) + 1;
+      }
+      
       if (data.rate) document.getElementById('rateInput').value = data.rate;
       if (data.skInv) {
         document.getElementById('skInv').dataset.raw = data.skInv;
@@ -296,15 +301,20 @@ function loadFromFirebase() {
         document.getElementById('skCur').dataset.raw = data.skCur;
         document.getElementById('skCur').value = new Intl.NumberFormat('es-CO').format(data.skCur);
       }
-      if (data.ts) document.getElementById('lastSaved').textContent = 'Sincronizado: '+new Date(data.ts).toLocaleTimeString('es-CO');
-      showToast('☁️ Nube sincronizada');
+      if (data.ts) document.getElementById('lastSaved').textContent = 'Nube OK: '+new Date(data.ts).toLocaleTimeString('es-CO');
+      showToast('☁️ Datos cargados de la nube');
     } else {
-      // Es usuario nuevo, guardamos los de prueba iniciales
+      // Usuario nuevo, inicializar vacío
+      SW = []; XT = []; nid = 1;
+      document.getElementById('lastSaved').textContent = 'Nube vacía (Usuario nuevo)';
       saveDataToFirebase();
     }
     fetchRealTimeData(); 
     recalc();
-  }).catch(e => console.error("Error leyendo DB:", e));
+  }).catch(e => {
+      console.error("Error leyendo DB:", e);
+      showToast('❌ Error de permisos en la nube');
+  });
 }
 
 function saveDataToFirebase() {
@@ -319,21 +329,28 @@ function saveDataToFirebase() {
   
   db.ref('users/' + currentUser.uid).set(dataObj)
     .then(() => {
-      document.getElementById('lastSaved').textContent = 'Guardado en la nube: ' + new Date().toLocaleTimeString('es-CO');
+      document.getElementById('lastSaved').textContent = 'Nube sincronizada: ' + new Date().toLocaleTimeString('es-CO');
     })
-    .catch(e => showToast('❌ Error guardando en nube'));
+    .catch(e => {
+        console.error("Error guardando:", e);
+        showToast('❌ Error sincronizando cambios');
+    });
 }
 
-// Reemplazamos el localStorage antiguo para que llame a Firebase
 function saveData() { saveDataToFirebase(); }
 
 // ── LÓGICA DE FÓRMULA TIPO EXCEL (USD) ──────────────
 function calculateSumFromFormula(formulaString) {
-  if (!formulaString || formulaString.trim() === '') return 0;
-  let cleanedFormula = formulaString.replace(/\s/g, '').replace(',', '.').replace(/[^\d.+\-]/g, '');
+  if (!formulaString || String(formulaString).trim() === '') return 0;
+  // Limpieza estricta: solo números, puntos y signo mas
+  let cleanedFormula = String(formulaString).replace(/\s/g, '').replace(',', '.').replace(/[^\d.+\-]/g, '');
+  if (!cleanedFormula) return 0;
+  
   const parts = cleanedFormula.split('+');
   let sum = 0;
-  parts.forEach(part => { sum += (parseFloat(part) || 0); });
+  parts.forEach(part => { 
+      if (part) sum += (parseFloat(part) || 0); 
+  });
   return sum;
 }
 
@@ -349,7 +366,7 @@ function investBlur(inputEl, tid, id) {
 
   inputEl.setAttribute('data-raw-formula', inputValue); 
   inputEl.value = f(sum); 
-  inputEl.title = `Fórmula: ${inputValue}`; 
+  inputEl.title = `Fórmula activa: ${inputValue}`; 
 
   const arr = (tid === 'sw') ? SW : XT;
   const row = arr.find(x => x.id === id);
@@ -420,18 +437,17 @@ document.addEventListener('keydown', function(e) {
 
 // ── CÁLCULOS Y RENDERIZADO ──────────────
 function calc(row) {
-  if (row.inv === undefined) { row.inv = row.qty * (row.avg || 0); }
-  const cur = row.qty * row.px; 
-  const avg = row.qty > 0 ? row.inv / row.qty : 0;
+  if (row.inv === undefined) { row.inv = calculateSumFromFormula(row.invFormula) || 0; }
+  const cur = (row.qty || 0) * (row.px || 0); 
+  const avg = (row.qty > 0) ? row.inv / row.qty : 0;
   row.avg = avg; 
-  const gl = row.inv > 0 ? ((cur - row.inv) / row.inv) * 100 : 0;
+  const gl = (row.inv > 0) ? ((cur - row.inv) / row.inv) * 100 : 0;
   const pnl = cur - row.inv;
   return { ...row, cur, gl, pnl };
 }
 
 function renderTable(data, tid) {
   const rows = data.map(calc);
-  const active = rows.filter(x=>x.qty>0);
 
   const thead = `<thead><tr>
     <th style="text-align:left">Activo</th>
@@ -446,21 +462,21 @@ function renderTable(data, tid) {
   </tr></thead>`;
 
   const tbody = rows.map(row => {
-    const isPend = row.p || row.qty===0;
+    const isPend = row.p || !row.qty;
     const isAlert = !isPend && row.gl <= -10; 
 
     return `<tr class="${isPend?'pending':''}">
       <td class="ticker-cell">
-        <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t}" onfocus="saveStateToHistory()" onblur="upd('${tid}',${row.id},'t',this.value)">
+        <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t || ''}" placeholder="TICKER" onfocus="saveStateToHistory()" onblur="upd('${tid}',${row.id},'t',this.value)">
         ${isPend?'<span class="badge">próximo</span>':''}
       </td>
-      <td><input class="ci" value="${row.qty}" onfocus="saveStateToHistory()" onblur="upd('${tid}',${row.id},'qty',this.value)"></td>
+      <td><input class="ci" value="${row.qty || 0}" onfocus="saveStateToHistory()" onblur="upd('${tid}',${row.id},'qty',this.value)"></td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
-      <td class="computed ${isAlert ? 'alert-glow' : ''}" style="font-weight: 700;">${row.px}</td>
+      <td class="computed ${isAlert ? 'alert-glow' : ''}" style="font-weight: 700;">${row.px || 0}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
       <td>
-        <input type="text" class="ci invested-usd" value="${f(row.inv)}" data-raw-formula="${row.invFormula || row.inv}" 
-               onfocus="investFocus(this)" onblur="investBlur(this, '${tid}', ${row.id})" title="Fórmula: ${row.invFormula || row.inv}">
+        <input type="text" class="ci invested-usd" value="${f(row.inv)}" data-raw-formula="${row.invFormula || row.inv || 0}" 
+               onfocus="investFocus(this)" onblur="investBlur(this, '${tid}', ${row.id})" title="Fórmula activa: ${row.invFormula || row.inv || 0}">
       </td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl, isAlert)}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
@@ -478,7 +494,13 @@ function upd(tid, id, field, val) {
   const arr = tid==='sw'?SW:XT;
   const row = arr.find(x=>x.id===id);
   if (!row) return;
-  row[field] = (field==='t') ? val.toUpperCase() : r(val);
+  
+  if (field === 't') {
+      row[field] = val.toUpperCase().trim();
+  } else {
+      row[field] = r(val);
+  }
+  
   if (field==='qty' && r(val)>0) row.p = false;
   recalc();
 }
@@ -486,11 +508,12 @@ function upd(tid, id, field, val) {
 function addRow(tid) {
   saveStateToHistory();
   const arr = tid==='sw'?SW:XT;
-  arr.push({id:nid++, t:'', qty:0, inv:0, px:0, p:true});
+  arr.push({id:nid++, t:'', qty:0, inv:0, invFormula: '0', px:0, p:true});
   recalc();
 }
 
 function delRow(tid, id) {
+  if(!confirm("¿Estás seguro de eliminar este activo?")) return;
   saveStateToHistory();
   if (tid==='sw') SW = SW.filter(x=>x.id!==id);
   else            XT = XT.filter(x=>x.id!==id);
@@ -500,7 +523,7 @@ function delRow(tid, id) {
 function sellRow(tid, id) {
   const arr = tid === 'sw' ? SW : XT;
   const row = arr.find(x => x.id === id);
-  if (!row || row.qty <= 0) { alert('No tienes acciones para vender de este activo.'); return; }
+  if (!row || !row.qty || row.qty <= 0) { alert('No tienes acciones válidas para vender.'); return; }
 
   const qtyStr = prompt(`¿Cuántas acciones de ${row.t || 'este activo'} vas a vender?\n(Tienes ${row.qty} disponibles)`);
   if (qtyStr === null) return; 
@@ -519,8 +542,8 @@ function sellRow(tid, id) {
 
   row.qty -= sellQty;
   row.inv -= (sellQty * avgCost); 
-  // Actualizamos también la fórmula para que no sume mal después
-  row.invFormula = `${row.inv}`; 
+  // Actualizamos la fórmula para que refleje el nuevo costo invertido remanente
+  row.invFormula = `${row.inv.toFixed(4)}`; 
   if (row.qty < 0.0001) { row.qty = 0; row.inv = 0; row.invFormula = '0'; }
 
   recalc();
@@ -536,7 +559,7 @@ function recalc() {
   renderCharts();
   
   clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(saveData, 1000);
+  saveTimeout = setTimeout(saveData, 1500); // Un poco más de delay para Firebase
 }
 
 function renderCards() {
@@ -551,8 +574,10 @@ function renderCards() {
   
   const rawSkCur = parseFloat(document.getElementById('skCur').dataset.raw || 12627217);
   const gC = tCur + (rawSkCur/rt);
-  const best  = [...all].sort((a,b)=>b.gl-a.gl)[0];
-  const worst = [...all].sort((a,b)=>a.gl-b.gl)[0];
+  
+  const brokerAssets = all.filter(x => x.t); // Solo activos con ticker
+  const best  = brokerAssets.length ? [...brokerAssets].sort((a,b)=>b.gl-a.gl)[0] : null;
+  const worst = brokerAssets.length ? [...brokerAssets].sort((a,b)=>a.gl-b.gl)[0] : null;
 
   document.getElementById('cards').innerHTML=`
     <div class="card"><div class="lbl">Valor Total USD</div><div class="val b">$${f(tCur)}</div><div class="s2">${fCOP(tCur*rt)}</div></div>
@@ -596,7 +621,7 @@ function renderSummary() {
 }
 
 function renderCharts() {
-  const all = [...SW.map(calc),...XT.map(calc)].filter(x=>x.qty>0);
+  const all = [...SW.map(calc),...XT.map(calc)].filter(x=>x.qty>0 && x.t);
   const labels = all.map(x=>x.t);
   const vals = all.map(x=>x.cur);
   const gls  = all.map(x=>x.gl);
@@ -608,29 +633,33 @@ function renderCharts() {
   });
 
   if (dChart) dChart.destroy();
-  dChart = new Chart(document.getElementById('donut'),{
-    type:'doughnut',
-    data:{labels: labelsPct, datasets:[{data:vals,backgroundColor:COLS.slice(0,labels.length),borderWidth:2,borderColor:'#161b22'}]},
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{position:'right',labels:{color:'#e6edf3',font:{size:12.5, family: "'Segoe UI', sans-serif"},boxWidth:12,padding:14}}}
-    }
-  });
+  if(labels.length > 0) {
+      dChart = new Chart(document.getElementById('donut'),{
+        type:'doughnut',
+        data:{labels: labelsPct, datasets:[{data:vals,backgroundColor:COLS.slice(0,labels.length),borderWidth:2,borderColor:'#161b22'}]},
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{legend:{position:'right',labels:{color:'#e6edf3',font:{size:11, family: "'Segoe UI', sans-serif"},boxWidth:10,padding:8}}}
+        }
+      });
+  }
 
   if (bChart) bChart.destroy();
-  bChart = new Chart(document.getElementById('bar'),{
-    type:'bar',
-    data:{labels,datasets:[{data:gls,backgroundColor:gls.map(g=>g>=0?'#3fb95055':'#f7816655'),borderColor:gls.map(g=>g>=0?'#3fb950':'#f78166'),borderWidth:1}]},
-    options:{
-      responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:'#e6edf3',font:{size:11}},grid:{color:'#21262d'}},y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}}
-    }
-  });
+  if(labels.length > 0) {
+      bChart = new Chart(document.getElementById('bar'),{
+        type:'bar',
+        data:{labels,datasets:[{data:gls,backgroundColor:gls.map(g=>g>=0?'#3fb95055':'#f7816655'),borderColor:gls.map(g=>g>=0?'#3fb950':'#f78166'),borderWidth:1}]},
+        options:{
+          responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+          scales:{x:{ticks:{color:'#e6edf3',font:{size:10}},grid:{color:'#21262d'}},y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}}
+        }
+      });
+  }
 }
 
 async function fetchRealTimeData() {
   if (document.activeElement && document.activeElement.tagName === 'INPUT') { return; }
-  if (!currentUser) return; // No actualizar si no ha iniciado sesión
+  if (!currentUser) return; 
 
   document.getElementById('rateBox').classList.add('updating');
   try {
@@ -642,15 +671,22 @@ async function fetchRealTimeData() {
   } catch(e) { console.log('Error TRM', e); }
 
   const fetchPrice = async (ticker) => {
-    const sym = ticker.includes('.UK') ? ticker.replace('.UK', '.L') : ticker; 
-    const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${FINNHUB_API_KEY}`);
-    const data = await res.json();
-    return data.c; 
+    try {
+        const sym = ticker.includes('.UK') ? ticker.replace('.UK', '.L') : ticker; 
+        const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${FINNHUB_API_KEY}`);
+        const data = await res.json();
+        return data.c; 
+    } catch (error) {
+        console.error(`Error fetching price for ${ticker}:`, error);
+        return null;
+    }
   };
 
   try {
-    for (let row of SW) if (row.t) { const p = await fetchPrice(row.t); if(p) row.px = p; }
-    for (let row of XT) if (row.t) { const p = await fetchPrice(row.t); if(p) row.px = p; }
+    // Usamos Promise.all para hacer las peticiones en paralelo y que sea más rápido
+    const swPromises = SW.filter(row => row.t).map(async row => { const p = await fetchPrice(row.t); if(p) row.px = p; });
+    const xtPromises = XT.filter(row => row.t).map(async row => { const p = await fetchPrice(row.t); if(p) row.px = p; });
+    await Promise.all([...swPromises, ...xtPromises]);
   } catch(e) { console.log('Error Stocks', e); }
 
   recalc();
@@ -660,6 +696,12 @@ async function fetchRealTimeData() {
 setInterval(fetchRealTimeData, 60000);
 
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+
+// Funciones vacías para evitar errores si se hace clic en tabs de IA
+function setTab(t, el) {}
+function runAI() {}
+function askAI() {}
+
 </script>
 </body>
 </html>
