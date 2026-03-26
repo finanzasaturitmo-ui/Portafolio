@@ -359,7 +359,7 @@ function delRow(tid,id) { if(!confirm('¿Eliminar este activo?'))return; if(tid=
 function sellRow(tid,id) {
   const row=(tid==='sw'?SW:XT).find(x=>x.id===id);
   if(!row||!row.qty||row.qty<=0){alert('No tienes acciones válidas.');return;}
-  const qtyStr=prompt('¿Cuántas de '+row.t+' vas a vender?\n(Tienes '+row.qty+')'); if(qtyStr===null)return;
+  const qtyStr=prompt('¿Cuántas acciones de '+row.t+' vendiste?\n(Tienes '+row.qty+')'); if(qtyStr===null)return;
   const sellQty=rv(qtyStr); if(sellQty<=0||sellQty>row.qty){alert('Cantidad inválida.');return;}
   const pxStr=prompt('¿A qué precio las vendiste?'); if(pxStr===null)return;
   const sellPx=rv(pxStr); if(sellPx<=0){alert('Precio inválido.');return;}
