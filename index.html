@@ -83,13 +83,29 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .opp-glow{color:#3fb950 !important;font-weight:900 !important;text-shadow:0 0 8px rgba(63,185,80,0.8);animation:pulse-green 1.2s infinite alternate}
 @keyframes pulse-green{0%{text-shadow:0 0 5px rgba(63,185,80,0.5)}100%{text-shadow:0 0 15px rgba(63,185,80,1),0 0 20px rgba(63,185,80,0.8)}}
 
+/* 🔥 NUEVO DISEÑO UI DEL RESUMEN CONSOLIDADO 🔥 */
 .bottom{display:block;margin-bottom:14px}
-.sum-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:16px}
-.box-title{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
-.sum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #21262d22}
-.sum-row:last-child{border-bottom:none;font-weight:700;padding-top:8px}
-.sum-lbl{color:var(--sub);font-size:.8rem}
-.sum-val{font-size:.85rem;font-weight:600}
+.sum-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.box-title{font-size:.85rem;color:#e6edf3;font-weight:700;letter-spacing:.3px;margin-bottom:15px; display:flex; align-items:center; gap:8px;}
+
+/* Grid para minitarjetas de brokers */
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px}
+.sum-card{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:12px}
+
+/* Módulo especial de Skandia */
+.sk-panel{background:#0d1117;border:1px dashed #3fb95066;border-radius:8px;padding:16px;margin-bottom:18px;position:relative}
+.sk-title-badge{position:absolute;top:-9px;left:12px;background:var(--card);padding:0 8px;font-size:.68rem;color:#3fb950;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-radius:4px}
+.sk-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+
+/* Inputs visuales tipo fórmula */
+.sk-edit-group{position:relative;margin-top:5px}
+.sk-edit-badge{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.7rem;color:var(--sub);font-weight:700;background:#21262d;padding:3px 6px;border-radius:4px; pointer-events:none;}
+.sk-edit-input{width:100%;background:#161b22;border:1px solid #30363d;color:var(--b);font-weight:700;text-align:right;padding:8px 10px 8px 50px;border-radius:6px;font-size:.95rem;outline:none;transition:.2s;box-shadow:inset 0 1px 3px rgba(0,0,0,0.3)}
+.sk-edit-input:hover{border-color:#58a6ff66}
+.sk-edit-input:focus{border-color:#3fb950;box-shadow:0 0 0 2px rgba(63,185,80,0.2);background:#0d1117}
+
+/* Tarjeta de totales finales */
+.totals-panel{background:linear-gradient(135deg,#161b22,#0d1117);border:1px solid #58a6ff44;border-radius:8px;padding:16px}
 
 .toast{position:fixed;bottom:18px;right:18px;background:#1f6feb;color:#fff;padding:9px 16px;border-radius:7px;font-size:.78rem;opacity:0;transition:.3s;pointer-events:none;z-index:99999}
 .toast.show{opacity:1}
@@ -100,6 +116,8 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
   .hdr{flex-direction:column;align-items:flex-start;gap:5px;padding:10px}
   .hdr-right{width:100%;justify-content:space-between;flex-wrap:wrap}
   .hide-mob{display:none}
+  .btn-undo-redo{padding:4px 6px;font-size:0.75rem}
+  .btn-logout{padding:4px 8px}
   .cards{grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:10px}
   .card{padding:8px}
   .card .lbl{font-size:0.6rem;margin-bottom:1px}
@@ -107,13 +125,13 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
   .card .s2{font-size:0.65rem}
   .charts{grid-template-columns:1fr;gap:10px;margin-bottom:10px}
   .ch-wrap{height:180px}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
   table th,table td{font-size:0.75rem;padding:4px 3px}
   .ci{padding:3px 5px;width:75px;font-size:0.75rem}
   .ci.ticker{width:70px}
-  /* Ajuste para que Skandia no se salga en celulares */
-  .skandia-inp { width: 100% !important; max-width: 120px; }
-  .sum-box{padding:10px}
-  .box-title{font-size:0.65rem}
+  .sum-box{padding:12px}
+  /* Skandia inputs apilados en celular */
+  .sk-grid{grid-template-columns:1fr;gap:12px}
 }
 @media(max-width:480px){.cards{grid-template-columns:1fr}}
 </style>
@@ -174,7 +192,7 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
     
     <div class="bottom">
       <div class="sum-box">
-        <div class="box-title">📋 Resumen Consolidado por Broker</div>
+        <div class="box-title">📋 Resumen Consolidado del Portafolio</div>
         <div id="sum-content"></div>
       </div>
     </div>
@@ -206,12 +224,11 @@ let skCurVal = 12627217;
 let dChart = null, bChart = null, saveTimeout = null;
 const COLS = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc'];
 
-// 🔥 NUEVA LÓGICA DE COLORES 🔥
 const f    = (n,d=2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
 const fCOP = n => new Intl.NumberFormat('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0}).format(n)+' COP';
-const fU   = (n,d=2) => (n<0?'-':'') + '$' + f(Math.abs(n),d); // Valores neutros (Precio, Capital)
-const fGain = (n,d=2) => '<span class="'+(n>=0?'g':'r')+'">'+(n>=0?'+':'-')+'$'+f(Math.abs(n),d)+'</span>'; // Valores de ganancia/pérdida (Profit)
-const fP   = n => '<span class="'+(n>=0?'g':'r')+'">'+(n>=0?'+':'')+f(n,2)+'%</span>'; // Porcentajes
+const fU   = (n,d=2) => (n<0?'-':'') + '$' + f(Math.abs(n),d); 
+const fGain = (n,d=2) => '<span class="'+(n>=0?'g':'r')+'">'+(n>=0?'+':'-')+'$'+f(Math.abs(n),d)+'</span>'; 
+const fP   = n => '<span class="'+(n>=0?'g':'r')+'">'+(n>=0?'+':'')+f(n,2)+'%</span>'; 
 const rv   = s => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => rv(document.getElementById('rateInput').value)||4180;
 
@@ -249,7 +266,6 @@ function loadFromFirebase() {
       
       if (d.rate) document.getElementById('rateInput').value = d.rate;
       if (d.opp)  document.getElementById('oppInput').value  = d.opp;
-      
       if (d.skInv) skInvVal = parseFloat(d.skInv);
       if (d.skCur) skCurVal = parseFloat(d.skCur);
       
@@ -358,7 +374,6 @@ function renderTable(data,tid) {
     const isPend=row.p||!row.qty;
     const isOpp=!isPend&&row.avg>0&&row.px>0&&((row.avg-row.px)/row.avg*100)>=opp;
     
-    // Profit ahora usa fGain para que se ponga Verde (+) o Rojo (-)
     return '<tr class="'+(isPend?'pending':'')+'">'+
       '<td><input class="ci ticker '+(isOpp?'opp-glow':'')+'" value="'+(row.t||'')+'" placeholder="TICKER" onblur="upd(\''+tid+'\','+row.id+',\'t\',this.value)">'+(isPend?'<span class="badge">próximo</span>':'')+'</td>'+
       '<td><input class="ci" value="'+(row.qty||0)+'" style="text-align:center" onblur="upd(\''+tid+'\','+row.id+',\'qty\',this.value)"></td>'+
@@ -486,25 +501,73 @@ function renderSummary() {
 
   const skPnl=skCurVal-skInvVal, skRet=skInvVal>0?skPnl/skInvVal*100:0;
 
-  document.getElementById('sum-content').innerHTML=
-    '<div class="sum-row"><span class="sum-lbl">🇺🇸 Schwab — Invertido</span><span class="sum-val">$'+f(sI)+'</span></div>'+
-    '<div class="sum-row"><span class="sum-lbl">🇺🇸 Schwab — Actual</span><span class="sum-val">'+fU(sC)+'</span></div>'+
-    '<div style="margin:5px 0;border-top:1px solid var(--border)"></div>'+
-    '<div class="sum-row"><span class="sum-lbl">🇪🇺 XTB — Invertido</span><span class="sum-val">$'+f(xI)+'</span></div>'+
-    '<div class="sum-row"><span class="sum-lbl">🇪🇺 XTB — Actual</span><span class="sum-val">'+fU(xC)+'</span></div>'+
-    '<div style="margin:5px 0;border-top:1px solid var(--border)"></div>'+
-    
-    '<div class="sum-row"><span class="sum-lbl">🇨🇴 Skandia — Invertido <span style="font-size:.68rem;font-weight:normal;color:var(--sub)">($'+f(skI_USD)+')</span></span>'+
-      '<input class="ci skandia-inp" id="skInv" value="'+new Intl.NumberFormat('es-CO').format(skInvVal)+'" onfocus="skFocus(this)" onblur="skBlur(this, \'inv\')" style="font-weight:700;color:var(--b);text-align:right;background:transparent;border-color:transparent;padding-right:0;"></div>'+
-    '<div class="sum-row"><span class="sum-lbl">🇨🇴 Skandia — Actual <span style="font-size:.68rem;font-weight:normal;color:var(--sub)">('+fU(skC_USD)+')</span></span>'+
-      '<input class="ci skandia-inp" id="skCur" value="'+new Intl.NumberFormat('es-CO').format(skCurVal)+'" onfocus="skFocus(this)" onblur="skBlur(this, \'cur\')" style="font-weight:700;color:var(--b);text-align:right;background:transparent;border-color:transparent;padding-right:0;"></div>'+
-    '<div class="sum-row"><span class="sum-lbl" style="padding-left:22px;font-size:.7rem;color:var(--sub)">↳ Rendimiento Skandia</span><span class="sum-val"><span class="'+(skPnl>=0?'g':'r')+'">'+(skPnl>=0?'+':'-')+' '+fCOP(Math.abs(skPnl))+' ('+(skRet>=0?'+':'')+f(skRet,2)+'%)</span></span></div>'+
-    
-    '<div style="margin:5px 0;border-top:1px solid var(--border)"></div>'+
-    '<div class="sum-row"><span class="sum-lbl" style="color:var(--e6edf3)">Total Invertido USD</span><span class="sum-val">$'+f(tI_USD)+'</span></div>'+
-    '<div class="sum-row"><span class="sum-lbl" style="color:var(--e6edf3)">Total Invertido COP</span><span class="sum-val">'+fCOP(tI_COP)+'</span></div>'+
-    '<div class="sum-row" style="margin-top:4px"><span class="sum-lbl" style="color:var(--b);font-weight:700">Total Actual USD</span><span class="sum-val b" style="font-size:.95rem">'+fU(tC_USD)+'</span></div>'+
-    '<div class="sum-row"><span class="sum-lbl" style="color:#3fb950;font-weight:700">Total Actual COP</span><span class="sum-val g" style="font-size:.95rem">'+fCOP(tC_COP)+'</span></div>';
+  // 🔥 RENDER UI DEL NUEVO RESUMEN CONSOLIDADO 🔥
+  document.getElementById('sum-content').innerHTML= `
+    <div class="sum-grid">
+      <div class="sum-card">
+        <div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇺🇸 Schwab USA</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(sI)}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(sC)}</span></div>
+      </div>
+      <div class="sum-card">
+        <div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇪🇺 XTB Europe</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(xI)}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(xC)}</span></div>
+      </div>
+    </div>
+
+    <div class="sk-panel">
+      <div class="sk-title-badge">🇨🇴 Skandia IBIT ✏️</div>
+      
+      <div class="sk-grid">
+        <div>
+          <label style="font-size:.7rem; color:var(--sub);">Capital Invertido</label>
+          <div class="sk-edit-group">
+            <span class="sk-edit-badge">COP</span>
+            <input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'inv')">
+          </div>
+          <div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ $${f(skI_USD)} USD</div>
+        </div>
+        <div>
+          <label style="font-size:.7rem; color:var(--sub);">Valor Actual</label>
+          <div class="sk-edit-group">
+            <span class="sk-edit-badge">COP</span>
+            <input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'cur')">
+          </div>
+          <div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ ${fU(skC_USD)} USD</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px; padding-top:12px; border-top:1px solid #3fb95022; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:.7rem; color:var(--sub)">Rendimiento Skandia</span>
+          <span style="font-size:.8rem; font-weight:700;" class="${skPnl>=0?'g':'r'}">${skPnl>=0?'+':'-'} ${fCOP(Math.abs(skPnl))} (${skRet>=0?'+':''}${f(skRet,2)}%)</span>
+      </div>
+    </div>
+
+    <div class="totals-panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div>
+          <div style="font-size:.75rem; color:var(--sub); margin-bottom:2px;">Total Invertido</div>
+          <div style="font-size:1.15rem; font-weight:700; color:#e6edf3; letter-spacing:.5px;">${fCOP(tI_COP)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:.7rem; color:var(--sub); margin-bottom:2px;">Equivalente USD</div>
+          <div style="font-size:.9rem; font-weight:600; color:var(--sub);">$${f(tI_USD)}</div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border); margin:12px 0;"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:.8rem; color:#3fb950; font-weight:700; margin-bottom:2px;">Total Actual COP</div>
+          <div style="font-size:1.5rem; font-weight:800; color:#3fb950; letter-spacing:.5px; text-shadow:0 0 10px rgba(63,185,80,0.2);">${fCOP(tC_COP)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:.75rem; color:var(--b); font-weight:600; margin-bottom:2px;">Total Actual USD</div>
+          <div style="font-size:1.2rem; font-weight:800; color:var(--b);">$${f(tC_USD)}</div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderCharts() {
