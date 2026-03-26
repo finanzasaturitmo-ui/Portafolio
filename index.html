@@ -59,7 +59,7 @@ main{padding:14px 18px;max-width:1300px;margin:0 auto}
 .bhdr{padding:9px 14px;font-weight:700;font-size:.82rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
 .bhdr.sw{color:#79c0ff;background:linear-gradient(90deg,#1a3a5c22,transparent)}
 .bhdr.xt{color:#56d364;background:linear-gradient(90deg,#1a5c3a22,transparent)}
-.tbl-wrap{overflow-x:auto}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;text-align:center}
 th{color:var(--sub);padding:6px 8px;font-weight:500;font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
 th:first-child{text-align:left}
@@ -83,7 +83,6 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .opp-glow{color:#3fb950 !important;font-weight:900 !important;text-shadow:0 0 8px rgba(63,185,80,0.8);animation:pulse-green 1.2s infinite alternate}
 @keyframes pulse-green{0%{text-shadow:0 0 5px rgba(63,185,80,0.5)}100%{text-shadow:0 0 15px rgba(63,185,80,1),0 0 20px rgba(63,185,80,0.8)}}
 
-/* 🔥 DISEÑO CONSOLIDADO PARA EL RESUMEN 🔥 */
 .bottom{display:block;margin-bottom:14px}
 .sum-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:16px}
 .box-title{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
@@ -108,10 +107,11 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
   .card .s2{font-size:0.65rem}
   .charts{grid-template-columns:1fr;gap:10px;margin-bottom:10px}
   .ch-wrap{height:180px}
-  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
   table th,table td{font-size:0.75rem;padding:4px 3px}
   .ci{padding:3px 5px;width:75px;font-size:0.75rem}
   .ci.ticker{width:70px}
+  /* Ajuste para que Skandia no se salga en celulares */
+  .skandia-inp { width: 100% !important; max-width: 120px; }
   .sum-box{padding:10px}
   .box-title{font-size:0.65rem}
 }
@@ -200,17 +200,18 @@ const db = firebase.database();
 let currentUser = null;
 
 let SW = [], XT = [], nid = 1;
-// Variables globales nativas para Skandia
 let skInvVal = 14613200;
 let skCurVal = 12627217;
 
 let dChart = null, bChart = null, saveTimeout = null;
 const COLS = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc'];
 
+// 🔥 NUEVA LÓGICA DE COLORES 🔥
 const f    = (n,d=2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
 const fCOP = n => new Intl.NumberFormat('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0}).format(n)+' COP';
-const fU   = (n,d=2) => { const s='$'+f(Math.abs(n),d); return '<span class="'+(n<0?'r':'')+'">'+(n<0?'-':'')+s+'</span>'; };
-const fP   = n => '<span class="'+(n>=0?'g':'r')+'">'+(n>=0?'+':'')+f(n,2)+'%</span>';
+const fU   = (n,d=2) => (n<0?'-':'') + '$' + f(Math.abs(n),d); // Valores neutros (Precio, Capital)
+const fGain = (n,d=2) => '<span class="'+(n>=0?'g':'r')+'">'+(n>=0?'+':'-')+'$'+f(Math.abs(n),d)+'</span>'; // Valores de ganancia/pérdida (Profit)
+const fP   = n => '<span class="'+(n>=0?'g':'r')+'">'+(n>=0?'+':'')+f(n,2)+'%</span>'; // Porcentajes
 const rv   = s => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => rv(document.getElementById('rateInput').value)||4180;
 
@@ -249,7 +250,6 @@ function loadFromFirebase() {
       if (d.rate) document.getElementById('rateInput').value = d.rate;
       if (d.opp)  document.getElementById('oppInput').value  = d.opp;
       
-      // Cargar Skandia a las variables globales
       if (d.skInv) skInvVal = parseFloat(d.skInv);
       if (d.skCur) skCurVal = parseFloat(d.skCur);
       
@@ -333,7 +333,6 @@ function investBlur(el,tid,id) {
   if(row){row.inv=sum;row.invFormula=v;} recalc();
 }
 
-// Controladores nativos para los inputs de Skandia
 function skFocus(el) { 
     saveStateToHistory();
     el.value = el.id === 'skInv' ? skInvVal : skCurVal; 
@@ -358,15 +357,17 @@ function renderTable(data,tid) {
   const tbody=rows.map(row=>{
     const isPend=row.p||!row.qty;
     const isOpp=!isPend&&row.avg>0&&row.px>0&&((row.avg-row.px)/row.avg*100)>=opp;
+    
+    // Profit ahora usa fGain para que se ponga Verde (+) o Rojo (-)
     return '<tr class="'+(isPend?'pending':'')+'">'+
       '<td><input class="ci ticker '+(isOpp?'opp-glow':'')+'" value="'+(row.t||'')+'" placeholder="TICKER" onblur="upd(\''+tid+'\','+row.id+',\'t\',this.value)">'+(isPend?'<span class="badge">próximo</span>':'')+'</td>'+
       '<td><input class="ci" value="'+(row.qty||0)+'" style="text-align:center" onblur="upd(\''+tid+'\','+row.id+',\'qty\',this.value)"></td>'+
       '<td class="computed">'+(isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg))+'</td>'+
       '<td class="computed '+(isOpp?'opp-glow':'')+'" style="font-weight:700">'+(row.px||0)+'</td>'+
       '<td class="computed">'+(isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur))+'</td>'+
-      '<td><input type="text" class="ci" value="'+f(row.inv)+'" data-raw-formula="'+(row.invFormula||row.inv||0)+'" onfocus="investFocus(this)" onblur="investBlur(this,\''+tid+'\','+row.id+')" title="Fórmula: '+(row.invFormula||row.inv||0)+'"></td>'+
+      '<td><input type="text" class="ci invested-usd" value="'+f(row.inv)+'" data-raw-formula="'+(row.invFormula||row.inv||0)+'" onfocus="investFocus(this)" onblur="investBlur(this,\''+tid+'\','+row.id+')" title="Fórmula: '+(row.invFormula||row.inv||0)+'"></td>'+
       '<td class="computed">'+(isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl))+'</td>'+
-      '<td class="computed">'+(isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl))+'</td>'+
+      '<td class="computed">'+(isPend?'<span style="color:var(--sub)">—</span>':fGain(row.pnl))+'</td>'+
       '<td class="action-btns"><button class="icon-btn" onmousedown="sellRow(\''+tid+'\','+row.id+')" title="Registrar Venta">💰</button><button class="icon-btn btn-del" onmousedown="delRow(\''+tid+'\','+row.id+')" title="Eliminar">✕</button></td>'+
       '</tr>';
   }).join('');
@@ -422,10 +423,10 @@ function renderCards() {
   const wCls = worst && worst.gl >= 0 ? 'g' : 'r';
 
   const bPnlUSD  = best  ? (best.pnl>=0?'+':'-')+'$'+f(Math.abs(best.pnl))  : '';
-  const bPnlCOP  = best  ? (best.pnl>=0?'+':'')+fCOP(best.pnl*rt)            : '';
+  const bPnlCOP  = best  ? (best.pnl>=0?'+':'-')+fCOP(Math.abs(best.pnl)*rt): '';
   const bGl      = best  ? (best.gl>=0?'+':'')+f(best.gl,1)+'%'              : '';
   const wPnlUSD  = worst ? (worst.pnl>=0?'+':'-')+'$'+f(Math.abs(worst.pnl)) : '';
-  const wPnlCOP  = worst ? fCOP(worst.pnl*rt)                                : '';
+  const wPnlCOP  = worst ? (worst.pnl>=0?'+':'-')+fCOP(Math.abs(worst.pnl)*rt): '';
   const wGl      = worst ? f(worst.gl,1)+'%'                                 : '';
 
   document.getElementById('cards').innerHTML =
@@ -493,11 +494,10 @@ function renderSummary() {
     '<div class="sum-row"><span class="sum-lbl">🇪🇺 XTB — Actual</span><span class="sum-val">'+fU(xC)+'</span></div>'+
     '<div style="margin:5px 0;border-top:1px solid var(--border)"></div>'+
     
-    // 🔥 SKANDIA INTEGRADO A LA TABLA 🔥
     '<div class="sum-row"><span class="sum-lbl">🇨🇴 Skandia — Invertido <span style="font-size:.68rem;font-weight:normal;color:var(--sub)">($'+f(skI_USD)+')</span></span>'+
-      '<input class="ci" id="skInv" value="'+new Intl.NumberFormat('es-CO').format(skInvVal)+'" onfocus="skFocus(this)" onblur="skBlur(this, \'inv\')" style="width:130px;font-weight:700;color:var(--b);text-align:right;background:transparent;border-color:transparent;padding-right:0;"></div>'+
+      '<input class="ci skandia-inp" id="skInv" value="'+new Intl.NumberFormat('es-CO').format(skInvVal)+'" onfocus="skFocus(this)" onblur="skBlur(this, \'inv\')" style="font-weight:700;color:var(--b);text-align:right;background:transparent;border-color:transparent;padding-right:0;"></div>'+
     '<div class="sum-row"><span class="sum-lbl">🇨🇴 Skandia — Actual <span style="font-size:.68rem;font-weight:normal;color:var(--sub)">('+fU(skC_USD)+')</span></span>'+
-      '<input class="ci" id="skCur" value="'+new Intl.NumberFormat('es-CO').format(skCurVal)+'" onfocus="skFocus(this)" onblur="skBlur(this, \'cur\')" style="width:130px;font-weight:700;color:var(--b);text-align:right;background:transparent;border-color:transparent;padding-right:0;"></div>'+
+      '<input class="ci skandia-inp" id="skCur" value="'+new Intl.NumberFormat('es-CO').format(skCurVal)+'" onfocus="skFocus(this)" onblur="skBlur(this, \'cur\')" style="font-weight:700;color:var(--b);text-align:right;background:transparent;border-color:transparent;padding-right:0;"></div>'+
     '<div class="sum-row"><span class="sum-lbl" style="padding-left:22px;font-size:.7rem;color:var(--sub)">↳ Rendimiento Skandia</span><span class="sum-val"><span class="'+(skPnl>=0?'g':'r')+'">'+(skPnl>=0?'+':'-')+' '+fCOP(Math.abs(skPnl))+' ('+(skRet>=0?'+':'')+f(skRet,2)+'%)</span></span></div>'+
     
     '<div style="margin:5px 0;border-top:1px solid var(--border)"></div>'+
