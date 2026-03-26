@@ -37,8 +37,8 @@ main{padding:14px 18px;max-width:1300px;margin:0 auto}
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .ch{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
 .ch h3{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
-.ch-wrap{height:220px;position:relative}
-@media(max-width:620px){.charts{grid-template-columns:1fr}}
+/* Reducimos un pelín la altura por defecto para compactar más */
+.ch-wrap{height:200px;position:relative}
 
 .broker{background:var(--card);border:1px solid var(--border);border-radius:9px;margin-bottom:12px;overflow:hidden}
 .bhdr{padding:9px 14px;font-weight:700;font-size:.82rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
@@ -87,7 +87,6 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .sum-row:last-child{border-bottom:none;font-weight:700;padding-top:8px}
 .sum-lbl{color:var(--sub);font-size:.78rem}
 .sum-val{font-size:.8rem;font-weight:600}
-@media(max-width:620px){.bottom{grid-template-columns:1fr}}
 
 .ai-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px}
 .ai-tabs{display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap}
@@ -103,6 +102,46 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 
 .toast{position:fixed;bottom:18px;right:18px;background:#1f6feb;color:#fff;padding:9px 16px;border-radius:7px;font-size:.78rem;opacity:0;transition:.3s;pointer-events:none;z-index:99}
 .toast.show{opacity:1}
+
+/* 🔥 ESTILOS RESPONSIVE PARA EL CELULAR 🔥 */
+@media (max-width: 768px) {
+  body { font-size: 11px; } /* Texto ligeramente más pequeño globalmente */
+  main { padding: 10px; } /* Menos márgenes laterales */
+  .hdr { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px; }
+  .hdr-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+  
+  /* KPIs en celular: 2 columnas compactas */
+  .cards { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
+  .card { padding: 8px; }
+  .card .lbl { font-size: 0.6rem; margin-bottom: 1px; }
+  .card .val { font-size: 1rem; }
+  .card .s2 { font-size: 0.65rem; }
+  
+  /* Gráficos apilados verticalmente */
+  .charts { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
+  .ch-wrap { height: 180px; } /* Altura reducida */
+  
+  /* Tablas: Permitir scroll horizontal, compactar columnas */
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 5px; }
+  table th, table td { font-size: 0.75rem; padding: 4px 3px; }
+  .ci { padding: 3px 5px; width: 75px; font-size: 0.75rem; } /* Casillas más compactas */
+  .ci.ticker { width: 70px; }
+  
+  /* Cajas de resumen/Skandia apiladas */
+  .bottom { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
+  .sum-box, .skandia-box { padding: 8px; }
+  .box-title { font-size: 0.65rem; }
+  .sum-val, .ci.computable { font-size: 0.75rem; }
+  
+  /* IA compacta */
+  .ai-inp, .btn-ai { font-size: 0.75rem; }
+}
+
+@media (max-width: 480px) {
+  /* KPIs en celular vertical muy estrecho: 1 columna */
+  .cards { grid-template-columns: 1fr; }
+}
+/* ─────────────────────────────────────── */
 </style>
 </head>
 <body>
@@ -190,21 +229,22 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 // ── CONFIGURACIÓN DE APIS ──────────────
 const FINNHUB_API_KEY = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
 
+// Se pre-pueblan los datos visibles en los screenshots como ejemplo inicial
 let SW = [
-  {id:1, t:'BABA',    qty:19,      inv:1460.91, px:129.87, p:false},
-  {id:2, t:'BRK-B',   qty:7.5562,  inv:2974.72, px:476.19, p:false},
-  {id:3, t:'CRCL',    qty:5,       inv:373.60,  px:103.86, p:false},
-  {id:4, t:'GRAB',    qty:473,     inv:2383.92, px:3.73,   p:false},
-  {id:5, t:'IBIT',    qty:18,      inv:716.04,  px:40.17,  p:false},
-  {id:6, t:'NU',      qty:195,     inv:2334.15, px:14.32,  p:false},
-  {id:7, t:'PLTR',    qty:35.2959, inv:1552.31, px:154.96, p:false},
-  {id:8, t:'SPYG',    qty:27.0281, inv:2135.76, px:99.71,  p:false},
-  {id:9, t:'TLT',     qty:21.1635, inv:1949.58, px:86.84,  p:false},
-  {id:10,t:'TSLA',    qty:2.1913,  inv:822.17,  px:385.95, p:false},
+  {id:1, t:'BABA',    qty:19,      inv:1460.91, invFormula: '1460.91', px:129.87, p:false},
+  {id:2, t:'BRK-B',   qty:7.5562,  inv:2974.72, invFormula: '2974.72', px:476.19, p:false},
+  {id:3, t:'CRCL',    qty:5,       inv:373.60,  invFormula: '373.60',  px:103.86, p:false},
+  {id:4, t:'GRAB',    qty:473,     inv:2383.92, invFormula: '2383.92', px:3.73,   p:false},
+  {id:5, t:'IBIT',    qty:18,      inv:716.04,  invFormula: '716.04',  px:40.17,  p:false},
+  {id:6, t:'NU',      qty:195,     inv:2334.15, invFormula: '2334.15', px:14.32,  p:false},
+  {id:7, t:'PLTR',    qty:35.2959, inv:1552.31, invFormula: '1552.31', px:154.96, p:false},
+  {id:8, t:'SPYG',    qty:27.0281, inv:2135.76, invFormula: '2135.76', px:99.71,  p:false},
+  {id:9, t:'TLT',     qty:21.1635, inv:1949.58, invFormula: '1949.58', px:86.84,  p:false},
+  {id:10,t:'TSLA',    qty:2.1913,  inv:822.17,  invFormula: '822.17',  px:385.95, p:false},
 ];
 let XT = [
-  {id:11,t:'EIMI.UK', qty:28.2244, inv:1125.02, px:46.19,  p:false},
-  {id:12,t:'CSPX.UK', qty:2.8771,  inv:1885.01, px:703.48, p:false}
+  {id:11,t:'EIMI.UK', qty:28.2244, inv:1125.02, invFormula: '1125.02', px:46.19,  p:false},
+  {id:12,t:'CSPX.UK', qty:2.8771,  inv:1885.01, invFormula: '1885.01', px:703.48, p:false}
 ];
 let nid = 20;
 let tab = 'auto';
@@ -219,19 +259,57 @@ const fP = (n, isAlert) => `<span class="${isAlert ? 'alert-glow' : (n>=0?'g':'r
 const r = (s,d=4) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => r(document.getElementById('rateInput').value)||4180;
 
+// ── LÓGICA DE FÓRMULA TIPO EXCEL (USD) ──────────────
+function calculateSumFromFormula(formulaString) {
+  if (!formulaString || formulaString.trim() === '') return 0;
+  // Limpieza básica: quitar espacios, cambiar comas por puntos (por seguridad), 
+  // filtrar caracteres extraños excepto números, punto y signo mas
+  let cleanedFormula = formulaString.replace(/\s/g, '').replace(',', '.').replace(/[^\d.+\-]/g, '');
+  const parts = cleanedFormula.split('+');
+  let sum = 0;
+  parts.forEach(part => {
+    // Manejo simple para evitar errores si hay un '+' al final
+    const num = parseFloat(part) || 0;
+    sum += num;
+  });
+  return sum;
+}
+
+function investFocus(inputEl) {
+  saveStateToHistory(); // Guardar estado para UNDO antes de editar
+  // Al enfocar, mostramos la fórmula cruda original
+  const rawFormula = inputEl.getAttribute('data-raw-formula');
+  if (rawFormula) { inputEl.value = rawFormula; }
+}
+
+function investBlur(inputEl, tid, id) {
+  const inputValue = inputEl.value; // La fórmula que escribió el usuario (ej: "100+50.5")
+  const sum = calculateSumFromFormula(inputValue);
+
+  inputEl.setAttribute('data-raw-formula', inputValue); // Guardamos la fórmula original para el historial
+  inputEl.value = f(sum); // Mostramos el total calculado formateado bonito
+  inputEl.title = `Breakdown: ${inputValue}`; // Set tooltip con el historial
+
+  // Actualizar los datos reales
+  const arr = (tid === 'sw') ? SW : XT;
+  const row = arr.find(x => x.id === id);
+  if (row) {
+    row.inv = sum;
+    row.invFormula = inputValue; // Guardamos la cadena de la fórmula en el objeto
+  }
+  recalc();
+}
+// ────────────────────────────────────────────────────────
+
 // ── LÓGICA DE SKANDIA (AUTO-FORMATO COP) ──────────────
 function skFocus(el) {
   saveStateToHistory();
-  // Al hacer clic, quitamos los puntos para que sea fácil editar el número real
   el.value = el.dataset.raw || el.value.replace(/\./g, '');
 }
 
 function skBlur(el) {
-  // Al salir de la casilla, leemos el número puro (quitando puntos por si el usuario los puso a mano)
   let cleanStr = String(el.value).replace(/\./g, '');
   let rawVal = parseFloat(cleanStr) || 0;
-  
-  // Guardamos el valor puro escondido y mostramos el valor bonito con formato colombiano
   el.dataset.raw = rawVal;
   el.value = new Intl.NumberFormat('es-CO').format(rawVal);
   recalc();
@@ -268,7 +346,6 @@ function undo() {
   XT = prevState.XT;
   document.getElementById('rateInput').value = prevState.rate;
   
-  // Restauramos los valores puros y visuales de Skandia
   document.getElementById('skInv').dataset.raw = prevState.skInv;
   document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(prevState.skInv);
   
@@ -331,7 +408,17 @@ function renderTable(data, tid) {
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
       <td class="computed ${isAlert ? 'alert-glow' : ''}" style="font-weight: 700;">${row.px}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
-      <td><input class="ci" value="${row.inv}" onfocus="saveStateToHistory()" onblur="upd('${tid}',${row.id},'inv',this.value)"></td>
+      
+      <td>
+        <input type="text" 
+               class="ci invested-usd" 
+               value="${f(row.inv)}" 
+               data-raw-formula="${row.invFormula || row.inv}" 
+               onfocus="investFocus(this)" 
+               onblur="investBlur(this, '${tid}', ${row.id})" 
+               title="Breakdown: ${row.invFormula || row.inv}">
+      </td>
+      
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl, isAlert)}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
       <td class="action-btns">
