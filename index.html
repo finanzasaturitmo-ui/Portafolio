@@ -94,7 +94,6 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .badge{display:inline-block;background:#21262d;color:var(--sub);font-size:.62rem;padding:1px 5px;border-radius:9px;margin-left:4px;vertical-align:middle}
 .computed{font-size:.8rem;padding:5px 8px}
 
-/* 🔥 NUEVO: HIGHLIGHT VERDE PARA OPORTUNIDAD DE COMPRA 🔥 */
 .opp-glow { color: #3fb950 !important; font-weight: 900 !important; text-shadow: 0 0 8px rgba(63, 185, 80, 0.8); animation: pulse-green 1.2s infinite alternate; }
 @keyframes pulse-green { 0% { text-shadow: 0 0 5px rgba(63, 185, 80, 0.5); } 100% { text-shadow: 0 0 15px rgba(63, 185, 80, 1), 0 0 20px rgba(63, 185, 80, 0.8); } }
 
@@ -237,10 +236,8 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 <div class="toast" id="toast"></div>
 
 <script>
-// ── CONFIGURACIÓN FINNHUB ──────────────
 const FINNHUB_API_KEY = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
 
-// ── INICIALIZAR FIREBASE ──────────────
 const firebaseConfig = {
   apiKey: "AIzaSyDAPrYB2pyJ7fQcMoC72DojH1ZKdzLgKwY",
   authDomain: "mi-portafolio-cristhian.firebaseapp.com",
@@ -255,7 +252,6 @@ const auth = firebase.auth();
 const db = firebase.database();
 let currentUser = null;
 
-// ── VARIABLES GLOBALES DEL PORTAFOLIO ──────────────
 let SW = [];
 let XT = [];
 let nid = 1;
@@ -270,7 +266,6 @@ const fP = (n) => `<span class="${n>=0?'g':'r'}">${n>=0?'+':''}${f(n,2)}%</span>
 const r = (s) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => r(document.getElementById('rateInput').value)||4180;
 
-// ── MANEJO DE SESIÓN FIREBASE ──────────────
 auth.onAuthStateChanged(user => {
   if (user) {
     currentUser = user;
@@ -305,7 +300,7 @@ function loadFromFirebase() {
       if (allRows.length > 0) nid = Math.max(...allRows.map(row => row.id)) + 1;
       
       if (data.rate) document.getElementById('rateInput').value = data.rate;
-      if (data.opp) document.getElementById('oppInput').value = data.opp; // Cargar la Oportunidad guardada
+      if (data.opp) document.getElementById('oppInput').value = data.opp; 
       if (data.skInv) {
         document.getElementById('skInv').dataset.raw = data.skInv;
         document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(data.skInv);
@@ -347,7 +342,6 @@ function saveDataToFirebase() {
   });
 }
 
-// ── LÓGICA DE HISTORIAL (DESHACER / REHACER MAX 10) ──────────────
 let historyArr = [];
 let historyIndex = -1;
 
@@ -432,7 +426,6 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// ── LÓGICA DE FÓRMULAS ──────────────
 function calculateSumFromFormula(fStr) {
   if (!fStr || String(fStr).trim() === '') return 0;
   let cleanStr = String(fStr).replace(/\s/g, '').replace(',', '.').replace(/[^\d.+\-]/g, '');
@@ -460,7 +453,6 @@ function skBlur(el) {
   recalc();
 }
 
-// ── CÁLCULOS Y RENDERIZADO ──────────────
 function calc(row) {
   if (row.inv === undefined) { row.inv = calculateSumFromFormula(row.invFormula) || 0; }
   const cur = (row.qty || 0) * (row.px || 0); 
@@ -478,8 +470,6 @@ function renderTable(data, tid) {
   
   const tbody = rows.map(row => {
     const isPend = row.p || !row.qty;
-    
-    // 🔥 LÓGICA PARA DETECTAR OPORTUNIDAD DE COMPRA 🔥
     let isOpp = false;
     if (!isPend && row.avg > 0 && row.px > 0) {
         const dropPct = ((row.avg - row.px) / row.avg) * 100;
@@ -575,7 +565,7 @@ function renderCards() {
     <div class="card"><div class="lbl">Valor Total USD</div><div class="val b">$${f(tCur)}</div><div class="s2">${fCOP(tCur*rt)}</div></div>
     <div class="card"><div class="lbl">Capital Invertido</div><div class="val">$${f(tInv)}</div><div class="s2">Brokers USD</div></div>
     <div class="card"><div class="lbl">P&L Brokers</div><div class="val ${tPnl>=0?'g':'r'}">${tPnl>=0?'+':'-'} $${f(Math.abs(tPnl))}</div><div class="s2 ${tPct>=0?'g':'r'}">${tPct>=0?'+':''}${f(tPct,1)}%</div></div>
-    <div class="card"><div class="lbl">Global USD (Con IBIT)</div><div class="val b">$${f(gC)}</div><div class="s2">Suma Skandia</div></div>
+    <div class="card"><div class="lbl">Global USD (Con IBIT)</div><div class="val b">$${f(gC)}</div><div class="s2">${fCOP(gC*rt)}</div></div>
     <div class="card"><div class="lbl">🏆 Mejor activo</div><div class="val g">${best?best.t:'—'}</div><div class="s2 g">${best?'+'+f(best.gl,1)+'%':''}</div></div>
     <div class="card"><div class="lbl">⚠️ Más rezagado</div><div class="val r">${worst?worst.t:'—'}</div><div class="s2 r">${worst?f(worst.gl,1)+'%':''}</div></div>`;
 }
@@ -626,7 +616,6 @@ function renderCharts() {
 
   if (bChart) bChart.destroy();
   if(labels.length > 0) {
-      // 🔥 PLUGIN MEJORADO: NÚMEROS SIEMPRE AFUERA DE LA BARRA 🔥
       const percentagePlugin = {
           id: 'percentagePlugin',
           afterDraw: (chart) => {
@@ -645,10 +634,10 @@ function renderCharts() {
                           let positionY;
                           if (value >= 0) {
                               ctx.textBaseline = 'bottom';
-                              positionY = element.y - padding; // Siempre arriba de la barra verde
+                              positionY = element.y - padding; 
                           } else {
                               ctx.textBaseline = 'top';
-                              positionY = element.y + padding; // Siempre abajo de la barra roja
+                              positionY = element.y + padding; 
                           }
                           
                           ctx.fillText(percentage, element.x, positionY);
@@ -665,7 +654,6 @@ function renderCharts() {
         options:{ 
             responsive:true, 
             maintainAspectRatio:false, 
-            // 🔥 PADDING: Evita que los números de arriba se corten
             layout: { padding: { top: 25, bottom: 25 } }, 
             plugins:{legend:{display:false}}, 
             scales:{
@@ -710,11 +698,6 @@ async function fetchRealTimeData() {
 setInterval(fetchRealTimeData, 60000);
 
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
-
-// Funciones vacías para evitar errores si se hace clic en tabs de IA
-function setTab(t, el) {}
-function runAI() {}
-function askAI() {}
 </script>
 </body>
 </html>
