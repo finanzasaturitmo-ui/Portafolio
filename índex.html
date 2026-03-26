@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-size:13px}
+:root{--g:#3fb950;--r:#f78166;--b:#58a6ff;--border:#21262d;--card:#161b22;--sub:#8b949e}
+
+.hdr{background:linear-gradient(135deg,#1a2332,#0d1117);padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hdr h1{font-size:1.15rem;color:var(--b);font-weight:700}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rate-box{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:5px 11px; transition: 0.3s;}
+.rate-box.updating { border-color: var(--g); box-shadow: 0 0 5px var(--g); }
+.rate-box label{color:var(--sub);font-size:.72rem;white-space:nowrap}
+.hdr input{background:transparent;border:none;color:var(--b);font-weight:700;font-size:.88rem;width:85px;outline:none;text-align:right}
+.btn{border:none;padding:7px 14px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;transition:.2s}
+.btn-add{background:#21262d;color:var(--sub);border:1px solid var(--border);font-size:.72rem;padding:4px 10px}.btn-add:hover{background:var(--border);color:#fff}
+.btn-ai{background:#1f6feb;color:#fff}.btn-ai:hover{background:#388bfd}.btn-ai:disabled{background:#21262d;color:var(--sub);cursor:not-allowed}
+
+main{padding:14px 18px;max-width:1300px;margin:0 auto}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px}
+.card .lbl{font-size:.68rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.card .val{font-size:1.2rem;font-weight:700}
+.card .s2{font-size:.72rem;color:var(--sub);margin-top:2px}
+.g{color:var(--g)}.r{color:var(--r)}.b{color:var(--b)}
+
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.ch{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
+.ch h3{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
+.ch-wrap{height:185px;position:relative}
+@media(max-width:620px){.charts{grid-template-columns:1fr}}
+
+.broker{background:var(--card);border:1px solid var(--border);border-radius:9px;margin-bottom:12px;overflow:hidden}
+.bhdr{padding:9px 14px;font-weight:700;font-size:.82rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.bhdr.sw{color:#79c0ff;background:linear-gradient(90deg,#1a3a5c22,transparent)}
+.bhdr.xt{color:#56d364;background:linear-gradient(90deg,#1a5c3a22,transparent)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{color:var(--sub);padding:6px 8px;text-align:right;font-weight:500;font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
+th:first-child,th:nth-child(2){text-align:left}
+td{padding:4px 5px;border-bottom:1px solid #0d111766;text-align:right;white-space:nowrap}
+td:first-child{text-align:left;padding-left:10px}
+tr:hover td{background:#1c212855}
+tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--border);border-bottom:none;font-size:.8rem}
+
+.ci{background:#0d1117;border:1px solid var(--border);color:#e6edf3;border-radius:5px;padding:4px 7px;width:90px;text-align:right;font-size:.8rem;outline:none;transition:.15s}
+.ci:focus{border-color:var(--b);background:#0d1c2e}
+.ci.ticker{width:85px;text-align:left;text-transform:uppercase;font-weight:700;color:var(--b)}
+.pending .ci{color:var(--sub)}
+.pending .ticker-cell{color:var(--sub);font-style:italic}
+.del{background:transparent;border:none;color:#f7816633;cursor:pointer;padding:2px 5px;font-size:.88rem;transition:.15s}
+.del:hover{color:var(--r)}
+.badge{display:inline-block;background:#21262d;color:var(--sub);font-size:.62rem;padding:1px 5px;border-radius:9px;margin-left:4px;vertical-align:middle}
+.computed{font-size:.8rem;padding:5px 8px}
+
+/* 🔥 NUEVO: EFECTO DE ALERTA ROJA BRILLANTE 🔥 */
+.alert-glow {
+  color: #ff3333 !important;
+  font-weight: 900 !important;
+  text-shadow: 0 0 8px rgba(255, 0, 0, 0.8);
+  animation: pulse-red 1.2s infinite alternate;
+}
+@keyframes pulse-red {
+  0% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+  100% { text-shadow: 0 0 15px rgba(255, 50, 50, 1), 0 0 20px rgba(255, 0, 0, 0.8); }
+}
+
+.bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.sum-box,.skandia-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
+.skandia-box{border-color:#3fb95033}
+.box-title{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #21262d22}
+.sum-row:last-child{border-bottom:none;font-weight:700;padding-top:8px}
+.sum-lbl{color:var(--sub);font-size:.78rem}
+.sum-val{font-size:.8rem;font-weight:600}
+.sk-inp{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--b);font-weight:700;font-size:.88rem;width:130px;text-align:right;outline:none;padding:2px 4px}
+.sk-inp:focus{border-color:var(--b)}
+@media(max-width:620px){.bottom{grid-template-columns:1fr}}
+
+.ai-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px}
+.ai-tabs{display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap}
+.ai-tab{background:#21262d;border:1px solid var(--border);color:var(--sub);padding:5px 13px;border-radius:18px;cursor:pointer;font-size:.76rem;transition:.2s}
+.ai-tab.on{background:#1f6feb;border-color:var(--b);color:#fff}
+.ai-chat-row{display:flex;gap:8px;margin-bottom:10px}
+.ai-inp{flex:1;background:#0d1117;border:1px solid var(--border);color:#e6edf3;padding:8px 12px;border-radius:7px;font-size:.8rem;outline:none}
+.ai-inp:focus{border-color:var(--b)}
+.ai-resp{background:#0d1117;border:1px solid var(--border);border-radius:7px;padding:13px;min-height:65px;font-size:.8rem;line-height:1.7;white-space:pre-wrap}
+.ai-resp.dim{color:var(--sub);font-style:italic}
+.spin{display:inline-block;width:9px;height:9px;border:2px solid #ffffff22;border-top-color:var(--b);border-radius:50%;animation:sp .7s linear infinite;margin-right:5px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+.toast{position:fixed;bottom:18px;right:18px;background:#1f6feb;color:#fff;padding:9px 16px;border-radius:7px;font-size:.78rem;opacity:0;transition:.3s;pointer-events:none;z-index:99}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>📊 Mi Portafolio</h1>
+    <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Sincronizando...</div>
+  </div>
+  <div class="hdr-right">
+    <div class="rate-box" id="rateBox">
+      <label>💱 COP/USD (Auto)</label>
+      <input id="rateInput" value="4180" readonly>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="cards" id="cards"></div>
+
+  <div class="charts">
+    <div class="ch"><h3>Distribución del Portafolio</h3><div class="ch-wrap"><canvas id="donut"></canvas></div></div>
+    <div class="ch"><h3>Rendimiento % G/L</h3><div class="ch-wrap"><canvas id="bar"></canvas></div></div>
+  </div>
+
+  <div class="broker">
+    <div class="bhdr sw">
+      <span>🇺🇸 Schwab USA</span>
+      <button class="btn btn-add" onclick="addRow('sw')">+ Agregar activo</button>
+    </div>
+    <div class="tbl-wrap"><table id="tbl-sw"></table></div>
+  </div>
+
+  <div class="broker">
+    <div class="bhdr xt">
+      <span>🇪🇺 XTB Europe</span>
+      <button class="btn btn-add" onclick="addRow('xt')">+ Agregar activo</button>
+    </div>
+    <div class="tbl-wrap"><table id="tbl-xt"></table></div>
+  </div>
+
+  <div class="bottom">
+    <div class="sum-box">
+      <div class="box-title">📋 Resumen por Broker</div>
+      <div id="sum-content"></div>
+    </div>
+    <div class="skandia-box">
+      <div class="box-title" style="color:#56d364">🏦 Skandia IBIT (COP)</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="sum-row"><span class="sum-lbl">Capital Invertido (COP)</span><input class="sk-inp" id="skInv" value="14613200" oninput="recalc()"></div>
+        <div class="sum-row"><span class="sum-lbl">Valor Actual (COP)</span><input class="sk-inp" id="skCur" value="12627217" oninput="recalc()"></div>
+        <div class="sum-row"><span class="sum-lbl">P&L</span><span class="sum-val" id="skPnl">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Retorno</span><span class="sum-val" id="skRet">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-box">
+    <div class="box-title">🤖 Análisis con IA</div>
+    <div class="ai-tabs">
+      <div class="ai-tab on" onclick="setTab('auto',this)">✨ Auto-análisis</div>
+      <div class="ai-tab" onclick="setTab('chat',this)">💬 Preguntar</div>
+      <div class="ai-tab" onclick="setTab('report',this)">📄 Reporte</div>
+      <div class="ai-tab" onclick="setTab('tax',this)">🇨🇴 Vista COP</div>
+    </div>
+    <div id="chatRow" style="display:none" class="ai-chat-row">
+      <input class="ai-inp" id="aiQ" placeholder="Ej: ¿Qué activo debería reforzar este mes?" onkeydown="if(event.key==='Enter')askAI()">
+      <button class="btn btn-ai" id="aiBtn" onclick="askAI()">Preguntar</button>
+    </div>
+    <button class="btn btn-ai" id="autoBtn" onclick="runAI()" style="width:100%;margin-bottom:10px">✨ Generar análisis</button>
+    <div class="ai-resp dim" id="aiResp">Haz clic en "Generar análisis" para obtener insights de tu portafolio.</div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIGURACIÓN DE APIS ──────────────
+const FINNHUB_API_KEY = 'TU_API_KEY_AQUI'; 
+
+let SW = [
+  {id:1, t:'BABA',    qty:19,      avg:76.89,  px:129.87, p:false},
+  {id:2, t:'BRK-B',   qty:7.5562,  avg:393.68, px:476.19, p:false},
+  {id:3, t:'CRCL',    qty:5,       avg:74.72,  px:103.86, p:false},
+  {id:4, t:'GRAB',    qty:473,     avg:5.04,   px:3.73,   p:false},
+  {id:5, t:'IBIT',    qty:18,      avg:39.78,  px:40.17,  p:false},
+  {id:6, t:'NU',      qty:195,     avg:11.97,  px:14.32,  p:false},
+  {id:7, t:'PLTR',    qty:35.2959, avg:43.98,  px:154.96, p:false},
+  {id:8, t:'SPYG',    qty:27.0281, avg:79.02,  px:99.71,  p:false},
+  {id:9, t:'TLT',     qty:21.1635, avg:92.12,  px:86.84,  p:false},
+  {id:10,t:'TSLA',    qty:2.1913,  avg:375.20, px:385.95, p:false},
+];
+let XT = [
+  {id:11,t:'EIMI.UK', qty:28.2244, avg:39.86,  px:46.19,  p:false},
+  {id:12,t:'CSPX.UK', qty:2.8771,  avg:655.18, px:703.48, p:false}
+];
+let nid = 20;
+let tab = 'auto';
+let dChart=null, bChart=null;
+let saveTimeout = null;
+const COLS=['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc'];
+
+const f = (n,d=2) => isNaN(n)?'—':new Intl.NumberFormat('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const fCOP = n => new Intl.NumberFormat('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0}).format(n)+' COP';
+const fU = (n,d=2) => { const s='$'+f(Math.abs(n),d); return `<span class="${n<0?'r':''}">${n<0?'-':''}${s}</span>`; };
+const fP = (n, isAlert) => `<span class="${isAlert ? 'alert-glow' : (n>=0?'g':'r')}">${n>=0?'+':''}${f(n,2)}%</span>`;
+const r = (s,d=4) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
+const rate = () => r(document.getElementById('rateInput').value)||4180;
+
+function calc(row) {
+  const cur = row.qty * row.px;
+  const inv = row.qty * row.avg;
+  return { ...row, cur, inv, gl: row.avg>0?(row.px-row.avg)/row.avg*100:0, pnl: cur-inv };
+}
+
+function renderTable(data, tid) {
+  const rows = data.map(calc);
+  const active = rows.filter(x=>x.qty>0);
+  const tCur = active.reduce((s,x)=>s+x.cur,0);
+  const tInv = active.reduce((s,x)=>s+x.inv,0);
+  const tPnl = tCur-tInv;
+  const tGl  = tInv>0?tPnl/tInv*100:0;
+
+  const thead = `<thead><tr>
+    <th style="text-align:left">Activo</th>
+    <th style="text-align:left">Cant.</th>
+    <th>Precio Prom</th>
+    <th>Precio Actual</th>
+    <th>Valor USD</th>
+    <th>Invertido USD</th>
+    <th>% G/L</th>
+    <th>Profit</th>
+    <th></th>
+  </tr></thead>`;
+
+  const tbody = rows.map(row => {
+    const isPend = row.p || row.qty===0;
+    
+    // 🔥 AQUÍ DEFINES EL LÍMITE DE LA ALERTA. Actualmente en -10% (-10) 🔥
+    const isAlert = !isPend && row.gl <= -10; 
+
+    return `<tr class="${isPend?'pending':''}">
+      <td class="ticker-cell">
+        <input class="ci ticker ${isAlert ? 'alert-glow' : ''}" value="${row.t}" oninput="upd('${tid}',${row.id},'t',this.value)">
+        ${isPend?'<span class="badge">próximo</span>':''}
+      </td>
+      <td><input class="ci" value="${row.qty}" oninput="upd('${tid}',${row.id},'qty',this.value)"></td>
+      <td><input class="ci" value="${row.avg}" oninput="upd('${tid}',${row.id},'avg',this.value)"></td>
+      <td><input class="ci ${isAlert ? 'alert-glow' : ''}" value="${row.px}"  oninput="upd('${tid}',${row.id},'px', this.value)" readonly title="Auto-actualizado"></td>
+      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
+      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.inv)}</td>
+      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl, isAlert)}</td>
+      <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
+      <td><button class="del" onclick="delRow('${tid}',${row.id})">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tbl-'+tid).innerHTML = thead+'<tbody>'+tbody+'</tbody>';
+}
+
+function upd(tid, id, field, val) {
+  const arr = tid==='sw'?SW:XT;
+  const row = arr.find(x=>x.id===id);
+  if (!row) return;
+  row[field] = (field==='t') ? val.toUpperCase() : r(val);
+  if (field==='qty' && r(val)>0) row.p = false;
+  recalc();
+}
+
+function addRow(tid) {
+  const arr = tid==='sw'?SW:XT;
+  arr.push({id:nid++, t:'', qty:0, avg:0, px:0, p:true});
+  recalc();
+}
+
+function delRow(tid, id) {
+  if (tid==='sw') SW = SW.filter(x=>x.id!==id);
+  else            XT = XT.filter(x=>x.id!==id);
+  recalc();
+}
+
+function recalc() {
+  renderTable(SW,'sw');
+  renderTable(XT,'xt');
+  renderCards();
+  renderSummary();
+  renderCharts();
+  
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(saveData, 1000);
+}
+
+function renderCards() {
+  const rt = rate();
+  const sA = SW.map(calc).filter(x=>x.qty>0);
+  const xA = XT.map(calc).filter(x=>x.qty>0);
+  const all = [...sA,...xA];
+  const tCur = all.reduce((s,x)=>s+x.cur,0);
+  const tInv = all.reduce((s,x)=>s+x.inv,0);
+  const tPnl = tCur-tInv;
+  const tPct = tInv>0?tPnl/tInv*100:0;
+  
+  const gC = tCur + (r(document.getElementById('skCur').value)/rt);
+  const best  = [...all].sort((a,b)=>b.gl-a.gl)[0];
+  const worst = [...all].sort((a,b)=>a.gl-b.gl)[0];
+
+  document.getElementById('cards').innerHTML=`
+    <div class="card"><div class="lbl">Valor Total USD</div><div class="val b">$${f(tCur)}</div><div class="s2">${fCOP(tCur*rt)}</div></div>
+    <div class="card"><div class="lbl">Capital Invertido</div><div class="val">$${f(tInv)}</div><div class="s2">Brokers USD</div></div>
+    <div class="card"><div class="lbl">P&L Brokers</div><div class="val ${tPnl>=0?'g':'r'}">${tPnl>=0?'+':'-'} $${f(Math.abs(tPnl))}</div><div class="s2 ${tPct>=0?'g':'r'}">${tPct>=0?'+':''}${f(tPct,1)}%</div></div>
+    <div class="card"><div class="lbl">Global USD (Con IBIT)</div><div class="val b">$${f(gC)}</div><div class="s2">Suma Skandia</div></div>
+    <div class="card"><div class="lbl">🏆 Mejor activo</div><div class="val g">${best?best.t:'—'}</div><div class="s2 g">${best?'+'+f(best.gl,1)+'%':''}</div></div>
+    <div class="card"><div class="lbl">⚠️ Más rezagado</div><div class="val r">${worst?worst.t:'—'}</div><div class="s2 r">${worst?f(worst.gl,1)+'%':''}</div></div>`;
+}
+
+function renderSummary() {
+  const rt = rate();
+  const sA = SW.map(calc).filter(x=>x.qty>0);
+  const xA = XT.map(calc).filter(x=>x.qty>0);
+  const sI=sA.reduce((s,x)=>s+x.inv,0), sC=sA.reduce((s,x)=>s+x.cur,0);
+  const xI=xA.reduce((s,x)=>s+x.inv,0), xC=xA.reduce((s,x)=>s+x.cur,0);
+  const tI=sI+xI, tC=sC+xC;
+  
+  const totalActualCOP = tC * rt;
+  const totalInvertidoCOP = tI * rt; 
+
+  document.getElementById('sum-content').innerHTML=`
+    <div class="sum-row"><span class="sum-lbl">🇺🇸 Schwab — Invertido</span><span class="sum-val">$${f(sI)}</span></div>
+    <div class="sum-row"><span class="sum-lbl">🇺🇸 Schwab — Actual</span><span class="sum-val">${fU(sC)}</span></div>
+    <div style="margin:5px 0;border-top:1px solid var(--border)"></div>
+    <div class="sum-row"><span class="sum-lbl">🇪🇺 XTB — Invertido</span><span class="sum-val">$${f(xI)}</span></div>
+    <div class="sum-row"><span class="sum-lbl">🇪🇺 XTB — Actual</span><span class="sum-val">${fU(xC)}</span></div>
+    <div style="margin:5px 0;border-top:1px solid var(--border)"></div>
+    <div class="sum-row"><span class="sum-lbl">Total Invertido USD</span><span class="sum-val">$${f(tI)}</span></div>
+    <div class="sum-row"><span class="sum-lbl">Total Invertido COP</span><span class="sum-val">${fCOP(totalInvertidoCOP)}</span></div>
+    <div class="sum-row"><span class="sum-lbl">Total Actual USD</span><span class="sum-val b">${fU(tC)}</span></div>
+    <div class="sum-row"><span class="sum-lbl">Total Actual COP (Dinámico)</span><span class="sum-val b">${fCOP(totalActualCOP)}</span></div>`;
+
+  const skI=r(document.getElementById('skInv').value);
+  const skC=r(document.getElementById('skCur').value);
+  const skPnl=skC-skI, skRet=skI>0?skPnl/skI*100:0;
+  document.getElementById('skPnl').innerHTML=`<span class="${skPnl>=0?'g':'r'}">${skPnl>=0?'+':'-'} ${fCOP(Math.abs(skPnl))}</span>`;
+  document.getElementById('skRet').innerHTML=`<span class="${skRet>=0?'g':'r'}">${skRet>=0?'+':''}${f(skRet,2)}%</span>`;
+}
+
+function renderCharts() {
+  const all = [...SW.map(calc),...XT.map(calc)].filter(x=>x.qty>0);
+  const labels = all.map(x=>x.t);
+  const vals = all.map(x=>x.cur);
+  const gls  = all.map(x=>x.gl);
+
+  if (dChart) dChart.destroy();
+  dChart = new Chart(document.getElementById('donut'),{
+    type:'doughnut',
+    data:{labels,datasets:[{data:vals,backgroundColor:COLS.slice(0,labels.length),borderWidth:2,borderColor:'#161b22'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8b949e',font:{size:10},boxWidth:9}}}}
+  });
+
+  if (bChart) bChart.destroy();
+  bChart = new Chart(document.getElementById('bar'),{
+    type:'bar',
+    data:{labels,datasets:[{data:gls,backgroundColor:gls.map(g=>g>=0?'#3fb95055':'#f7816655'),borderColor:gls.map(g=>g>=0?'#3fb950':'#f78166'),borderWidth:1}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#8b949e',font:{size:9}},grid:{color:'#21262d'}},y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}}}
+  });
+}
+
+async function fetchRealTimeData() {
+  document.getElementById('rateBox').classList.add('updating');
+  
+  try {
+    const trmRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const trmData = await trmRes.json();
+    if(trmData.rates && trmData.rates.COP) {
+       document.getElementById('rateInput').value = trmData.rates.COP.toFixed(2);
+    }
+  } catch(e) { console.log('Error TRM', e); }
+
+  /* Descomenta cuando pongas tu API Key
+  const fetchPrice = async (ticker) => {
+    const sym = ticker.includes('.UK') ? ticker.replace('.UK', '.L') : ticker; 
+    const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${FINNHUB_API_KEY}`);
+    const data = await res.json();
+    return data.c; 
+  };
+
+  try {
+    for (let row of SW) if (row.t) { const p = await fetchPrice(row.t); if(p) row.px = p; }
+    for (let row of XT) if (row.t) { const p = await fetchPrice(row.t); if(p) row.px = p; }
+  } catch(e) { console.log('Error Stocks', e); }
+  */
+
+  recalc();
+  document.getElementById('rateBox').classList.remove('updating');
+  showToast('🔄 TRM (y precios) actualizados');
+}
+
+setInterval(fetchRealTimeData, 60000);
+
+function saveData() {
+  try {
+    const dataObj = {
+      SW, XT, 
+      rate: document.getElementById('rateInput').value,
+      skInv: document.getElementById('skInv').value,
+      skCur: document.getElementById('skCur').value,
+      ts: new Date().toISOString()
+    };
+    localStorage.setItem('miPortafolioPaisa', JSON.stringify(dataObj));
+    document.getElementById('lastSaved').textContent = 'Guardado: ' + new Date().toLocaleTimeString('es-CO');
+  } catch(e) { showToast('Error al guardar'); }
+}
+
+function loadSaved() {
+  try {
+    const res = localStorage.getItem('miPortafolioPaisa');
+    if (res) {
+      const d = JSON.parse(res);
+      if (d.SW) SW = d.SW;
+      if (d.XT) XT = d.XT;
+      if (d.rate) document.getElementById('rateInput').value = d.rate;
+      if (d.skInv) document.getElementById('skInv').value = d.skInv;
+      if (d.skCur) document.getElementById('skCur').value = d.skCur;
+      if (d.ts) document.getElementById('lastSaved').textContent = 'Cargado: '+new Date(d.ts).toLocaleTimeString('es-CO');
+    }
+  } catch(e) {}
+  
+  fetchRealTimeData(); 
+  recalc();
+}
+
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+
+loadSaved();
+
+// Mismo bloque de IA de antes (puedes volver a pegarlo acá si vas a usar esa función)
+function setTab(t, el) {}
+function ctx() {}
+async function runAI() {}
+async function askAI() {}
+</script>
+</body>
+</html>
