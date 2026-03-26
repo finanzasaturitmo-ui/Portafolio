@@ -724,7 +724,6 @@ async function fetchRealTimeData() {
   if (document.activeElement && document.activeElement.tagName === 'INPUT') { return; }
   if (!currentUser) return; 
 
-  document.getElementById('rateBox').classList.add('updating');
   try {
     const trmRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
     const trmData = await trmRes.json();
@@ -747,7 +746,6 @@ async function fetchRealTimeData() {
   } catch(e) {}
 
   recalc(false); 
-  document.getElementById('rateBox').classList.remove('updating');
 }
 
 setInterval(fetchRealTimeData, 60000);
