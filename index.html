@@ -4,11 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-size:13px}
 :root{--g:#3fb950;--r:#f78166;--b:#58a6ff;--border:#21262d;--card:#161b22;--sub:#8b949e}
 
+/* PANTALLA DE LOGIN */
+#login-screen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: #0d1117; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; z-index: 9999;
+}
+.btn-google {
+  background: #ffffff; color: #1f2328; border: none; padding: 12px 24px;
+  border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer;
+  margin-top: 20px; transition: 0.2s; display: flex; align-items: center; gap: 10px;
+}
+.btn-google:hover { background: #e6edf3; transform: scale(1.05); }
+
+/* ESTILOS DEL PORTAFOLIO */
 .hdr{background:linear-gradient(135deg,#1a2332,#0d1117);padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .hdr h1{font-size:1.15rem;color:var(--b);font-weight:700}
 .hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -20,6 +39,8 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-siz
 
 .btn-undo { background: #21262d; color: var(--sub); border: 1px solid var(--border); font-size: .72rem; padding: 5px 10px; }
 .btn-undo:hover { background: var(--border); color: #fff; }
+.btn-logout { background: #f7816622; color: var(--r); border: 1px solid #f7816655; font-size: .72rem; padding: 5px 10px; }
+.btn-logout:hover { background: var(--r); color: #fff; }
 
 .btn-add { background: var(--g); color: #fff; border: none; font-size: .75rem; padding: 5px 12px; font-weight: 600; box-shadow: 0 0 5px rgba(63,185,80,0.3);}
 .btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63,185,80,0.6); transform: scale(1.03); }
@@ -37,7 +58,6 @@ main{padding:14px 18px;max-width:1300px;margin:0 auto}
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .ch{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
 .ch h3{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
-/* Reducimos un pelín la altura por defecto para compactar más */
 .ch-wrap{height:200px;position:relative}
 
 .broker{background:var(--card);border:1px solid var(--border);border-radius:9px;margin-bottom:12px;overflow:hidden}
@@ -68,16 +88,8 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .badge{display:inline-block;background:#21262d;color:var(--sub);font-size:.62rem;padding:1px 5px;border-radius:9px;margin-left:4px;vertical-align:middle}
 .computed{font-size:.8rem;padding:5px 8px}
 
-.alert-glow {
-  color: #ff3333 !important;
-  font-weight: 900 !important;
-  text-shadow: 0 0 8px rgba(255, 0, 0, 0.8);
-  animation: pulse-red 1.2s infinite alternate;
-}
-@keyframes pulse-red {
-  0% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
-  100% { text-shadow: 0 0 15px rgba(255, 50, 50, 1), 0 0 20px rgba(255, 0, 0, 0.8); }
-}
+.alert-glow { color: #ff3333 !important; font-weight: 900 !important; text-shadow: 0 0 8px rgba(255, 0, 0, 0.8); animation: pulse-red 1.2s infinite alternate; }
+@keyframes pulse-red { 0% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); } 100% { text-shadow: 0 0 15px rgba(255, 50, 50, 1), 0 0 20px rgba(255, 0, 0, 0.8); } }
 
 .bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .sum-box,.skandia-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px}
@@ -88,148 +100,132 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 .sum-lbl{color:var(--sub);font-size:.78rem}
 .sum-val{font-size:.8rem;font-weight:600}
 
-.ai-box{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px}
-.ai-tabs{display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap}
-.ai-tab{background:#21262d;border:1px solid var(--border);color:var(--sub);padding:5px 13px;border-radius:18px;cursor:pointer;font-size:.76rem;transition:.2s}
-.ai-tab.on{background:#1f6feb;border-color:var(--b);color:#fff}
-.ai-chat-row{display:flex;gap:8px;margin-bottom:10px}
-.ai-inp{flex:1;background:#0d1117;border:1px solid var(--border);color:#e6edf3;padding:8px 12px;border-radius:7px;font-size:.8rem;outline:none}
-.ai-inp:focus{border-color:var(--b)}
-.ai-resp{background:#0d1117;border:1px solid var(--border);border-radius:7px;padding:13px;min-height:65px;font-size:.8rem;line-height:1.7;white-space:pre-wrap}
-.ai-resp.dim{color:var(--sub);font-style:italic}
-.spin{display:inline-block;width:9px;height:9px;border:2px solid #ffffff22;border-top-color:var(--b);border-radius:50%;animation:sp .7s linear infinite;margin-right:5px}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-.toast{position:fixed;bottom:18px;right:18px;background:#1f6feb;color:#fff;padding:9px 16px;border-radius:7px;font-size:.78rem;opacity:0;transition:.3s;pointer-events:none;z-index:99}
+.toast{position:fixed;bottom:18px;right:18px;background:#1f6feb;color:#fff;padding:9px 16px;border-radius:7px;font-size:.78rem;opacity:0;transition:.3s;pointer-events:none;z-index:99999}
 .toast.show{opacity:1}
 
-/* 🔥 ESTILOS RESPONSIVE PARA EL CELULAR 🔥 */
+/* ESTILOS RESPONSIVE CELULAR */
 @media (max-width: 768px) {
-  body { font-size: 11px; } /* Texto ligeramente más pequeño globalmente */
-  main { padding: 10px; } /* Menos márgenes laterales */
+  body { font-size: 11px; }
+  main { padding: 10px; }
   .hdr { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px; }
   .hdr-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
-  
-  /* KPIs en celular: 2 columnas compactas */
   .cards { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
   .card { padding: 8px; }
   .card .lbl { font-size: 0.6rem; margin-bottom: 1px; }
   .card .val { font-size: 1rem; }
   .card .s2 { font-size: 0.65rem; }
-  
-  /* Gráficos apilados verticalmente */
   .charts { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
-  .ch-wrap { height: 180px; } /* Altura reducida */
-  
-  /* Tablas: Permitir scroll horizontal, compactar columnas */
+  .ch-wrap { height: 180px; }
   .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 5px; }
   table th, table td { font-size: 0.75rem; padding: 4px 3px; }
-  .ci { padding: 3px 5px; width: 75px; font-size: 0.75rem; } /* Casillas más compactas */
+  .ci { padding: 3px 5px; width: 75px; font-size: 0.75rem; }
   .ci.ticker { width: 70px; }
-  
-  /* Cajas de resumen/Skandia apiladas */
   .bottom { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
   .sum-box, .skandia-box { padding: 8px; }
   .box-title { font-size: 0.65rem; }
   .sum-val, .ci.computable { font-size: 0.75rem; }
-  
-  /* IA compacta */
-  .ai-inp, .btn-ai { font-size: 0.75rem; }
 }
-
-@media (max-width: 480px) {
-  /* KPIs en celular vertical muy estrecho: 1 columna */
-  .cards { grid-template-columns: 1fr; }
-}
-/* ─────────────────────────────────────── */
+@media (max-width: 480px) { .cards { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<div class="hdr">
-  <div>
-    <h1>📊 Mi Portafolio</h1>
-    <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Sincronizando...</div>
-  </div>
-  <div class="hdr-right">
-    <button class="btn btn-undo" onclick="undo()" title="Atajo: Cmd+Z o Ctrl+Z">↩️ Deshacer</button>
-    <div class="rate-box" id="rateBox">
-      <label>💱 COP/USD (Auto)</label>
-      <input id="rateInput" value="4180" readonly>
-    </div>
-  </div>
+<div id="login-screen">
+  <h1 style="font-size: 2.5rem; color: var(--b); margin-bottom: 10px;">📊 Mi Portafolio</h1>
+  <p style="color: var(--sub);">Sincronizado en la nube privada</p>
+  <button class="btn-google" onclick="iniciarSesion()">
+    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.7 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+    Entrar con Google
+  </button>
 </div>
 
-<main>
-  <div class="cards" id="cards"></div>
-
-  <div class="charts">
-    <div class="ch"><h3>Distribución del Portafolio</h3><div class="ch-wrap"><canvas id="donut"></canvas></div></div>
-    <div class="ch"><h3>Rendimiento % G/L</h3><div class="ch-wrap"><canvas id="bar"></canvas></div></div>
-  </div>
-
-  <div class="broker">
-    <div class="bhdr sw">
-      <span>🇺🇸 Schwab USA</span>
-      <button class="btn btn-add" onmousedown="addRow('sw')">+ Agregar activo</button>
+<div id="app-content" style="display: none;">
+  <div class="hdr">
+    <div>
+      <h1>📊 Mi Portafolio</h1>
+      <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Conectando a la nube...</div>
     </div>
-    <div class="tbl-wrap"><table id="tbl-sw"></table></div>
-  </div>
-
-  <div class="broker">
-    <div class="bhdr xt">
-      <span>🇪🇺 XTB Europe</span>
-      <button class="btn btn-add" onmousedown="addRow('xt')">+ Agregar activo</button>
-    </div>
-    <div class="tbl-wrap"><table id="tbl-xt"></table></div>
-  </div>
-
-  <div class="bottom">
-    <div class="sum-box">
-      <div class="box-title">📋 Resumen por Broker</div>
-      <div id="sum-content"></div>
-    </div>
-    <div class="skandia-box">
-      <div class="box-title" style="color:#56d364">🏦 Skandia IBIT (COP)</div>
-      <div style="display:flex;flex-direction:column;gap:7px">
-        <div class="sum-row">
-          <span class="sum-lbl">Capital Invertido (COP)</span>
-          <input class="ci" id="skInv" value="14.613.200" data-raw="14613200" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b);">
-        </div>
-        <div class="sum-row">
-          <span class="sum-lbl">Valor Actual (COP)</span>
-          <input class="ci" id="skCur" value="12.627.217" data-raw="12627217" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b);">
-        </div>
-        <div class="sum-row"><span class="sum-lbl">P&L</span><span class="sum-val" id="skPnl">—</span></div>
-        <div class="sum-row"><span class="sum-lbl">Retorno</span><span class="sum-val" id="skRet">—</span></div>
+    <div class="hdr-right">
+      <button class="btn btn-undo" onclick="undo()" title="Atajo: Cmd+Z o Ctrl+Z">↩️ Deshacer</button>
+      <button class="btn btn-logout" onclick="cerrarSesion()">Salir</button>
+      <div class="rate-box" id="rateBox">
+        <label>💱 COP/USD (Auto)</label>
+        <input id="rateInput" value="4180" readonly>
       </div>
     </div>
   </div>
 
-  <div class="ai-box">
-    <div class="box-title">🤖 Análisis con IA</div>
-    <div class="ai-tabs">
-      <div class="ai-tab on" onclick="setTab('auto',this)">✨ Auto-análisis</div>
-      <div class="ai-tab" onclick="setTab('chat',this)">💬 Preguntar</div>
-      <div class="ai-tab" onclick="setTab('report',this)">📄 Reporte</div>
-      <div class="ai-tab" onclick="setTab('tax',this)">🇨🇴 Vista COP</div>
+  <main>
+    <div class="cards" id="cards"></div>
+
+    <div class="charts">
+      <div class="ch"><h3>Distribución del Portafolio</h3><div class="ch-wrap"><canvas id="donut"></canvas></div></div>
+      <div class="ch"><h3>Rendimiento % G/L</h3><div class="ch-wrap"><canvas id="bar"></canvas></div></div>
     </div>
-    <div id="chatRow" style="display:none" class="ai-chat-row">
-      <input class="ai-inp" id="aiQ" placeholder="Ej: ¿Qué activo debería reforzar este mes?" onkeydown="if(event.key==='Enter')askAI()">
-      <button class="btn btn-ai" id="aiBtn" onclick="askAI()">Preguntar</button>
+
+    <div class="broker">
+      <div class="bhdr sw">
+        <span>🇺🇸 Schwab USA</span>
+        <button class="btn btn-add" onmousedown="addRow('sw')">+ Agregar activo</button>
+      </div>
+      <div class="tbl-wrap"><table id="tbl-sw"></table></div>
     </div>
-    <button class="btn btn-ai" id="autoBtn" onclick="runAI()" style="width:100%;margin-bottom:10px">✨ Generar análisis</button>
-    <div class="ai-resp dim" id="aiResp">Haz clic en "Generar análisis" para obtener insights de tu portafolio.</div>
-  </div>
-</main>
+
+    <div class="broker">
+      <div class="bhdr xt">
+        <span>🇪🇺 XTB Europe</span>
+        <button class="btn btn-add" onmousedown="addRow('xt')">+ Agregar activo</button>
+      </div>
+      <div class="tbl-wrap"><table id="tbl-xt"></table></div>
+    </div>
+
+    <div class="bottom">
+      <div class="sum-box">
+        <div class="box-title">📋 Resumen por Broker</div>
+        <div id="sum-content"></div>
+      </div>
+      <div class="skandia-box">
+        <div class="box-title" style="color:#56d364">🏦 Skandia IBIT (COP)</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div class="sum-row">
+            <span class="sum-lbl">Capital Invertido (COP)</span>
+            <input class="ci" id="skInv" value="14.613.200" data-raw="14613200" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b);">
+          </div>
+          <div class="sum-row">
+            <span class="sum-lbl">Valor Actual (COP)</span>
+            <input class="ci" id="skCur" value="12.627.217" data-raw="12627217" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b);">
+          </div>
+          <div class="sum-row"><span class="sum-lbl">P&L</span><span class="sum-val" id="skPnl">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">Retorno</span><span class="sum-val" id="skRet">—</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ── CONFIGURACIÓN DE APIS ──────────────
+// ── CONFIGURACIÓN FINNHUB ──────────────
 const FINNHUB_API_KEY = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
 
-// Se pre-pueblan los datos visibles en los screenshots como ejemplo inicial
+// ── INICIALIZAR FIREBASE (CON TUS LLAVES) ──────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyDAPrYB2pyJ7fQcMoC72DojH1ZKdzLgKwY",
+  authDomain: "mi-portafolio-cristhian.firebaseapp.com",
+  databaseURL: "https://mi-portafolio-cristhian-default-rtdb.firebaseio.com",
+  projectId: "mi-portafolio-cristhian",
+  storageBucket: "mi-portafolio-cristhian.firebasestorage.app",
+  messagingSenderId: "857924881558",
+  appId: "1:857924881558:web:091fa5c2fb44b0a650c6b7"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+let currentUser = null;
+
+// ── VARIABLES GLOBALES DEL PORTAFOLIO ──────────────
+// Datos iniciales de ejemplo (Se usarán solo la primera vez si la nube está vacía)
 let SW = [
   {id:1, t:'BABA',    qty:19,      inv:1460.91, invFormula: '1460.91', px:129.87, p:false},
   {id:2, t:'BRK-B',   qty:7.5562,  inv:2974.72, invFormula: '2974.72', px:476.19, p:false},
@@ -247,7 +243,6 @@ let XT = [
   {id:12,t:'CSPX.UK', qty:2.8771,  inv:1885.01, invFormula: '1885.01', px:703.48, p:false}
 ];
 let nid = 20;
-let tab = 'auto';
 let dChart=null, bChart=null;
 let saveTimeout = null;
 const COLS=['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc'];
@@ -259,47 +254,111 @@ const fP = (n, isAlert) => `<span class="${isAlert ? 'alert-glow' : (n>=0?'g':'r
 const r = (s,d=4) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => r(document.getElementById('rateInput').value)||4180;
 
+// ── MANEJO DE SESIÓN FIREBASE ──────────────
+auth.onAuthStateChanged(user => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-content').style.display = 'block';
+    loadFromFirebase();
+  } else {
+    currentUser = null;
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-content').style.display = 'none';
+  }
+});
+
+function iniciarSesion() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(error => {
+    console.error("Error iniciando sesión:", error);
+    alert("Hubo un error al iniciar sesión. Revisa los dominios autorizados en Firebase.");
+  });
+}
+
+function cerrarSesion() {
+  auth.signOut();
+}
+
+function loadFromFirebase() {
+  if (!currentUser) return;
+  db.ref('users/' + currentUser.uid).once('value').then(snapshot => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      if (data.SW) SW = data.SW;
+      if (data.XT) XT = data.XT;
+      if (data.rate) document.getElementById('rateInput').value = data.rate;
+      if (data.skInv) {
+        document.getElementById('skInv').dataset.raw = data.skInv;
+        document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(data.skInv);
+      }
+      if (data.skCur) {
+        document.getElementById('skCur').dataset.raw = data.skCur;
+        document.getElementById('skCur').value = new Intl.NumberFormat('es-CO').format(data.skCur);
+      }
+      if (data.ts) document.getElementById('lastSaved').textContent = 'Sincronizado: '+new Date(data.ts).toLocaleTimeString('es-CO');
+      showToast('☁️ Nube sincronizada');
+    } else {
+      // Es usuario nuevo, guardamos los de prueba iniciales
+      saveDataToFirebase();
+    }
+    fetchRealTimeData(); 
+    recalc();
+  }).catch(e => console.error("Error leyendo DB:", e));
+}
+
+function saveDataToFirebase() {
+  if (!currentUser) return;
+  const dataObj = {
+    SW, XT, 
+    rate: document.getElementById('rateInput').value,
+    skInv: document.getElementById('skInv').dataset.raw || "14613200",
+    skCur: document.getElementById('skCur').dataset.raw || "12627217",
+    ts: new Date().toISOString()
+  };
+  
+  db.ref('users/' + currentUser.uid).set(dataObj)
+    .then(() => {
+      document.getElementById('lastSaved').textContent = 'Guardado en la nube: ' + new Date().toLocaleTimeString('es-CO');
+    })
+    .catch(e => showToast('❌ Error guardando en nube'));
+}
+
+// Reemplazamos el localStorage antiguo para que llame a Firebase
+function saveData() { saveDataToFirebase(); }
+
 // ── LÓGICA DE FÓRMULA TIPO EXCEL (USD) ──────────────
 function calculateSumFromFormula(formulaString) {
   if (!formulaString || formulaString.trim() === '') return 0;
-  // Limpieza básica: quitar espacios, cambiar comas por puntos (por seguridad), 
-  // filtrar caracteres extraños excepto números, punto y signo mas
   let cleanedFormula = formulaString.replace(/\s/g, '').replace(',', '.').replace(/[^\d.+\-]/g, '');
   const parts = cleanedFormula.split('+');
   let sum = 0;
-  parts.forEach(part => {
-    // Manejo simple para evitar errores si hay un '+' al final
-    const num = parseFloat(part) || 0;
-    sum += num;
-  });
+  parts.forEach(part => { sum += (parseFloat(part) || 0); });
   return sum;
 }
 
 function investFocus(inputEl) {
-  saveStateToHistory(); // Guardar estado para UNDO antes de editar
-  // Al enfocar, mostramos la fórmula cruda original
+  saveStateToHistory();
   const rawFormula = inputEl.getAttribute('data-raw-formula');
   if (rawFormula) { inputEl.value = rawFormula; }
 }
 
 function investBlur(inputEl, tid, id) {
-  const inputValue = inputEl.value; // La fórmula que escribió el usuario (ej: "100+50.5")
+  const inputValue = inputEl.value; 
   const sum = calculateSumFromFormula(inputValue);
 
-  inputEl.setAttribute('data-raw-formula', inputValue); // Guardamos la fórmula original para el historial
-  inputEl.value = f(sum); // Mostramos el total calculado formateado bonito
-  inputEl.title = `Breakdown: ${inputValue}`; // Set tooltip con el historial
+  inputEl.setAttribute('data-raw-formula', inputValue); 
+  inputEl.value = f(sum); 
+  inputEl.title = `Fórmula: ${inputValue}`; 
 
-  // Actualizar los datos reales
   const arr = (tid === 'sw') ? SW : XT;
   const row = arr.find(x => x.id === id);
   if (row) {
     row.inv = sum;
-    row.invFormula = inputValue; // Guardamos la cadena de la fórmula en el objeto
+    row.invFormula = inputValue; 
   }
   recalc();
 }
-// ────────────────────────────────────────────────────────
 
 // ── LÓGICA DE SKANDIA (AUTO-FORMATO COP) ──────────────
 function skFocus(el) {
@@ -317,7 +376,6 @@ function skBlur(el) {
 
 // ── LÓGICA DE HISTORIAL (DESHACER / UNDO) ──────────────
 let historyStack = [];
-
 function saveStateToHistory() {
   const currentState = JSON.stringify({
     SW: JSON.parse(JSON.stringify(SW)), 
@@ -334,10 +392,7 @@ function saveStateToHistory() {
 }
 
 function undo() {
-  if (historyStack.length === 0) { 
-    showToast('Nada más para deshacer'); 
-    return; 
-  }
+  if (historyStack.length === 0) { showToast('Nada más para deshacer'); return; }
   
   const prevStateJSON = historyStack.pop();
   const prevState = JSON.parse(prevStateJSON);
@@ -348,7 +403,6 @@ function undo() {
   
   document.getElementById('skInv').dataset.raw = prevState.skInv;
   document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(prevState.skInv);
-  
   document.getElementById('skCur').dataset.raw = prevState.skCur;
   document.getElementById('skCur').value = new Intl.NumberFormat('es-CO').format(prevState.skCur);
 
@@ -363,8 +417,8 @@ document.addEventListener('keydown', function(e) {
     undo();
   }
 });
-// ────────────────────────────────────────────────────────
 
+// ── CÁLCULOS Y RENDERIZADO ──────────────
 function calc(row) {
   if (row.inv === undefined) { row.inv = row.qty * (row.avg || 0); }
   const cur = row.qty * row.px; 
@@ -378,10 +432,6 @@ function calc(row) {
 function renderTable(data, tid) {
   const rows = data.map(calc);
   const active = rows.filter(x=>x.qty>0);
-  const tCur = active.reduce((s,x)=>s+x.cur,0);
-  const tInv = active.reduce((s,x)=>s+x.inv,0);
-  const tPnl = tCur-tInv;
-  const tGl  = tInv>0?tPnl/tInv*100:0;
 
   const thead = `<thead><tr>
     <th style="text-align:left">Activo</th>
@@ -408,17 +458,10 @@ function renderTable(data, tid) {
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.avg)}</td>
       <td class="computed ${isAlert ? 'alert-glow' : ''}" style="font-weight: 700;">${row.px}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.cur)}</td>
-      
       <td>
-        <input type="text" 
-               class="ci invested-usd" 
-               value="${f(row.inv)}" 
-               data-raw-formula="${row.invFormula || row.inv}" 
-               onfocus="investFocus(this)" 
-               onblur="investBlur(this, '${tid}', ${row.id})" 
-               title="Breakdown: ${row.invFormula || row.inv}">
+        <input type="text" class="ci invested-usd" value="${f(row.inv)}" data-raw-formula="${row.invFormula || row.inv}" 
+               onfocus="investFocus(this)" onblur="investBlur(this, '${tid}', ${row.id})" title="Fórmula: ${row.invFormula || row.inv}">
       </td>
-      
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fP(row.gl, isAlert)}</td>
       <td class="computed">${isPend?'<span style="color:var(--sub)">—</span>':fU(row.pnl)}</td>
       <td class="action-btns">
@@ -476,7 +519,9 @@ function sellRow(tid, id) {
 
   row.qty -= sellQty;
   row.inv -= (sellQty * avgCost); 
-  if (row.qty < 0.0001) { row.qty = 0; row.inv = 0; }
+  // Actualizamos también la fórmula para que no sume mal después
+  row.invFormula = `${row.inv}`; 
+  if (row.qty < 0.0001) { row.qty = 0; row.inv = 0; row.invFormula = '0'; }
 
   recalc();
   const estadoVenta = realizedPnL >= 0 ? 'Ganancia' : 'Pérdida';
@@ -489,6 +534,7 @@ function recalc() {
   renderCards();
   renderSummary();
   renderCharts();
+  
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(saveData, 1000);
 }
@@ -528,14 +574,8 @@ function renderSummary() {
   const totalActualCOP = tC * rt;
   const totalInvertidoCOP = tI * rt; 
 
-  // Leemos los valores crudos para la matemática
   let skI = parseFloat(document.getElementById('skInv').dataset.raw || 14613200);
-  if (skI <= 0) {
-    skI = 14613200; // Candado: si borran todo, restaura el valor por defecto
-    document.getElementById('skInv').dataset.raw = skI;
-    document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(skI);
-  }
-  
+  if (skI <= 0) { skI = 14613200; document.getElementById('skInv').dataset.raw = skI; document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(skI); }
   let skC = parseFloat(document.getElementById('skCur').dataset.raw || 12627217);
 
   document.getElementById('sum-content').innerHTML=`
@@ -572,19 +612,8 @@ function renderCharts() {
     type:'doughnut',
     data:{labels: labelsPct, datasets:[{data:vals,backgroundColor:COLS.slice(0,labels.length),borderWidth:2,borderColor:'#161b22'}]},
     options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{
-        legend:{
-          position:'right',
-          labels:{
-            color:'#e6edf3',
-            font:{size:12.5, family: "'Segoe UI', sans-serif"},
-            boxWidth:12,
-            padding:14
-          }
-        }
-      }
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{color:'#e6edf3',font:{size:12.5, family: "'Segoe UI', sans-serif"},boxWidth:12,padding:14}}}
     }
   });
 
@@ -593,19 +622,15 @@ function renderCharts() {
     type:'bar',
     data:{labels,datasets:[{data:gls,backgroundColor:gls.map(g=>g>=0?'#3fb95055':'#f7816655'),borderColor:gls.map(g=>g>=0?'#3fb950':'#f78166'),borderWidth:1}]},
     options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:{color:'#e6edf3',font:{size:11}},grid:{color:'#21262d'}},
-        y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}
-      }
+      responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#e6edf3',font:{size:11}},grid:{color:'#21262d'}},y:{ticks:{color:'#8b949e',callback:v=>v+'%'},grid:{color:'#21262d'}}}
     }
   });
 }
 
 async function fetchRealTimeData() {
   if (document.activeElement && document.activeElement.tagName === 'INPUT') { return; }
+  if (!currentUser) return; // No actualizar si no ha iniciado sesión
 
   document.getElementById('rateBox').classList.add('updating');
   try {
@@ -634,52 +659,7 @@ async function fetchRealTimeData() {
 
 setInterval(fetchRealTimeData, 60000);
 
-function saveData() {
-  try {
-    const dataObj = {
-      SW, XT, 
-      rate: document.getElementById('rateInput').value,
-      skInv: document.getElementById('skInv').dataset.raw || "14613200",
-      skCur: document.getElementById('skCur').dataset.raw || "12627217",
-      ts: new Date().toISOString()
-    };
-    localStorage.setItem('miPortafolioPaisa', JSON.stringify(dataObj));
-    document.getElementById('lastSaved').textContent = 'Guardado: ' + new Date().toLocaleTimeString('es-CO');
-  } catch(e) { showToast('Error al guardar'); }
-}
-
-function loadSaved() {
-  try {
-    const res = localStorage.getItem('miPortafolioPaisa');
-    if (res) {
-      const d = JSON.parse(res);
-      if (d.SW) SW = d.SW;
-      if (d.XT) XT = d.XT;
-      if (d.rate) document.getElementById('rateInput').value = d.rate;
-      
-      if (d.skInv) {
-        document.getElementById('skInv').dataset.raw = d.skInv;
-        document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(d.skInv);
-      }
-      if (d.skCur) {
-        document.getElementById('skCur').dataset.raw = d.skCur;
-        document.getElementById('skCur').value = new Intl.NumberFormat('es-CO').format(d.skCur);
-      }
-      
-      if (d.ts) document.getElementById('lastSaved').textContent = 'Cargado: '+new Date(d.ts).toLocaleTimeString('es-CO');
-    }
-  } catch(e) {}
-  
-  fetchRealTimeData(); 
-  recalc();
-}
-
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
-
-function setTab(t, el) {}
-function ctx() {}
-async function runAI() {}
-async function askAI() {}
 </script>
 </body>
 </html>
