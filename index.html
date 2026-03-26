@@ -589,9 +589,8 @@ function renderCards() {
 
     <div class="card">
       <div class="lbl">📥 Capital Invertido</div>
-      <div class="val">$${f(tInv)}</div>
-      <div class="s2" style="color:#8b949e;margin-top:3px">${fCOP(tInv*rt)}</div>
-      <div class="s2 hide-mob" style="color:#444;margin-top:2px;font-size:.62rem">COP = USD × TRM ${f(rt,0)}</div>
+      <div class="val">${f(tInv + skIUSD)}</div>
+      <div class="s2" style="color:#8b949e;margin-top:3px">${fCOP((tInv + skIUSD)*rt)}</div>
     </div>
 
     <div class="card" style="border-color:${tPnl>=0?'#3fb95033':'#f7816633'}">
