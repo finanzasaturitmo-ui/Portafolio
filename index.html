@@ -156,7 +156,6 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
 </div>
 
 <div id="app-content" style="display: none;">
-  <input id="rateInput" value="4180" type="hidden">
   <div class="hdr">
     <div>
       <h1>📊 Mi Portafolio Pro</h1>
@@ -561,20 +560,19 @@ function renderCards() {
   const skIUSD = rawSkInv / rt;
   const gC = tCur + skUSD;
   const gI = tInv + skIUSD;
+  const gPnl = gC - gI;
+  const gPct = gI > 0 ? gPnl/gI*100 : 0;
 
   const brokerAssets = all.filter(x => x.t);
   const best  = brokerAssets.length ? [...brokerAssets].sort((a,b)=>b.gl-a.gl)[0] : null;
   const worst = brokerAssets.length ? [...brokerAssets].sort((a,b)=>a.gl-b.gl)[0] : null;
 
-  const lastUpd = document.getElementById('lastSaved').textContent.includes('Nube')
-    ? new Date().toLocaleTimeString('es-CO') : '—';
+  // Hora de última actualización (del rateBox)
+  const lastUpd = document.getElementById('lastSaved').textContent.includes('Nube') 
+    ? new Date().toLocaleTimeString('es-CO') 
+    : '—';
 
-  const bestPnlUSD  = best  ? (best.pnl  >= 0 ? '+' : '-') + '$' + f(Math.abs(best.pnl))  : '';
-  const bestPnlCOP  = best  ? (best.pnl  >= 0 ? '+' : '')  + fCOP(best.pnl * rt)           : '';
-  const worstPnlUSD = worst ? (worst.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(worst.pnl)) : '';
-  const worstPnlCOP = worst ? fCOP(worst.pnl * rt)                                          : '';
-
-  document.getElementById('cards').innerHTML = `
+  document.getElementById('cards').innerHTML=`
     <div class="card" style="border-color:#58a6ff33">
       <div class="lbl">💼 Portafolio Global</div>
       <div class="val b">$${f(gC)}</div>
@@ -587,13 +585,13 @@ function renderCards() {
 
     <div class="card">
       <div class="lbl">📥 Capital Invertido</div>
-      <div class="val">$${f(tInv + skIUSD)}</div>
+      <div class="val">${f(tInv + skIUSD)}</div>
       <div class="s2" style="color:#8b949e;margin-top:3px">${fCOP((tInv + skIUSD)*rt)}</div>
     </div>
 
     <div class="card" style="border-color:${tPnl>=0?'#3fb95033':'#f7816633'}">
       <div class="lbl">📈 Retorno Total</div>
-      <div class="val ${tPnl>=0?'g':'r'}">${tPnl>=0?'+':'-'} $${f(Math.abs(tPnl))}</div>
+      <div class="val ${tPnl>=0?'g':'r'}">${tPnl>=0?'+':'-'} ${f(Math.abs(tPnl))}</div>
       <div class="s2 ${tPct>=0?'g':'r'}" style="margin-top:3px">${tPct>=0?'+':''}${f(tPct,1)}% sobre invertido</div>
       <div class="s2 ${tPnl>=0?'g':'r'}" style="margin-top:2px;font-weight:600">${tPnl>=0?'+':'-'} ${fCOP(Math.abs(tPnl)*rt)}</div>
     </div>
@@ -602,23 +600,21 @@ function renderCards() {
       <div class="lbl">💱 TRM en Vivo</div>
       <div class="val" style="color:#ffa657">${f(rt,0)} <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div>
       <div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">1 USD = ${f(rt,0)} COP</div>
-      <div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">Act: ${lastUpd}</div>
+      <div class="s2 hide-mob" style="color:#444;margin-top:2px;font-size:.62rem">Act: ${lastUpd}</div>
     </div>
 
     <div class="card" style="border-color:#3fb95033">
       <div class="lbl">🏆 Mejor Activo</div>
       <div class="val g">${best ? best.t : '—'}</div>
-      <div class="s2 g" style="margin-top:3px">${bestPnlUSD}</div>
-      <div class="s2 g" style="margin-top:2px">${best ? '+'+f(best.gl,1)+'%' : ''}</div>
-      <div class="s2 hide-mob" style="color:#3fb950;margin-top:2px;font-size:.68rem">${bestPnlCOP}</div>
+      <div class="s2 g" style="margin-top:3px">${best ? '+'+f(best.gl,1)+'%' : ''}</div>
+      <div class="s2 hide-mob" style="color:#3fb950;margin-top:2px;font-size:.68rem">${best ? '+'+fCOP(best.pnl*rt) : ''}</div>
     </div>
 
     <div class="card" style="border-color:#f7816633">
       <div class="lbl">⚠️ Más Rezagado</div>
       <div class="val r">${worst ? worst.t : '—'}</div>
-      <div class="s2 r" style="margin-top:3px">${worstPnlUSD}</div>
-      <div class="s2 r" style="margin-top:2px">${worst ? f(worst.gl,1)+'%' : ''}</div>
-      <div class="s2 hide-mob" style="color:#f78166;margin-top:2px;font-size:.68rem">${worstPnlCOP}</div>
+      <div class="s2 r" style="margin-top:3px">${worst ? f(worst.gl,1)+'%' : ''}</div>
+      <div class="s2 hide-mob" style="color:#f78166;margin-top:2px;font-size:.68rem">${worst ? fCOP(worst.pnl*rt) : ''}</div>
     </div>`;
 }
 
@@ -721,6 +717,7 @@ async function fetchRealTimeData() {
   if (document.activeElement && document.activeElement.tagName === 'INPUT') { return; }
   if (!currentUser) return; 
 
+  document.getElementById('rateBox').classList.add('updating');
   try {
     const trmRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
     const trmData = await trmRes.json();
@@ -743,6 +740,7 @@ async function fetchRealTimeData() {
   } catch(e) {}
 
   recalc(false); 
+  document.getElementById('rateBox').classList.remove('updating');
 }
 
 setInterval(fetchRealTimeData, 60000);
