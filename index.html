@@ -18,7 +18,6 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-siz
 .hdr input{background:transparent;border:none;color:var(--b);font-weight:700;font-size:.88rem;width:85px;outline:none;text-align:right}
 .btn{border:none;padding:7px 14px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;transition:.2s}
 
-/* Botón de Agregar y Deshacer */
 .btn-undo { background: #21262d; color: var(--sub); border: 1px solid var(--border); font-size: .72rem; padding: 5px 10px; }
 .btn-undo:hover { background: var(--border); color: #fff; }
 
@@ -156,11 +155,11 @@ tr.total-row td{font-weight:700;background:#0d111755;border-top:1px solid var(--
       <div style="display:flex;flex-direction:column;gap:7px">
         <div class="sum-row">
           <span class="sum-lbl">Capital Invertido (COP)</span>
-          <input class="ci" id="skInv" value="14613200" onfocus="saveStateToHistory()" onblur="recalc()" style="width:130px; font-weight:700; color:var(--b);">
+          <input class="ci" id="skInv" value="14.613.200" data-raw="14613200" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b);">
         </div>
         <div class="sum-row">
           <span class="sum-lbl">Valor Actual (COP)</span>
-          <input class="ci" id="skCur" value="12627217" onfocus="saveStateToHistory()" onblur="recalc()" style="width:130px; font-weight:700; color:var(--b);">
+          <input class="ci" id="skCur" value="12.627.217" data-raw="12627217" onfocus="skFocus(this)" onblur="skBlur(this)" style="width:130px; font-weight:700; color:var(--b);">
         </div>
         <div class="sum-row"><span class="sum-lbl">P&L</span><span class="sum-val" id="skPnl">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Retorno</span><span class="sum-val" id="skRet">—</span></div>
@@ -220,6 +219,24 @@ const fP = (n, isAlert) => `<span class="${isAlert ? 'alert-glow' : (n>=0?'g':'r
 const r = (s,d=4) => parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
 const rate = () => r(document.getElementById('rateInput').value)||4180;
 
+// ── LÓGICA DE SKANDIA (AUTO-FORMATO COP) ──────────────
+function skFocus(el) {
+  saveStateToHistory();
+  // Al hacer clic, quitamos los puntos para que sea fácil editar el número real
+  el.value = el.dataset.raw || el.value.replace(/\./g, '');
+}
+
+function skBlur(el) {
+  // Al salir de la casilla, leemos el número puro (quitando puntos por si el usuario los puso a mano)
+  let cleanStr = String(el.value).replace(/\./g, '');
+  let rawVal = parseFloat(cleanStr) || 0;
+  
+  // Guardamos el valor puro escondido y mostramos el valor bonito con formato colombiano
+  el.dataset.raw = rawVal;
+  el.value = new Intl.NumberFormat('es-CO').format(rawVal);
+  recalc();
+}
+
 // ── LÓGICA DE HISTORIAL (DESHACER / UNDO) ──────────────
 let historyStack = [];
 
@@ -228,13 +245,13 @@ function saveStateToHistory() {
     SW: JSON.parse(JSON.stringify(SW)), 
     XT: JSON.parse(JSON.stringify(XT)),
     rate: document.getElementById('rateInput').value,
-    skInv: document.getElementById('skInv').value,
-    skCur: document.getElementById('skCur').value
+    skInv: document.getElementById('skInv').dataset.raw || "14613200",
+    skCur: document.getElementById('skCur').dataset.raw || "12627217"
   });
   
   if (historyStack.length === 0 || historyStack[historyStack.length - 1] !== currentState) {
     historyStack.push(currentState);
-    if (historyStack.length > 20) historyStack.shift(); // Guarda máximo los últimos 20 cambios
+    if (historyStack.length > 20) historyStack.shift();
   }
 }
 
@@ -250,19 +267,21 @@ function undo() {
   SW = prevState.SW;
   XT = prevState.XT;
   document.getElementById('rateInput').value = prevState.rate;
-  document.getElementById('skInv').value = prevState.skInv;
-  document.getElementById('skCur').value = prevState.skCur;
+  
+  // Restauramos los valores puros y visuales de Skandia
+  document.getElementById('skInv').dataset.raw = prevState.skInv;
+  document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(prevState.skInv);
+  
+  document.getElementById('skCur').dataset.raw = prevState.skCur;
+  document.getElementById('skCur').value = new Intl.NumberFormat('es-CO').format(prevState.skCur);
 
   recalc();
   showToast('↩️ Acción deshecha');
 }
 
-// Atajo de teclado para deshacer (Ctrl+Z o Cmd+Z)
 document.addEventListener('keydown', function(e) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-    // Si estás escribiendo en una casilla, dejamos que el navegador haga el deshacer normal de texto
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-    
     e.preventDefault();
     undo();
   }
@@ -397,7 +416,8 @@ function renderCards() {
   const tPnl = tCur-tInv;
   const tPct = tInv>0?tPnl/tInv*100:0;
   
-  const gC = tCur + (r(document.getElementById('skCur').value)/rt);
+  const rawSkCur = parseFloat(document.getElementById('skCur').dataset.raw || 12627217);
+  const gC = tCur + (rawSkCur/rt);
   const best  = [...all].sort((a,b)=>b.gl-a.gl)[0];
   const worst = [...all].sort((a,b)=>a.gl-b.gl)[0];
 
@@ -421,13 +441,15 @@ function renderSummary() {
   const totalActualCOP = tC * rt;
   const totalInvertidoCOP = tI * rt; 
 
-  // Candado por si borran el valor invertido de Skandia
-  let skI=r(document.getElementById('skInv').value);
+  // Leemos los valores crudos para la matemática
+  let skI = parseFloat(document.getElementById('skInv').dataset.raw || 14613200);
   if (skI <= 0) {
-    skI = 14613200; // Valor por defecto
-    document.getElementById('skInv').value = skI;
+    skI = 14613200; // Candado: si borran todo, restaura el valor por defecto
+    document.getElementById('skInv').dataset.raw = skI;
+    document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(skI);
   }
-  const skC=r(document.getElementById('skCur').value);
+  
+  let skC = parseFloat(document.getElementById('skCur').dataset.raw || 12627217);
 
   document.getElementById('sum-content').innerHTML=`
     <div class="sum-row"><span class="sum-lbl">🇺🇸 Schwab — Invertido</span><span class="sum-val">$${f(sI)}</span></div>
@@ -530,8 +552,8 @@ function saveData() {
     const dataObj = {
       SW, XT, 
       rate: document.getElementById('rateInput').value,
-      skInv: document.getElementById('skInv').value,
-      skCur: document.getElementById('skCur').value,
+      skInv: document.getElementById('skInv').dataset.raw || "14613200",
+      skCur: document.getElementById('skCur').dataset.raw || "12627217",
       ts: new Date().toISOString()
     };
     localStorage.setItem('miPortafolioPaisa', JSON.stringify(dataObj));
@@ -548,11 +570,15 @@ function loadSaved() {
       if (d.XT) XT = d.XT;
       if (d.rate) document.getElementById('rateInput').value = d.rate;
       
-      // Chequeo por si hay un error guardado en memoria
-      if (d.skInv && r(d.skInv) > 0) document.getElementById('skInv').value = d.skInv;
-      else document.getElementById('skInv').value = "14613200"; 
+      if (d.skInv) {
+        document.getElementById('skInv').dataset.raw = d.skInv;
+        document.getElementById('skInv').value = new Intl.NumberFormat('es-CO').format(d.skInv);
+      }
+      if (d.skCur) {
+        document.getElementById('skCur').dataset.raw = d.skCur;
+        document.getElementById('skCur').value = new Intl.NumberFormat('es-CO').format(d.skCur);
+      }
       
-      if (d.skCur) document.getElementById('skCur').value = d.skCur;
       if (d.ts) document.getElementById('lastSaved').textContent = 'Cargado: '+new Date(d.ts).toLocaleTimeString('es-CO');
     }
   } catch(e) {}
