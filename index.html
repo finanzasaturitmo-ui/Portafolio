@@ -71,15 +71,14 @@
     .bhdr.cr { color: var(--yellow); background: linear-gradient(90deg, #f3ba2f22, transparent); }
     .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; text-align: center; }
-    th { color: var(--sub); padding: 6px 8px; font-weight: 500; font-size: .68rem; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-    th:first-child { text-align: left; }
-    td { padding: 4px 5px; border-bottom: 1px solid #0d111766; white-space: nowrap; }
-    td:first-child { text-align: left; padding-left: 10px; }
+    th { color: var(--sub); padding: 6px 8px; font-weight: 500; font-size: .68rem; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); white-space: nowrap; text-align: center; } /* 🟢 AHORA TODO CENTRADO */
+    td { padding: 4px 5px; border-bottom: 1px solid #0d111766; white-space: nowrap; text-align: center; } /* 🟢 AHORA TODO CENTRADO */
     tr:hover td { background: #1c212855; }
     
-    .ci { background: #0d1117; border: 1px solid var(--border); color: #e6edf3; border-radius: 5px; padding: 4px 7px; width: 90px; font-size: .8rem; outline: none; transition: .15s; }
+    .ci { background: #0d1117; border: 1px solid var(--border); color: #e6edf3; border-radius: 5px; padding: 4px 7px; width: 90px; font-size: .8rem; outline: none; transition: .15s; text-align: center; } /* 🟢 INPUTS CENTRADOS */
+    .ci.wallet { width: 110px; color: var(--sub); font-size: .75rem; } /* Estilo para el input de wallet */
     .ci:focus { border-color: var(--b); background: #0d1c2e; }
-    .ci.ticker { width: 85px; text-align: left; text-transform: uppercase; font-weight: 700; color: var(--b); }
+    .ci.ticker { width: 85px; text-transform: uppercase; font-weight: 700; color: var(--b); }
     .pending .ci { color: var(--sub); }
     
     .action-btns { display: flex; gap: 4px; justify-content: center; align-items: center; }
@@ -149,6 +148,7 @@
       table th, table td { font-size: 0.75rem; padding: 4px 3px; }
       .ci { padding: 3px 5px; width: 75px; font-size: 0.75rem; }
       .ci.ticker { width: 70px; }
+      .ci.wallet { width: 90px; }
       .sum-box { padding: 12px; }
       .sk-grid { grid-template-columns: 1fr; gap: 12px; }
     }
@@ -233,7 +233,7 @@
     <div id="content-crypto" class="tab-content">
       <div class="broker">
         <div class="bhdr cr">
-          <span>₿🚀🪙 Billetera Cripto (Billeteras Frias / Exchange )</span>
+          <span>₿🚀🪙 Billetera Cripto</span>
           <div style="display:flex; gap:6px; align-items:center;">
             <button class="btn-undo-redo btn-undo-action" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span class="undo-cnt">0</span>)</button>
             <button class="btn-undo-redo btn-redo-action" onclick="redo()" disabled>↪️ <span class="hide-mob">Rehacer</span> (<span class="redo-cnt">0</span>)</button>
@@ -361,11 +361,10 @@ function switchTab(tabId) {
   document.getElementById('btn-tab-' + tabId).classList.add('active');
   document.getElementById('content-' + tabId).classList.add('active');
   
-  // Cambiar etiquetas dinámicas
   document.getElementById('lbl-donut').textContent = tabId === 'stocks' ? 'Distribución de Acciones' : 'Distribución Cripto';
   document.getElementById('lbl-summary').textContent = tabId === 'stocks' ? '📋 Resumen Consolidado de Acciones' : '📋 Resumen Billetera Cripto';
   
-  recalc(false); // Redibujar todo basado en la vista actual
+  recalc(false);
 }
 
 function loadFromFirebase() {
@@ -378,10 +377,13 @@ function loadFromFirebase() {
       SW = d.SW || []; 
       XT = d.XT || [];
       CR = d.CR || [
-          {id: 41, t: 'ETH', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
-          {id: 42, t: 'BTC', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
-          {id: 43, t: 'NEAR', qty: 0, inv: 0, invFormula: '0', px: 0, p: true}
+          {id: 41, t: 'ETH', wallet: 'Binance', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
+          {id: 42, t: 'BTC', wallet: 'Ledger', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
+          {id: 43, t: 'NEAR', wallet: 'Binance', qty: 0, inv: 0, invFormula: '0', px: 0, p: true}
       ];
+
+      // Compatibilidad hacia atrás para asegurar que las cripto viejas no rompan si no tienen la propiedad wallet
+      CR.forEach(crypto => { if(crypto.wallet === undefined) crypto.wallet = ''; });
 
       const all = [...SW, ...XT, ...CR];
       if (all.length) nid = Math.max(...all.map(r => r.id)) + 1;
@@ -396,9 +398,9 @@ function loadFromFirebase() {
       SW = [{id: 1, t: 'BABA', qty: 19, inv: 1460.91, invFormula: '1460.91', px: 129.87, p: false},{id: 2, t: 'BRK-B', qty: 7.5562, inv: 2974.72, invFormula: '2974.72', px: 476.19, p: false}];
       XT = [{id: 11, t: 'EIMI.UK', qty: 28.2244, inv: 1125.02, invFormula: '1125.02', px: 46.19, p: false}];
       CR = [
-          {id: 41, t: 'ETH', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
-          {id: 42, t: 'BTC', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
-          {id: 43, t: 'NEAR', qty: 0, inv: 0, invFormula: '0', px: 0, p: true}
+          {id: 41, t: 'ETH', wallet: 'Binance', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
+          {id: 42, t: 'BTC', wallet: 'Ledger', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
+          {id: 43, t: 'NEAR', wallet: 'Binance', qty: 0, inv: 0, invFormula: '0', px: 0, p: true}
       ];
       nid = 50;
     }
@@ -549,14 +551,22 @@ function renderTable(data, tid) {
   const opp = rv(document.getElementById('oppInput').value) || 10;
   const rows = data.map(calc);
   const isCrypto = tid === 'cr';
-  const thead = `<thead><tr><th style="text-align:left">${isCrypto ? 'Moneda' : 'Activo'}</th><th>Cant.</th><th>Precio Prom</th><th>Precio Actual</th><th>Valor USD</th><th>Invertido USD</th><th>% G/L</th><th>Profit</th><th></th></tr></thead>`;
+  
+  // 🔥 Nueva columna "Wallet / Exchange" condicional solo para Cripto 🔥
+  const walletHeader = isCrypto ? '<th>Wallet / Exchange</th>' : '';
+
+  const thead = `<thead><tr><th>${isCrypto ? 'Moneda' : 'Activo'}</th>${walletHeader}<th>Cant.</th><th>Precio Prom</th><th>Precio Actual</th><th>Valor USD</th><th>Invertido USD</th><th>% G/L</th><th>Profit</th><th></th></tr></thead>`;
   
   const tbody = rows.map(row => {
     const isPend = row.p || !row.qty;
     const isOpp = !isPend && row.avg > 0 && row.px > 0 && ((row.avg - row.px) / row.avg * 100) >= opp;
     
+    // Campo condicional para la wallet
+    const walletCell = isCrypto ? `<td><input class="ci wallet" value="${row.wallet || ''}" placeholder="Binance, Ledger..." onblur="upd('${tid}', ${row.id}, 'wallet', this.value)"></td>` : '';
+
     return '<tr class="' + (isPend ? 'pending' : '') + '">' +
       '<td><input class="ci ticker ' + (isOpp ? 'opp-glow' : '') + '" value="' + (row.t || '') + '" placeholder="' + (isCrypto ? 'BTC, ETH...' : 'TICKER') + '" onblur="upd(\'' + tid + '\',' + row.id + ',\'t\',this.value)">' + (isPend ? '<span class="badge">próximo</span>' : '') + '</td>' +
+      walletCell +
       '<td><input class="ci" value="' + (row.qty || 0) + '" style="text-align:center" onblur="upd(\'' + tid + '\',' + row.id + ',\'qty\',this.value)"></td>' +
       '<td class="computed">' + (isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)) + '</td>' +
       '<td class="computed ' + (isOpp ? 'opp-glow' : '') + '" style="font-weight:700">' + (row.px || 0) + '</td>' +
@@ -577,10 +587,19 @@ function renderTable(data, tid) {
 
 function upd(tid, id, field, val) {
   const row = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id); if(!row) return;
-  row[field] = field === 't' ? val.toUpperCase().trim() : rv(val);
-  if(field === 'qty' && rv(val) > 0) row.p = false; recalc();
+  // Solo convierte a mayúsculas si es el ticker, de lo contrario guarda tal cual o numérico
+  if (field === 't') {
+    row[field] = val.toUpperCase().trim();
+  } else if (field === 'wallet') {
+    row[field] = val.trim(); // Guarda el texto libre para Wallet
+  } else {
+    row[field] = rv(val);
+  }
+  
+  if(field === 'qty' && rv(val) > 0) row.p = false; 
+  recalc();
 }
-function addRow(tid) { (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).push({id: nid++, t: '', qty: 0, inv: 0, invFormula: '0', px: 0, p: true}); recalc(); }
+function addRow(tid) { (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).push({id: nid++, t: '', wallet: '', qty: 0, inv: 0, invFormula: '0', px: 0, p: true}); recalc(); }
 function delRow(tid, id) { if(!confirm('¿Eliminar este activo?')) return; if(tid === 'sw') SW = SW.filter(x => x.id !== id); else if (tid === 'xt') XT = XT.filter(x => x.id !== id); else CR = CR.filter(x => x.id !== id); recalc(); }
 function sellRow(tid, id) {
   const row = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
@@ -611,7 +630,6 @@ function renderCards() {
   let lblGlobal = '', valInvStr = '', htmlSkandiaOrCripto = '';
   
   if (currentView === 'stocks') {
-    // 📈 VISTA ACCIONES
     activeAssets = [...SW.map(calc), ...XT.map(calc)].filter(x => x.qty > 0);
     tCur = activeAssets.reduce((s, x) => s + x.cur, 0);
     const bInv = activeAssets.reduce((s, x) => s + x.inv, 0);
@@ -630,12 +648,11 @@ function renderCards() {
     htmlSkandiaOrCripto = `Brokers <span style="color:#e6edf3;font-weight:600">$${f(tCur)}</span> · Skandia <span style="color:#e6edf3;font-weight:600">$${f(skUSD)}</span>`;
     
   } else {
-    // 🪙 VISTA CRIPTO
     activeAssets = CR.map(calc).filter(x => x.qty > 0);
     tCur = activeAssets.reduce((s, x) => s + x.cur, 0);
     tInv = activeAssets.reduce((s, x) => s + x.inv, 0);
     
-    gC = tCur; // En cripto el global es solo la suma de las criptos
+    gC = tCur;
     tPnl = tCur - tInv;
     tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
     
@@ -690,7 +707,6 @@ function renderSummary() {
       </div>
     `;
   } else {
-    // VISTA CRIPTO (SIN SKANDIA NI BROKERS)
     const cA = CR.map(calc).filter(x => x.qty > 0);
     const cI = cA.reduce((s, x) => s + x.inv, 0); const cC = cA.reduce((s, x) => s + x.cur, 0);
     const tI_COP = cI * rt; const tC_COP = cC * rt;
@@ -746,9 +762,10 @@ async function fetchRealTimeData() {
     } catch (e) { return null; }
   };
   
+  // 🔥 MOTOR ACTUALIZADO A MEXC (Muchos más tokens) 🔥
   const fetchCryptoPrice = async ticker => {
     try {
-      const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + ticker + 'USDT');
+      const res = await fetch('https://api.mexc.com/api/v3/ticker/price?symbol=' + ticker + 'USDT');
       const d = await res.json(); return parseFloat(d.price);
     } catch (e) { return null; }
   };
