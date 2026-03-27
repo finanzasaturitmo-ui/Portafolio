@@ -127,12 +127,6 @@
         outline: none;
         text-align: right;
       }
-      .opp-inp {
-        width: 35px !important;
-        text-align: center !important;
-        color: var(--g) !important;
-        padding: 0 !important;
-      }
 
       /* Botones Generales */
       .btn {
@@ -193,14 +187,12 @@
         transform: scale(1.03);
       }
 
-      /* Contenedor Principal */
+      /* Contenedor Principal y Tarjetas */
       main {
         padding: 14px 18px;
         max-width: 1300px;
         margin: 0 auto;
       }
-      
-      /* Tarjetas de Resumen (KPIs) */
       .cards {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
@@ -330,15 +322,6 @@
         color: var(--yellow);
         background: linear-gradient(90deg, #f3ba2f22, transparent);
       }
-      
-      /* Contenedor de controles del Header para hacerlo Responsive */
-      .bhdr-controls {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
       .tbl-wrap {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -450,7 +433,7 @@
         color: #ff6666;
       }
 
-      /* Drag and Drop (Arrastrar Filas) */
+      /* 🔥 ESTILOS DRAG AND DROP (FIX MÓVIL) 🔥 */
       .drag-handle {
         cursor: grab;
         padding: 0 10px;
@@ -459,7 +442,7 @@
         opacity: 0.5;
         transition: 0.2s;
         width: 30px;
-        touch-action: none; /* Previene scroll en móvil al agarrar */
+        touch-action: none; /* 🔥 FIX: Previene scroll en móvil al agarrar */
       }
       .drag-handle:hover {
         opacity: 1;
@@ -476,7 +459,7 @@
         background-color: var(--card);
         box-shadow: 0 15px 25px rgba(0,0,0,0.8);
         opacity: 1 !important;
-      }
+      } /* 🔥 FIX: Evita que la fila se rompa al moverla */
 
       /* Mini-Input de Oportunidad de Compra */
       .opp-mini {
@@ -754,16 +737,16 @@
       .toast.show { opacity: 1; }
 
       /* ==========================================
-         🔥 RESPONSIVE (CELULARES) 🔥
+         RESPONSIVE (CELULARES)
          ========================================== */
       @media(max-width: 768px) {
         body { font-size: 11px; }
         main { padding: 10px; }
-        
         .hdr { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px; }
         .hdr-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
         .hide-mob { display: none; }
-        
+        .btn-undo-redo { padding: 4px 6px; font-size: 0.75rem; }
+        .btn-logout { padding: 4px 8px; }
         .cards { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
         .card { padding: 8px; }
         .card .lbl { font-size: 0.6rem; margin-bottom: 1px; }
@@ -771,23 +754,20 @@
         .card .s2 { font-size: 0.65rem; }
         
         .charts { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
-        .ch-wrap { height: 280px !important; } /* 🔥 FIX: Gráficas más altas para evitar cortes de texto */
+        .ch-wrap { height: 280px !important; } /* Gráficas más altas */
         
-        /* 🔥 FIX: Encabezado de Tablas y Botones */
         .bhdr { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
         .bhdr > span { font-size: 1rem; text-align: center; }
         .bhdr-controls { width: 100%; justify-content: space-between; }
         .bhdr-controls .opp-mini { flex-grow: 1; justify-content: center; }
         .bhdr-controls .btn-undo-redo { padding: 8px 10px; }
-        .btn-add { width: 100%; padding: 12px; margin-top: 8px; font-size: 0.85rem; } /* Botón grande y fácil de tocar */
+        .btn-add { width: 100%; padding: 12px; margin-top: 8px; font-size: 0.85rem; } 
         
         .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table th, table td { font-size: 0.75rem; padding: 4px 3px; }
-        
         .ci { padding: 3px 5px; width: 75px; font-size: 0.75rem; }
         .ci.ticker { width: 70px; }
         .ci.wallet { width: 90px; }
-        
         .sum-box { padding: 12px; }
         .sk-grid { grid-template-columns: 1fr; gap: 12px; }
       }
@@ -1716,7 +1696,7 @@
           options: { 
               responsive: true, 
               maintainAspectRatio: false, 
-              layout: { padding: { top: 25, bottom: 60 } }, // 🔥 FIX MÓVIL: Más padding abajo
+              layout: { padding: { top: 25, bottom: 60 } }, 
               plugins: { legend: { display: false } }, 
               scales: { 
                   x: { ticks: { color: '#e6edf3', font: { size: 10 } }, grid: { color: '#21262d' } }, 
@@ -1762,7 +1742,7 @@
              const d = await res.json(); 
              if (d.price) return parseFloat(d.price);
           }
-          throw new Error('No encontrado');
+          throw new Error('No encontrado en MEXC');
         } catch (e) { 
           try {
               const fallbackRes = await fetch('https://cryptoprices.cc/' + tUpper + '/');
