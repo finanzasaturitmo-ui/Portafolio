@@ -104,9 +104,6 @@
 
     .totals-panel { background: linear-gradient(135deg, #161b22, #0d1117); border: 1px solid #58a6ff44; border-radius: 8px; padding: 16px; }
 
-    .toast { position: fixed; bottom: 18px; right: 18px; background: #1f6feb; color: #fff; padding: 9px 16px; border-radius: 7px; font-size: .78rem; opacity: 0; transition: .3s; pointer-events: none; z-index: 99999; }
-    .toast.show { opacity: 1; }
-
     /* 🔥 ESTILOS DEL POP-UP SIMULADOR 🔥 */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 100000; backdrop-filter: blur(4px); }
     .modal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; width: 90%; max-width: 360px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
@@ -114,12 +111,15 @@
     .modal-row { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
     .modal-label { color: var(--sub); font-size: .85rem; }
     .modal-val { font-size: .95rem; font-weight: 700; color: #e6edf3; }
-    .modal-input { background: #0d1117; border: 1px solid var(--border); color: var(--b); font-weight:bold; padding: 8px 10px; border-radius: 6px; width: 110px; text-align: right; outline: none; font-size: .9rem; }
+    .modal-input { background: #0d1117; border: 1px solid var(--border); color: var(--b); font-weight:bold; padding: 8px 10px; border-radius: 6px; width: 110px; text-align: right; outline: none; font-size: .9rem; transition:.2s; }
     .modal-input:focus { border-color: var(--b); box-shadow: 0 0 0 2px rgba(88,166,255,0.2); }
     .modal-res { background: #0d1117; padding: 14px; border-radius: 8px; margin-top: 18px; border: 1px dashed #58a6ff66; }
     .modal-res-row { display: flex; justify-content: space-between; margin-bottom: 6px; align-items:center; }
     .modal-btn { width: 100%; background: #21262d; color: #e6edf3; border: 1px solid var(--border); padding: 10px; border-radius: 6px; margin-top: 15px; cursor: pointer; font-weight: bold; transition: .2s; }
     .modal-btn:hover { background: #30363d; border-color: #8b949e; }
+
+    .toast { position: fixed; bottom: 18px; right: 18px; background: #1f6feb; color: #fff; padding: 9px 16px; border-radius: 7px; font-size: .78rem; opacity: 0; transition: .3s; pointer-events: none; z-index: 99999; }
+    .toast.show { opacity: 1; }
 
     @media(max-width: 768px) {
       body { font-size: 11px; }
@@ -230,13 +230,17 @@
     <div class="modal-row"><span class="modal-label">Precio Prom. actual:</span> <span id="simCurAvg" class="modal-val">$0.00</span></div>
     <hr style="border:0; border-top:1px solid var(--border); margin:16px 0;">
     
-    <div class="modal-row">
-      <span class="modal-label">Comprar (Cantidad):</span>
-      <input type="number" id="simInpQty" class="modal-input" value="1" min="0" step="0.01" oninput="calcSim()">
+    <div class="modal-row" style="margin-bottom: 15px;">
+      <span class="modal-label">Precio de mercado ($):</span>
+      <input type="number" id="simInpPx" class="modal-input" value="0" min="0" step="0.01" oninput="calcSim('px')">
     </div>
     <div class="modal-row">
-      <span class="modal-label">Precio de compra ($):</span>
-      <input type="number" id="simInpPx" class="modal-input" value="0" min="0" step="0.01" oninput="calcSim()">
+      <span class="modal-label" style="color:var(--b);">Inversión (USD):</span>
+      <input type="number" id="simInpInv" class="modal-input" placeholder="Ej: 100" min="0" step="0.01" oninput="calcSim('inv')" style="border-color:var(--b);">
+    </div>
+    <div class="modal-row">
+      <span class="modal-label">Cantidad a comprar:</span>
+      <input type="number" id="simInpQty" class="modal-input" value="1" min="0" step="0.0001" oninput="calcSim('qty')">
     </div>
     
     <div class="modal-res">
@@ -412,7 +416,7 @@ function calc(row) {
   return { ...row, cur, gl: row.inv > 0 ? (cur - row.inv) / row.inv * 100 : 0, pnl: cur - row.inv };
 }
 
-// 🔥 FUNCIONES DEL SIMULADOR POP-UP 🔥
+// 🔥 FUNCIONES DEL SIMULADOR POP-UP (ACTUALIZADO) 🔥
 let activeSimRow = null;
 
 function openSim(tid, id) {
@@ -422,7 +426,6 @@ function openSim(tid, id) {
     return;
   }
   
-  // Recalcular el promedio real al momento
   const currQty = activeSimRow.qty || 0;
   const currInv = activeSimRow.inv || 0;
   const currAvg = currQty > 0 ? currInv / currQty : 0;
@@ -432,11 +435,15 @@ function openSim(tid, id) {
   document.getElementById('simCurQty').textContent = currQty;
   document.getElementById('simCurAvg').textContent = '$' + f(currAvg);
   
+  const currentPx = activeSimRow.px || currAvg;
+  document.getElementById('simInpPx').value = currentPx;
+  
+  // Por defecto simulamos comprar 1 acción
   document.getElementById('simInpQty').value = 1;
-  document.getElementById('simInpPx').value = activeSimRow.px || currAvg;
+  document.getElementById('simInpInv').value = currentPx; // 1 accion * precio
   
   document.getElementById('simModal').style.display = 'flex';
-  calcSim();
+  calcSim('px');
 }
 
 function closeSim() {
@@ -444,24 +451,42 @@ function closeSim() {
   activeSimRow = null;
 }
 
-function calcSim() {
+// source indica qué input modificó el usuario: 'inv', 'qty', o 'px'
+function calcSim(source = 'px') {
   if (!activeSimRow) return;
-  const buyQty = parseFloat(document.getElementById('simInpQty').value) || 0;
-  const buyPx = parseFloat(document.getElementById('simInpPx').value) || 0;
   
+  const elPx = document.getElementById('simInpPx');
+  const elInv = document.getElementById('simInpInv');
+  const elQty = document.getElementById('simInpQty');
+  
+  let px = parseFloat(elPx.value) || 0;
+  let inv = parseFloat(elInv.value) || 0;
+  let qty = parseFloat(elQty.value) || 0;
+
+  // Lógica de cálculo cruzado
+  if (source === 'inv') {
+      // Si el usuario escribe la inversión en dólares, calculamos la cantidad de acciones
+      qty = px > 0 ? (inv / px) : 0;
+      elQty.value = qty > 0 ? parseFloat(qty.toFixed(4)) : '';
+  } else {
+      // Si el usuario cambia la cantidad o el precio, calculamos el costo en dólares
+      inv = qty * px;
+      elInv.value = inv > 0 ? parseFloat(inv.toFixed(2)) : '';
+  }
+  
+  // Calcular el nuevo escenario global
   const currentQty = activeSimRow.qty || 0;
   const currentInv = activeSimRow.inv || 0;
   
-  const newQty = currentQty + buyQty;
-  const additionalInv = buyQty * buyPx;
-  const newInv = currentInv + additionalInv;
+  const newQty = currentQty + qty;
+  const newInv = currentInv + inv;
   const newAvg = newQty > 0 ? newInv / newQty : 0;
   
   const avgEl = document.getElementById('simOutAvg');
   avgEl.textContent = '$' + f(newAvg);
   document.getElementById('simOutInv').textContent = '$' + f(newInv);
   
-  // Colorear el nuevo promedio: Verde si baja, Rojo si sube
+  // Colorear: Verde si baja el promedio, Rojo si sube
   if (newAvg < activeSimRow.avg) {
      avgEl.style.color = 'var(--g)'; 
   } else if (newAvg > activeSimRow.avg) {
@@ -490,7 +515,6 @@ function renderTable(data, tid) {
       '<td class="computed">' + (isPend ? '<span style="color:var(--sub)">—</span>' : fP(row.gl)) + '</td>' +
       '<td class="computed">' + (isPend ? '<span style="color:var(--sub)">—</span>' : fGain(row.pnl)) + '</td>' +
       '<td class="action-btns">' +
-        // 🔥 BOTÓN DEL SIMULADOR AGREGADO AQUÍ 🔥
         '<button class="icon-btn" onmousedown="openSim(\'' + tid + '\',' + row.id + ')" title="Simular Compra">🧮</button>' +
         '<button class="icon-btn" onmousedown="sellRow(\'' + tid + '\',' + row.id + ')" title="Registrar Venta">💰</button>' +
         '<button class="icon-btn btn-del" onmousedown="delRow(\'' + tid + '\',' + row.id + ')" title="Eliminar">✕</button>' +
