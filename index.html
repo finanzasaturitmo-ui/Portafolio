@@ -72,6 +72,8 @@
     .bhdr.cr { color: var(--yellow); background: linear-gradient(90deg, #f3ba2f22, transparent); }
     .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; text-align: center; }
+    
+    /* 🟢 TODO CENTRADO PARA LAS TABLAS */
     th { color: var(--sub); padding: 6px 8px; font-weight: 500; font-size: .68rem; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); white-space: nowrap; text-align: center; }
     td { padding: 4px 5px; border-bottom: 1px solid #0d111766; white-space: nowrap; text-align: center; }
     tr:hover td { background: #1c212855; }
@@ -79,7 +81,7 @@
     .ci { background: #0d1117; border: 1px solid var(--border); color: #e6edf3; border-radius: 5px; padding: 4px 7px; width: 90px; font-size: .8rem; outline: none; transition: .15s; text-align: center; }
     .ci.wallet { width: 110px; color: var(--sub); font-size: .75rem; }
     .ci:focus { border-color: var(--b); background: #0d1c2e; }
-    .ci.ticker { width: 85px; text-transform: uppercase; font-weight: 700; color: var(--b); }
+    .ci.ticker { width: 85px; text-transform: uppercase; font-weight: 700; color: var(--b); text-align: center; }
     .pending .ci { color: var(--sub); }
     
     .action-btns { display: flex; gap: 4px; justify-content: center; align-items: center; }
@@ -89,7 +91,7 @@
     .btn-del:hover { color: #ff6666; }
 
     /* 🔥 ESTILOS PARA EL DRAG AND DROP 🔥 */
-    .drag-handle { cursor: grab; padding: 0 10px; color: var(--sub); font-size: 1rem; opacity: 0.5; transition: 0.2s; }
+    .drag-handle { cursor: grab; padding: 0 10px; color: var(--sub); font-size: 1rem; opacity: 0.5; transition: 0.2s; width: 30px; }
     .drag-handle:hover { opacity: 1; color: var(--b); }
     .sortable-ghost { opacity: 0.4; background-color: #1a2332; }
 
@@ -239,7 +241,7 @@
     <div id="content-crypto" class="tab-content">
       <div class="broker">
         <div class="bhdr cr">
-          <span>🪙 Billetera Cripto (Binance / Ledger)</span>
+          <span>₿🚀🪙 Billetera Cripto (Binance / Ledger)</span>
           <div style="display:flex; gap:6px; align-items:center;">
             <button class="btn-undo-redo btn-undo-action" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span class="undo-cnt">0</span>)</button>
             <button class="btn-undo-redo btn-redo-action" onclick="redo()" disabled>↪️ <span class="hide-mob">Rehacer</span> (<span class="redo-cnt">0</span>)</button>
@@ -267,7 +269,7 @@
     <hr style="border:0; border-top:1px solid var(--border); margin:16px 0;">
     
     <div class="modal-row" style="margin-bottom: 15px;">
-      <span class="modal-label">Precio de compra ($):</span>
+      <span class="modal-label">Precio de mercado ($):</span>
       <input type="number" id="simInpPx" class="modal-input" value="0" min="0" step="0.0001" oninput="calcSim('buy', 'px')">
     </div>
     <div class="modal-row">
@@ -365,7 +367,7 @@ let skCurVal = 12627217;
 let dChart = null, bChart = null, saveTimeout = null;
 const COLS = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc', '#f3ba2f', '#8c52ff'];
 
-// 🔥 Lista de Stablecoins a excluir de la API de MEXC
+// 🔥 Lista de Stablecoins a excluir de la API
 const STABLECOINS = ['USDT', 'USDC', 'EUSD'];
 
 const f = (n, d = 2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
@@ -522,7 +524,7 @@ function calc(row) {
   // 🔥 LÓGICA ESPECIAL PARA STABLECOINS 🔥
   let isStable = STABLECOINS.includes(row.t);
   if(isStable) {
-      row.px = 1.00; // Forzar precio a $1
+      row.px = 1.00; 
   }
 
   const cur = (row.qty || 0) * (row.px || 0);
@@ -665,7 +667,7 @@ function confirmSell() {
     return;
   }
   
-  saveStateToHistory();
+  saveStateToHistory(); 
   
   const avgCost = activeSimRow.inv / activeSimRow.qty;
   const realizedPnL = (sellPx - avgCost) * sellQty;
@@ -680,7 +682,7 @@ function confirmSell() {
       activeSimRow.invFormula = '0'; 
   }
   
-  recalc(false);
+  recalc(false); 
   closeSim('sell');
   showToast('✅ Venta registrada. ' + (realizedPnL >= 0 ? 'Ganancia' : 'Pérdida') + ': $' + f(Math.abs(realizedPnL)) + ' USD');
 }
@@ -875,7 +877,17 @@ function renderSummary() {
 function renderCharts() {
   const activeData = currentView === 'stocks' ? [...SW.map(calc), ...XT.map(calc)] : [...CR.map(calc)];
   const all = activeData.filter(x => x.qty > 0 && x.t);
-  const labels = all.map(x => x.t); const vals = all.map(x => x.cur); const gls = all.map(x => x.gl);
+  
+  // 🔥 LÓGICA DE ETIQUETAS MEJORADA (MUESTRA LA WALLET EN STABLECOINS) 🔥
+  const labels = all.map(x => {
+      let name = x.t;
+      if (STABLECOINS.includes(name.toUpperCase()) && x.wallet) {
+          name += ` (${x.wallet})`; // Ej: USDT (Binance)
+      }
+      return name;
+  });
+  
+  const vals = all.map(x => x.cur); const gls = all.map(x => x.gl);
   const totalVal = vals.reduce((a, b) => a + b, 0);
   const labelsPct = labels.map((t, i) => t + ' (' + (totalVal > 0 ? (vals[i] / totalVal * 100).toFixed(1) : 0) + '%)');
   
@@ -907,15 +919,32 @@ async function fetchRealTimeData() {
   };
   
   const fetchCryptoPrice = async ticker => {
-    // Si es stablecoin, no consultar API y retornar 1 directamente
-    if (STABLECOINS.includes(ticker.toUpperCase())) {
-      return 1.00;
-    }
-
+    const tUpper = ticker.toUpperCase();
+    
+    if (STABLECOINS.includes(tUpper)) return 1.00; // Forzar a $1
+    
+    // Primero intenta con MEXC
     try {
-      const res = await fetch('https://api.mexc.com/api/v3/ticker/price?symbol=' + ticker + 'USDT');
-      const d = await res.json(); return parseFloat(d.price);
-    } catch (e) { return null; }
+      const res = await fetch('https://api.mexc.com/api/v3/ticker/price?symbol=' + tUpper + 'USDT');
+      if (res.ok) {
+         const d = await res.json(); 
+         if (d.price) return parseFloat(d.price);
+      }
+      throw new Error('No encontrado en MEXC');
+    } catch (e) { 
+      // 🔥 PLAN B: Si falla MEXC, busca en CryptoPrices.cc (Para monedas como ACU o RUNWAGO) 🔥
+      try {
+          const fallbackRes = await fetch('https://cryptoprices.cc/' + tUpper + '/');
+          if (fallbackRes.ok) {
+             const textVal = await fallbackRes.text();
+             const parsedVal = parseFloat(textVal);
+             if (!isNaN(parsedVal)) return parsedVal;
+          }
+          return null;
+      } catch(err) {
+          return null;
+      }
+    }
   };
   
   try {
