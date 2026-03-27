@@ -1061,11 +1061,7 @@
     const STABLECOINS = ['USDT', 'USDC', 'EUSD'];
 
     // Estado para Ordenamiento
-    let sortState = { 
-      sw: { col: null, dir: 1 }, 
-      xt: { col: null, dir: 1 }, 
-      cr: { col: null, dir: 1 } 
-    };
+    let sortState = { sw: { col: null, dir: 1 }, xt: { col: null, dir: 1 }, cr: { col: null, dir: 1 } };
 
     // Utilidades de formato
     const f = (n, d = 2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
@@ -1156,6 +1152,16 @@
           if (all.length) nid = Math.max(...all.map(r => r.id)) + 1;
           
           if (d.rate) document.getElementById('rateInput').value = d.rate;
+          
+          // Actualización: Leer TRM desde API AwesomeAPI
+          fetch('https://economia.awesomeapi.com.br/json/last/USD-COP')
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.USDCOP) {
+                    document.getElementById('rateInput').value = parseFloat(data.USDCOP.bid).toFixed(2);
+                }
+            }).catch(e => console.log("Error TRM"));
+            
           if (d.skInv) skInvVal = parseFloat(d.skInv);
           if (d.skCur) skCurVal = parseFloat(d.skCur);
 
@@ -1399,7 +1405,7 @@
       }
       calc(activeSimRow); 
 
-      document.getElementById('sellTitle').innerHTML = `💸 Vender: <span style="color:#e6edf3; margin-left:5px;">${activeSimRow.t}</span>`; // 🔥 ÍCONO CAMBIADO
+      document.getElementById('sellTitle').innerHTML = `💸 Vender: <span style="color:#e6edf3; margin-left:5px;">${activeSimRow.t}</span>`;
       document.getElementById('sellCurQty').textContent = activeSimRow.qty;
       document.getElementById('sellCurAvg').textContent = '$' + f(activeSimRow.avg);
       
@@ -1527,7 +1533,7 @@
         
         const walletCell = isCrypto ? `<td><input class="ci wallet" value="${row.wallet || ''}" placeholder="Binance, Ledger..." onblur="upd('${tid}', ${row.id}, 'wallet', this.value)"></td>` : '';
 
-        // 🔥 ÍCONO CAMBIADO A 💸 🔥
+        // 🔥 ÍCONO DE VENTA ACTUALIZADO A 💸 🔥
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
           <td class="drag-handle" title="Arrastrar para mover">☰</td>
           <td><input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t || ''}" placeholder="${isCrypto ? 'BTC, ETH...' : 'TICKER'}" onblur="upd('${tid}', ${row.id}, 't', this.value)">${isPend ? '<span class="badge">próximo</span>' : ''}</td>
@@ -1742,10 +1748,11 @@
       
       if (dChart) dChart.destroy();
       if (labels.length) {
+        const isMobile = window.innerWidth <= 768;
         dChart = new Chart(document.getElementById('donut'), { 
           type: 'doughnut', 
           data: { labels: labelsPct, datasets: [{ data: vals, backgroundColor: COLS.slice(0, labels.length), borderWidth: 2, borderColor: '#161b22' }] }, 
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#e6edf3', font: { size: 11 }, boxWidth: 10, padding: 8 } } } } 
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: isMobile ? 'bottom' : 'right', labels: { color: '#e6edf3', font: { size: 11 }, boxWidth: 10, padding: 8 } } } } 
         });
       }
       
@@ -1836,9 +1843,11 @@
       
       // Consultar TRM
       try {
-        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const res = await fetch('https://economia.awesomeapi.com.br/json/last/USD-COP');
         const d = await res.json();
-        if (d.rates && d.rates.COP) document.getElementById('rateInput').value = d.rates.COP.toFixed(2);
+        if (d.USDCOP && d.USDCOP.bid) {
+            document.getElementById('rateInput').value = parseFloat(d.USDCOP.bid).toFixed(2);
+        }
       } catch (e) { console.log('Error TRM'); }
       
       // Función Precios Acciones
