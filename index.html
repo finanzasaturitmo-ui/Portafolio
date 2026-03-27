@@ -322,6 +322,14 @@
         color: var(--yellow);
         background: linear-gradient(90deg, #f3ba2f22, transparent);
       }
+      
+      /* 🔥 SOLUCIÓN PARA WEB (Alineación horizontal correcta en PC) 🔥 */
+      .bhdr-controls {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
       .tbl-wrap {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -742,11 +750,11 @@
       @media(max-width: 768px) {
         body { font-size: 11px; }
         main { padding: 10px; }
+        
         .hdr { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px; }
         .hdr-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
         .hide-mob { display: none; }
-        .btn-undo-redo { padding: 4px 6px; font-size: 0.75rem; }
-        .btn-logout { padding: 4px 8px; }
+        
         .cards { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
         .card { padding: 8px; }
         .card .lbl { font-size: 0.6rem; margin-bottom: 1px; }
@@ -754,20 +762,23 @@
         .card .s2 { font-size: 0.65rem; }
         
         .charts { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
-        .ch-wrap { height: 280px !important; } /* Gráficas más altas */
+        .ch-wrap { height: 280px !important; } 
         
+        /* 🔥 SOLUCIÓN PARA MÓVIL: Encabezado de Tablas y Botones 🔥 */
         .bhdr { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
         .bhdr > span { font-size: 1rem; text-align: center; }
-        .bhdr-controls { width: 100%; justify-content: space-between; }
+        .bhdr-controls { width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
         .bhdr-controls .opp-mini { flex-grow: 1; justify-content: center; }
         .bhdr-controls .btn-undo-redo { padding: 8px 10px; }
-        .btn-add { width: 100%; padding: 12px; margin-top: 8px; font-size: 0.85rem; } 
+        .btn-add { width: 100%; padding: 10px; margin-top: 4px; font-size: 0.85rem; } 
         
         .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table th, table td { font-size: 0.75rem; padding: 4px 3px; }
+        
         .ci { padding: 3px 5px; width: 75px; font-size: 0.75rem; }
         .ci.ticker { width: 70px; }
         .ci.wallet { width: 90px; }
+        
         .sum-box { padding: 12px; }
         .sk-grid { grid-template-columns: 1fr; gap: 12px; }
       }
@@ -964,7 +975,7 @@
     };
 
     // ==========================================================================
-    // 2. INICIALIZACIÓN DE VARIABLES GLOBALES
+    // 2. INICIALIZACIÓN Y VARIABLES GLOBALES
     // ==========================================================================
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -990,11 +1001,7 @@
     const STABLECOINS = ['USDT', 'USDC', 'EUSD'];
 
     // Estado para Ordenamiento
-    let sortState = { 
-      sw: { col: null, dir: 1 }, 
-      xt: { col: null, dir: 1 }, 
-      cr: { col: null, dir: 1 } 
-    };
+    let sortState = { sw: { col: null, dir: 1 }, xt: { col: null, dir: 1 }, cr: { col: null, dir: 1 } };
 
     // Utilidades de formato
     const f = (n, d = 2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
