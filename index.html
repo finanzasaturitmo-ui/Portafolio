@@ -195,13 +195,13 @@
     <div class="cards" id="cards"></div>
     
     <div class="charts">
-      <div class="ch"><h3>Distribución del Portafolio</h3><div class="ch-wrap"><canvas id="donut"></canvas></div></div>
-      <div class="ch"><h3>Rendimiento % G/L</h3><div class="ch-wrap"><canvas id="bar"></canvas></div></div>
+      <div class="ch"><h3 id="lbl-donut">Distribución del Portafolio</h3><div class="ch-wrap"><canvas id="donut"></canvas></div></div>
+      <div class="ch"><h3 id="lbl-bar">Rendimiento % G/L</h3><div class="ch-wrap"><canvas id="bar"></canvas></div></div>
     </div>
     
     <div class="view-tabs">
       <button id="btn-tab-stocks" class="view-tab active" onclick="switchTab('stocks')">📈 Acciones (Tradicional)</button>
-      <button id="btn-tab-crypto" class="view-tab" onclick="switchTab('crypto')">🪙 Portafolio Cripto</button>
+      <button id="btn-tab-crypto" class="view-tab" onclick="switchTab('crypto')">🪙 Portafolio Cripto ₿🚀🪙</button>
     </div>
 
     <div id="content-stocks" class="tab-content active">
@@ -246,7 +246,7 @@
     
     <div class="bottom">
       <div class="sum-box">
-        <div class="box-title">📋 Resumen Consolidado del Portafolio</div>
+        <div class="box-title" id="lbl-summary">📋 Resumen Consolidado de Acciones</div>
         <div id="sum-content"></div>
       </div>
     </div>
@@ -312,9 +312,12 @@ const auth = firebase.auth();
 const db = firebase.database();
 let currentUser = null;
 
+// 🔥 ESTADO DE LA VISTA (Acciones o Cripto) 🔥
+let currentView = 'stocks'; 
+
 let SW = [];
 let XT = [];
-let CR = []; // 🔥 Nueva Billetera Crypto
+let CR = []; // Billetera Crypto
 let nid = 1;
 let skInvVal = 14613200;
 let skCurVal = 12627217;
@@ -352,10 +355,17 @@ function cerrarSesion() { auth.signOut(); }
 
 // Funcionalidad de Pestañas
 function switchTab(tabId) {
+  currentView = tabId;
   document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('btn-tab-' + tabId).classList.add('active');
   document.getElementById('content-' + tabId).classList.add('active');
+  
+  // Cambiar etiquetas dinámicas
+  document.getElementById('lbl-donut').textContent = tabId === 'stocks' ? 'Distribución de Acciones' : 'Distribución Cripto';
+  document.getElementById('lbl-summary').textContent = tabId === 'stocks' ? '📋 Resumen Consolidado de Acciones' : '📋 Resumen Billetera Cripto';
+  
+  recalc(false); // Redibujar todo basado en la vista actual
 }
 
 function loadFromFirebase() {
@@ -367,7 +377,6 @@ function loadFromFirebase() {
       const d = snap.val();
       SW = d.SW || []; 
       XT = d.XT || [];
-      // 🔥 Si ya existía el usuario pero no tenía el array de Cripto, se lo dejamos pre-llenado con sus preferencias
       CR = d.CR || [
           {id: 41, t: 'ETH', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
           {id: 42, t: 'BTC', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
@@ -594,66 +603,125 @@ function recalc(pushToHistory = true) {
 }
 
 function renderCards() {
-  const rt = rate(); const all = [...SW.map(calc), ...XT.map(calc), ...CR.map(calc)].filter(x => x.qty > 0);
-  const tCur = all.reduce((s, x) => s + x.cur, 0); const tInv = all.reduce((s, x) => s + x.inv, 0);
-  const tPnl = tCur - tInv; const tPct = tInv > 0 ? tPnl / tInv * 100 : 0;
-  
-  const cCur = CR.map(calc).filter(x=>x.qty>0).reduce((s, x) => s + x.cur, 0); // Solo cripto real
-  
-  const skUSD  = skCurVal / rt; const skIUSD = skInvVal / rt; const gC = tCur + skUSD;
-  const assets = all.filter(x => x.t);
-  const best  = assets.length ? [...assets].sort((a, b) => b.gl - a.gl)[0] : null;
-  const worst = assets.length ? [...assets].sort((a, b) => a.gl - b.gl)[0] : null;
+  const rt = rate(); 
   const lastUpd = document.getElementById('lastSaved').textContent.includes('Nube') ? new Date().toLocaleTimeString('es-CO') : '—';
+  
+  let activeAssets = [];
+  let tInv = 0, tCur = 0, tPnl = 0, tPct = 0, gC = 0;
+  let lblGlobal = '', valInvStr = '', htmlSkandiaOrCripto = '';
+  
+  if (currentView === 'stocks') {
+    // 📈 VISTA ACCIONES
+    activeAssets = [...SW.map(calc), ...XT.map(calc)].filter(x => x.qty > 0);
+    tCur = activeAssets.reduce((s, x) => s + x.cur, 0);
+    const bInv = activeAssets.reduce((s, x) => s + x.inv, 0);
+    
+    if (skInvVal <= 0) skInvVal = 14613200;
+    const skUSD  = skCurVal / rt; 
+    const skIUSD = skInvVal / rt; 
+    
+    tInv = bInv + skIUSD;
+    gC = tCur + skUSD;
+    tPnl = gC - tInv;
+    tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
+    
+    lblGlobal = '💼 Portafolio Acciones + Skandia';
+    valInvStr = '$' + f(tInv);
+    htmlSkandiaOrCripto = `Brokers <span style="color:#e6edf3;font-weight:600">$${f(tCur)}</span> · Skandia <span style="color:#e6edf3;font-weight:600">$${f(skUSD)}</span>`;
+    
+  } else {
+    // 🪙 VISTA CRIPTO
+    activeAssets = CR.map(calc).filter(x => x.qty > 0);
+    tCur = activeAssets.reduce((s, x) => s + x.cur, 0);
+    tInv = activeAssets.reduce((s, x) => s + x.inv, 0);
+    
+    gC = tCur; // En cripto el global es solo la suma de las criptos
+    tPnl = tCur - tInv;
+    tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
+    
+    lblGlobal = '🪙 Portafolio Cripto';
+    valInvStr = '$' + f(tInv);
+    htmlSkandiaOrCripto = `Billetera Digital <span style="color:#e6edf3;font-weight:600">$${f(tCur)}</span>`;
+  }
 
-  const bCls = best && best.gl >= 0 ? 'g' : 'r'; const wCls = worst && worst.gl >= 0 ? 'g' : 'r';
+  const namedAssets = activeAssets.filter(x => x.t);
+  const best  = namedAssets.length ? [...namedAssets].sort((a, b) => b.gl - a.gl)[0] : null;
+  const worst = namedAssets.length ? [...namedAssets].sort((a, b) => a.gl - b.gl)[0] : null;
+
+  const bCls = best && best.gl >= 0 ? 'g' : 'r'; 
+  const wCls = worst && worst.gl >= 0 ? 'g' : 'r';
 
   document.getElementById('cards').innerHTML =
-    '<div class="card" style="border-color:#58a6ff33"><div class="lbl">💼 Patrimonio Global USD</div><div class="val b">$' + f(gC) + '</div><div class="s2" style="color:#8b949e;margin-top:3px">Brokers <span style="color:#e6edf3;font-weight:600">$' + f(tCur - cCur) + '</span> · Cripto <span style="color:#e6edf3;font-weight:600">$' + f(cCur) + '</span></div><div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">' + fCOP(gC * rt) + '</div></div>' +
-    '<div class="card"><div class="lbl">📥 Capital Invertido</div><div class="val">$' + f(tInv + skIUSD) + '</div><div class="s2" style="color:#8b949e;margin-top:3px">' + fCOP((tInv + skIUSD) * rt) + '</div></div>' +
-    '<div class="card" style="border-color:' + (tPnl >= 0 ? '#3fb95033' : '#f7816633') + '"><div class="lbl">📈 Retorno Total (Sin Skandia)</div><div class="val ' + (tPnl >= 0 ? 'g' : 'r') + '">' + (tPnl >= 0 ? '+' : '-') + ' $' + f(Math.abs(tPnl)) + '</div><div class="s2 ' + (tPct >= 0 ? 'g' : 'r') + '" style="margin-top:3px">' + (tPct >= 0 ? '+' : '') + f(tPct, 1) + '% sobre invertido</div><div class="s2 ' + (tPnl >= 0 ? 'g' : 'r') + '" style="margin-top:2px;font-weight:600">' + (tPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(tPnl) * rt) + '</div></div>' +
+    '<div class="card" style="border-color:#58a6ff33"><div class="lbl">' + lblGlobal + '</div><div class="val b">$' + f(gC) + '</div><div class="s2" style="color:#8b949e;margin-top:3px">' + htmlSkandiaOrCripto + '</div><div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">' + fCOP(gC * rt) + '</div></div>' +
+    '<div class="card"><div class="lbl">📥 Capital Invertido</div><div class="val">' + valInvStr + '</div><div class="s2" style="color:#8b949e;margin-top:3px">' + fCOP(tInv * rt) + '</div></div>' +
+    '<div class="card" style="border-color:' + (tPnl >= 0 ? '#3fb95033' : '#f7816633') + '"><div class="lbl">📈 Retorno Total</div><div class="val ' + (tPnl >= 0 ? 'g' : 'r') + '">' + (tPnl >= 0 ? '+' : '-') + ' $' + f(Math.abs(tPnl)) + '</div><div class="s2 ' + (tPct >= 0 ? 'g' : 'r') + '" style="margin-top:3px">' + (tPct >= 0 ? '+' : '') + f(tPct, 1) + '% sobre invertido</div><div class="s2 ' + (tPnl >= 0 ? 'g' : 'r') + '" style="margin-top:2px;font-weight:600">' + (tPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(tPnl) * rt) + '</div></div>' +
     '<div class="card" style="border-color:#ffa65733"><div class="lbl">💱 TRM en Vivo</div><div class="val" style="color:#ffa657">' + f(rt, 0) + ' <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div><div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">1 USD = ' + f(rt, 0) + ' COP</div><div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">Act: ' + lastUpd + '</div></div>' +
     '<div class="card" style="border-color:' + (best && best.gl >= 0 ? '#3fb95033' : '#f7816633') + '"><div class="lbl">🏆 Mejor Activo</div><div class="val ' + bCls + '">' + (best ? best.t : '—') + '</div><div class="s2 ' + bCls + '" style="margin-top:3px">' + (best ? (best.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(best.pnl)) : '') + '</div><div class="s2 ' + bCls + '" style="margin-top:2px">' + (best ? (best.gl >= 0 ? '+' : '') + f(best.gl, 1) + '%' : '') + '</div><div class="s2 hide-mob ' + bCls + '" style="margin-top:2px;font-size:.68rem">' + (best ? (best.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(best.pnl) * rt) : '') + '</div></div>' +
     '<div class="card" style="border-color:' + (worst && worst.gl >= 0 ? '#3fb95033' : '#f7816633') + '"><div class="lbl">⚠️ Más Rezagado</div><div class="val ' + wCls + '">' + (worst ? worst.t : '—') + '</div><div class="s2 ' + wCls + '" style="margin-top:3px">' + (worst ? (worst.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(worst.pnl)) : '') + '</div><div class="s2 ' + wCls + '" style="margin-top:2px">' + (worst ? f(worst.gl, 1) + '%' : '') + '</div><div class="s2 hide-mob ' + wCls + '" style="margin-top:2px;font-size:.68rem">' + (worst ? (worst.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(worst.pnl) * rt) : '') + '</div></div>';
 }
 
 function renderSummary() {
-  const rt = rate(); const sA = SW.map(calc).filter(x => x.qty > 0); const xA = XT.map(calc).filter(x => x.qty > 0); const cA = CR.map(calc).filter(x => x.qty > 0);
-  const sI = sA.reduce((s, x) => s + x.inv, 0); const sC = sA.reduce((s, x) => s + x.cur, 0);
-  const xI = xA.reduce((s, x) => s + x.inv, 0); const xC = xA.reduce((s, x) => s + x.cur, 0);
-  const cI = cA.reduce((s, x) => s + x.inv, 0); const cC = cA.reduce((s, x) => s + x.cur, 0);
-  if (skInvVal <= 0) skInvVal = 14613200;
-  const skI_USD = skInvVal / rt; const skC_USD = skCurVal / rt;
-  const tI_USD = sI + xI + cI + skI_USD; const tC_USD = sC + xC + cC + skC_USD;
-  const tI_COP = (sI + xI + cI) * rt + skInvVal; const tC_COP = (sC + xC + cC) * rt + skCurVal;
-  const skPnl = skCurVal - skInvVal; const skRet = skInvVal > 0 ? (skPnl / skInvVal) * 100 : 0;
+  const rt = rate(); 
+  
+  if (currentView === 'stocks') {
+    const sA = SW.map(calc).filter(x => x.qty > 0); const xA = XT.map(calc).filter(x => x.qty > 0);
+    const sI = sA.reduce((s, x) => s + x.inv, 0); const sC = sA.reduce((s, x) => s + x.cur, 0);
+    const xI = xA.reduce((s, x) => s + x.inv, 0); const xC = xA.reduce((s, x) => s + x.cur, 0);
+    if (skInvVal <= 0) skInvVal = 14613200;
+    const skI_USD = skInvVal / rt; const skC_USD = skCurVal / rt;
+    const tI_USD = sI + xI + skI_USD; const tC_USD = sC + xC + skC_USD;
+    const tI_COP = (sI + xI) * rt + skInvVal; const tC_COP = (sC + xC) * rt + skCurVal;
+    const skPnl = skCurVal - skInvVal; const skRet = skInvVal > 0 ? (skPnl / skInvVal) * 100 : 0;
 
-  document.getElementById('sum-content').innerHTML = `
-    <div class="sum-grid">
-      <div class="sum-card"><div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇺🇸 Schwab USA</div><div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(sI)}</span></div><div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(sC)}</span></div></div>
-      <div class="sum-card"><div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇪🇺 XTB Europe</div><div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(xI)}</span></div><div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(xC)}</span></div></div>
-      <div class="sum-card"><div style="font-size:.65rem; color:var(--yellow); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🪙 Billetera Cripto</div><div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(cI)}</span></div><div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(cC)}</span></div></div>
-    </div>
-    <div class="sk-panel">
-      <div class="sk-hdr"><div class="sk-title-badge">🇨🇴 Skandia Portafolio BITCOIN ₿</div><div style="display: flex; gap: 4px;"><button class="btn-undo-redo btn-undo-action" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span class="undo-cnt">0</span>)</button><button class="btn-undo-redo btn-redo-action" onclick="redo()" disabled>↪️ <span class="hide-mob">Rehacer</span> (<span class="redo-cnt">0</span>)</button></div></div>
-      <div class="sk-grid"><div><label style="font-size:.7rem; color:var(--sub);">Capital Invertido</label><div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'inv')"></div><div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ $${f(skI_USD)} USD</div></div><div><label style="font-size:.7rem; color:var(--sub);">Valor Actual</label><div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'cur')"></div><div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ ${fU(skC_USD)} USD</div></div></div>
-      <div style="margin-top:12px; padding-top:12px; border-top:1px solid #3fb95022; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:.7rem; color:var(--sub)">Rendimiento Skandia</span><span style="font-size:.8rem; font-weight:700;" class="${skPnl >= 0 ? 'g' : 'r'}">${skPnl >= 0 ? '+' : '-'} ${fCOP(Math.abs(skPnl))} (${skRet >= 0 ? '+' : ''}${f(skRet, 2)}%)</span></div>
-    </div>
-    <div class="totals-panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><div><div style="font-size:.75rem; color:var(--sub); margin-bottom:2px;">Total Invertido</div><div style="font-size:1.15rem; font-weight:700; color:#e6edf3; letter-spacing:.5px;">${fCOP(tI_COP)}</div></div><div style="text-align:right;"><div style="font-size:.7rem; color:var(--sub); margin-bottom:2px;">Equivalente USD</div><div style="font-size:.9rem; font-weight:600; color:var(--sub);">$${f(tI_USD)}</div></div></div>
-      <div style="border-top:1px solid var(--border); margin:12px 0;"></div>
-      <div style="display:flex; justify-content:space-between; align-items:center;"><div><div style="font-size:.8rem; color:#3fb950; font-weight:700; margin-bottom:2px;">Total Actual COP</div><div style="font-size:1.5rem; font-weight:800; color:#3fb950; letter-spacing:.5px; text-shadow:0 0 10px rgba(63,185,80,0.2);">${fCOP(tC_COP)}</div></div><div style="text-align:right;"><div style="font-size:.75rem; color:var(--b); font-weight:600; margin-bottom:2px;">Total Actual USD</div><div style="font-size:1.2rem; font-weight:800; color:var(--b);">$${f(tC_USD)}</div></div></div>
-    </div>
-  `;
+    document.getElementById('sum-content').innerHTML = `
+      <div class="sum-grid">
+        <div class="sum-card"><div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇺🇸 Schwab USA</div><div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(sI)}</span></div><div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(sC)}</span></div></div>
+        <div class="sum-card"><div style="font-size:.65rem; color:var(--sub); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🇪🇺 XTB Europe</div><div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(xI)}</span></div><div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(xC)}</span></div></div>
+      </div>
+      <div class="sk-panel">
+        <div class="sk-hdr"><div class="sk-title-badge">🇨🇴 Skandia Portafolio BITCOIN ₿</div><div style="display: flex; gap: 4px;"><button class="btn-undo-redo btn-undo-action" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span class="undo-cnt">0</span>)</button><button class="btn-undo-redo btn-redo-action" onclick="redo()" disabled>↪️ <span class="hide-mob">Rehacer</span> (<span class="redo-cnt">0</span>)</button></div></div>
+        <div class="sk-grid"><div><label style="font-size:.7rem; color:var(--sub);">Capital Invertido</label><div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'inv')"></div><div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ $${f(skI_USD)} USD</div></div><div><label style="font-size:.7rem; color:var(--sub);">Valor Actual</label><div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this, 'cur')"></div><div style="font-size:.65rem; color:var(--sub); text-align:right; margin-top:3px;">≈ ${fU(skC_USD)} USD</div></div></div>
+        <div style="margin-top:12px; padding-top:12px; border-top:1px solid #3fb95022; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:.7rem; color:var(--sub)">Rendimiento Skandia</span><span style="font-size:.8rem; font-weight:700;" class="${skPnl >= 0 ? 'g' : 'r'}">${skPnl >= 0 ? '+' : '-'} ${fCOP(Math.abs(skPnl))} (${skRet >= 0 ? '+' : ''}${f(skRet, 2)}%)</span></div>
+      </div>
+      <div class="totals-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><div><div style="font-size:.75rem; color:var(--sub); margin-bottom:2px;">Total Invertido</div><div style="font-size:1.15rem; font-weight:700; color:#e6edf3; letter-spacing:.5px;">${fCOP(tI_COP)}</div></div><div style="text-align:right;"><div style="font-size:.7rem; color:var(--sub); margin-bottom:2px;">Equivalente USD</div><div style="font-size:.9rem; font-weight:600; color:var(--sub);">$${f(tI_USD)}</div></div></div>
+        <div style="border-top:1px solid var(--border); margin:12px 0;"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;"><div><div style="font-size:.8rem; color:#3fb950; font-weight:700; margin-bottom:2px;">Total Actual COP</div><div style="font-size:1.5rem; font-weight:800; color:#3fb950; letter-spacing:.5px; text-shadow:0 0 10px rgba(63,185,80,0.2);">${fCOP(tC_COP)}</div></div><div style="text-align:right;"><div style="font-size:.75rem; color:var(--b); font-weight:600; margin-bottom:2px;">Total Actual USD</div><div style="font-size:1.2rem; font-weight:800; color:var(--b);">$${f(tC_USD)}</div></div></div>
+      </div>
+    `;
+  } else {
+    // VISTA CRIPTO (SIN SKANDIA NI BROKERS)
+    const cA = CR.map(calc).filter(x => x.qty > 0);
+    const cI = cA.reduce((s, x) => s + x.inv, 0); const cC = cA.reduce((s, x) => s + x.cur, 0);
+    const tI_COP = cI * rt; const tC_COP = cC * rt;
+    
+    document.getElementById('sum-content').innerHTML = `
+      <div class="sum-grid">
+        <div class="sum-card" style="border-color: #f3ba2f44;">
+          <div style="font-size:.65rem; color:var(--yellow); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🪙 Billetera Cripto</div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:.75rem; color:var(--sub)">Invertido</span> <span style="font-size:.8rem; font-weight:600;">$${f(cI)}</span></div>
+          <div style="display:flex; justify-content:space-between;"><span style="font-size:.75rem; color:var(--sub)">Actual</span> <span style="font-size:.8rem; font-weight:600;" class="b">${fU(cC)}</span></div>
+        </div>
+      </div>
+      <div class="totals-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><div><div style="font-size:.75rem; color:var(--sub); margin-bottom:2px;">Total Invertido Cripto</div><div style="font-size:1.15rem; font-weight:700; color:#e6edf3; letter-spacing:.5px;">${fCOP(tI_COP)}</div></div><div style="text-align:right;"><div style="font-size:.7rem; color:var(--sub); margin-bottom:2px;">Equivalente USD</div><div style="font-size:.9rem; font-weight:600; color:var(--sub);">$${f(cI)}</div></div></div>
+        <div style="border-top:1px solid var(--border); margin:12px 0;"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;"><div><div style="font-size:.8rem; color:#3fb950; font-weight:700; margin-bottom:2px;">Total Actual COP</div><div style="font-size:1.5rem; font-weight:800; color:#3fb950; letter-spacing:.5px; text-shadow:0 0 10px rgba(63,185,80,0.2);">${fCOP(tC_COP)}</div></div><div style="text-align:right;"><div style="font-size:.75rem; color:var(--b); font-weight:600; margin-bottom:2px;">Total Actual USD</div><div style="font-size:1.2rem; font-weight:800; color:var(--b);">$${f(cC)}</div></div></div>
+      </div>
+    `;
+  }
 }
 
 function renderCharts() {
-  const all = [...SW.map(calc), ...XT.map(calc), ...CR.map(calc)].filter(x => x.qty > 0 && x.t);
+  const activeData = currentView === 'stocks' ? [...SW.map(calc), ...XT.map(calc)] : [...CR.map(calc)];
+  const all = activeData.filter(x => x.qty > 0 && x.t);
   const labels = all.map(x => x.t); const vals = all.map(x => x.cur); const gls = all.map(x => x.gl);
   const totalVal = vals.reduce((a, b) => a + b, 0);
   const labelsPct = labels.map((t, i) => t + ' (' + (totalVal > 0 ? (vals[i] / totalVal * 100).toFixed(1) : 0) + '%)');
+  
   if (dChart) dChart.destroy();
   if (labels.length) dChart = new Chart(document.getElementById('donut'), { type: 'doughnut', data: { labels: labelsPct, datasets: [{ data: vals, backgroundColor: COLS.slice(0, labels.length), borderWidth: 2, borderColor: '#161b22' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#e6edf3', font: { size: 11 }, boxWidth: 10, padding: 8 } } } } });
+  
   if (bChart) bChart.destroy();
   if (labels.length) {
     const pctPlugin = { id: 'pct', afterDraw: chart => { const ctx = chart.ctx; chart.data.datasets.forEach((ds, i) => { const meta = chart.getDatasetMeta(i); if (!meta.hidden) { meta.data.forEach((el, j) => { ctx.fillStyle = ds.borderColor[j]; ctx.textAlign = 'center'; ctx.font = 'bold 10px sans-serif'; const v = ds.data[j]; ctx.textBaseline = v >= 0 ? 'bottom' : 'top'; ctx.fillText(f(v, 1) + '%', el.x, el.y + (v >= 0 ? -6 : 6)); }); } }); } };
@@ -664,15 +732,12 @@ function renderCharts() {
 async function fetchRealTimeData() {
   if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
   if (!currentUser) return;
-  
-  // 1. TRM
   try {
     const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
     const d = await res.json();
     if (d.rates && d.rates.COP) document.getElementById('rateInput').value = d.rates.COP.toFixed(2);
   } catch (e) { console.log('Error TRM'); }
   
-  // 2. FINNHUB (Acciones)
   const fetchStockPrice = async ticker => {
     try {
       const sym = ticker.includes('.UK') ? ticker.replace('.UK', '.L') : ticker;
@@ -681,7 +746,6 @@ async function fetchRealTimeData() {
     } catch (e) { return null; }
   };
   
-  // 3. BINANCE (Cripto)
   const fetchCryptoPrice = async ticker => {
     try {
       const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + ticker + 'USDT');
@@ -695,7 +759,7 @@ async function fetchRealTimeData() {
       ...XT.filter(r => r.t).map(async r => { const p = await fetchStockPrice(r.t); if (p) r.px = p; }),
       ...CR.filter(r => r.t).map(async r => { const p = await fetchCryptoPrice(r.t); if (p) r.px = p; })
     ]);
-  } catch (e) { console.log("Error al sincronizar precios"); }
+  } catch (e) {}
   
   recalc(false);
 }
