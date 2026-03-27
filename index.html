@@ -73,11 +73,15 @@
     .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; text-align: center; }
     
-    /* 🟢 TODO CENTRADO PARA LAS TABLAS */
-    th { color: var(--sub); padding: 6px 8px; font-weight: 500; font-size: .68rem; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); white-space: nowrap; text-align: center; }
+    /* 🔥 CABECERAS PARA FILTRAR 🔥 */
+    th { color: var(--sub); padding: 6px 8px; font-weight: 500; font-size: .68rem; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); white-space: nowrap; text-align: center; cursor: pointer; transition: 0.2s; user-select: none; }
+    th:hover { color: var(--b); }
     td { padding: 4px 5px; border-bottom: 1px solid #0d111766; white-space: nowrap; text-align: center; }
     tr:hover td { background: #1c212855; }
     
+    .sort-icon { font-size: 0.7rem; opacity: 0.3; margin-left: 4px; display: inline-block; transition: 0.2s; }
+    .sort-icon.active { opacity: 1; color: var(--b); }
+
     .ci { background: #0d1117; border: 1px solid var(--border); color: #e6edf3; border-radius: 5px; padding: 4px 7px; width: 90px; font-size: .8rem; outline: none; transition: .15s; text-align: center; }
     .ci.wallet { width: 110px; color: var(--sub); font-size: .75rem; }
     .ci:focus { border-color: var(--b); background: #0d1c2e; }
@@ -269,7 +273,7 @@
     <hr style="border:0; border-top:1px solid var(--border); margin:16px 0;">
     
     <div class="modal-row" style="margin-bottom: 15px;">
-      <span class="modal-label">Precio de mercado ($):</span>
+      <span class="modal-label">Precio de compra ($):</span>
       <input type="number" id="simInpPx" class="modal-input" value="0" min="0" step="0.0001" oninput="calcSim('buy', 'px')">
     </div>
     <div class="modal-row">
@@ -355,20 +359,25 @@ const auth = firebase.auth();
 const db = firebase.database();
 let currentUser = null;
 
-// 🔥 ESTADO DE LA VISTA (Acciones o Cripto) 🔥
 let currentView = 'stocks'; 
 
 let SW = [];
 let XT = [];
-let CR = []; // Billetera Crypto
+let CR = []; 
 let nid = 1;
 let skInvVal = 14613200;
 let skCurVal = 12627217;
 let dChart = null, bChart = null, saveTimeout = null;
 const COLS = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc', '#f3ba2f', '#8c52ff'];
 
-// 🔥 Lista de Stablecoins a excluir de la API
 const STABLECOINS = ['USDT', 'USDC', 'EUSD'];
+
+// 🔥 ESTADO DE ORDENAMIENTO (FILTROS) 🔥
+let sortState = {
+  sw: { col: null, dir: 1 },
+  xt: { col: null, dir: 1 },
+  cr: { col: null, dir: 1 }
+};
 
 const f = (n, d = 2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
 const fCOP = n => new Intl.NumberFormat('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n) + ' COP';
@@ -393,13 +402,10 @@ auth.onAuthStateChanged(user => {
 
 function iniciarSesion() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(err => {
-    alert('Error al iniciar sesión: ' + err.message);
-  });
+  auth.signInWithPopup(provider).catch(err => alert('Error al iniciar sesión: ' + err.message));
 }
 function cerrarSesion() { auth.signOut(); }
 
-// Funcionalidad de Pestañas
 function switchTab(tabId) {
   currentView = tabId;
   document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
@@ -420,14 +426,12 @@ function loadFromFirebase() {
   db.ref('users/' + currentUser.uid).once('value').then(snap => {
     if (snap.exists()) {
       const d = snap.val();
-      SW = d.SW || []; 
-      XT = d.XT || [];
+      SW = d.SW || []; XT = d.XT || [];
       CR = d.CR || [
           {id: 41, t: 'ETH', wallet: 'Binance', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
           {id: 42, t: 'BTC', wallet: 'Ledger', qty: 0, inv: 0, invFormula: '0', px: 0, p: true},
           {id: 43, t: 'USDT', wallet: 'Binance', qty: 0, inv: 0, invFormula: '0', px: 1, p: true}
       ];
-
       CR.forEach(crypto => { if(crypto.wallet === undefined) crypto.wallet = ''; });
 
       const all = [...SW, ...XT, ...CR];
@@ -458,10 +462,8 @@ function saveDataToFirebase() {
   if (!currentUser) return;
   db.ref('users/' + currentUser.uid).set({
     SW: SW, XT: XT, CR: CR,
-    rate: document.getElementById('rateInput').value,
-    opp: document.getElementById('oppInput').value,
-    skInv: skInvVal, skCur: skCurVal,
-    ts: new Date().toISOString()
+    rate: document.getElementById('rateInput').value, opp: document.getElementById('oppInput').value,
+    skInv: skInvVal, skCur: skCurVal, ts: new Date().toISOString()
   }).then(() => {
     document.getElementById('lastSaved').textContent = 'Nube sincronizada: ' + new Date().toLocaleTimeString('es-CO');
   });
@@ -520,45 +522,81 @@ function skBlur(el, type) {
 
 function calc(row) {
   if(row.inv === undefined) row.inv = calculateSumFromFormula(row.invFormula) || 0;
-  
-  // 🔥 LÓGICA ESPECIAL PARA STABLECOINS 🔥
   let isStable = STABLECOINS.includes(row.t);
-  if(isStable) {
-      row.px = 1.00; 
-  }
+  if(isStable) row.px = 1.00; 
 
   const cur = (row.qty || 0) * (row.px || 0);
   const avg = row.qty > 0 ? row.inv / row.qty : 0; 
-  row.avg = avg;
   
-  return { ...row, cur, gl: row.inv > 0 ? (cur - row.inv) / row.inv * 100 : 0, pnl: cur - row.inv };
+  // Mutamos el objeto para que SortTable pueda leer los campos calculados
+  row.avg = avg;
+  row.cur = cur;
+  row.gl = row.inv > 0 ? (cur - row.inv) / row.inv * 100 : 0;
+  row.pnl = cur - row.inv;
+  
+  return row;
 }
 
-// 🔥 FUNCIONES DE MODALES (COMPRA Y VENTA) 🔥
+// 🔥 FUNCIONES DE ORDENAMIENTO (FILTROS) 🔥
+function sortTable(tid, field) {
+  let arr = tid === 'sw' ? SW : tid === 'xt' ? XT : CR;
+  
+  // Calcular antes de ordenar
+  arr.forEach(calc);
+
+  if (sortState[tid].col === field) {
+    sortState[tid].dir *= -1; // Invertir orden
+  } else {
+    sortState[tid].col = field;
+    sortState[tid].dir = -1; // Por defecto arranca de Mayor a Menor para números
+  }
+  
+  const dir = sortState[tid].dir;
+  
+  arr.sort((a, b) => {
+    let valA = a[field];
+    let valB = b[field];
+    
+    // Si es texto (Activo o Wallet)
+    if (field === 't' || field === 'wallet') {
+      valA = valA || ''; valB = valB || '';
+      return valA.localeCompare(valB) * dir;
+    }
+    
+    // Si es número
+    valA = parseFloat(valA) || 0;
+    valB = parseFloat(valB) || 0;
+    return (valA - valB) * dir;
+  });
+  
+  recalc(); 
+}
+
+function getTh(tid, label, field) {
+  const isSorted = sortState[tid].col === field;
+  const icon = isSorted ? (sortState[tid].dir === 1 ? '▲' : '▼') : '⇕';
+  const activeCls = isSorted ? 'active' : '';
+  return `<th onclick="sortTable('${tid}', '${field}')" title="Ordenar por ${label}">${label} <span class="sort-icon ${activeCls}">${icon}</span></th>`;
+}
+
+
+// 🔥 MODALES 🔥
 let activeSimRow = null;
 let activeSimTid = null; 
 
-// --- Modal de Compra ---
 function openSim(tid, id) {
   activeSimTid = tid;
   activeSimRow = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
-  if (!activeSimRow || !activeSimRow.t) {
-    showToast('Primero asigna un nombre (Ticker) al activo.');
-    return;
-  }
+  if (!activeSimRow || !activeSimRow.t) { showToast('Primero asigna un nombre.'); return; }
   
-  const currQty = activeSimRow.qty || 0;
-  const currInv = activeSimRow.inv || 0;
-  const currAvg = currQty > 0 ? currInv / currQty : 0;
-  activeSimRow.avg = currAvg;
-
+  calc(activeSimRow); // Asegurar valores al día
+  
   document.getElementById('simTitle').innerHTML = `🧮 Simular Compra: <span style="color:#e6edf3; margin-left:5px;">${activeSimRow.t}</span>`;
-  document.getElementById('simCurQty').textContent = currQty;
-  document.getElementById('simCurAvg').textContent = '$' + f(currAvg);
+  document.getElementById('simCurQty').textContent = activeSimRow.qty || 0;
+  document.getElementById('simCurAvg').textContent = '$' + f(activeSimRow.avg);
   
-  const currentPx = STABLECOINS.includes(activeSimRow.t) ? 1.00 : (activeSimRow.px || currAvg);
+  const currentPx = STABLECOINS.includes(activeSimRow.t) ? 1.00 : (activeSimRow.px || activeSimRow.avg);
   document.getElementById('simInpPx').value = currentPx;
-  
   document.getElementById('simInpQty').value = 1;
   document.getElementById('simInpInv').value = currentPx; 
   
@@ -566,29 +604,22 @@ function openSim(tid, id) {
   calcSim('buy', 'px');
 }
 
-// --- Modal de Venta ---
 function openSell(tid, id) {
   activeSimTid = tid;
   activeSimRow = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
   
-  if (!activeSimRow || !activeSimRow.qty || activeSimRow.qty <= 0) {
-    alert('No tienes saldo válido para vender.');
-    return;
-  }
+  if (!activeSimRow || !activeSimRow.qty || activeSimRow.qty <= 0) { alert('No tienes saldo válido para vender.'); return; }
   
-  const currQty = activeSimRow.qty || 0;
-  const currInv = activeSimRow.inv || 0;
-  const currAvg = currQty > 0 ? currInv / currQty : 0;
-  activeSimRow.avg = currAvg;
+  calc(activeSimRow); 
 
   document.getElementById('sellTitle').innerHTML = `💰 Vender: <span style="color:#e6edf3; margin-left:5px;">${activeSimRow.t}</span>`;
-  document.getElementById('sellCurQty').textContent = currQty;
-  document.getElementById('sellCurAvg').textContent = '$' + f(currAvg);
+  document.getElementById('sellCurQty').textContent = activeSimRow.qty;
+  document.getElementById('sellCurAvg').textContent = '$' + f(activeSimRow.avg);
   
-  const currentPx = STABLECOINS.includes(activeSimRow.t) ? 1.00 : (activeSimRow.px || currAvg);
+  const currentPx = STABLECOINS.includes(activeSimRow.t) ? 1.00 : (activeSimRow.px || activeSimRow.avg);
   document.getElementById('sellInpPx').value = currentPx;
   
-  const defaultSellQty = currQty > 1 ? 1 : currQty;
+  const defaultSellQty = activeSimRow.qty > 1 ? 1 : activeSimRow.qty;
   document.getElementById('sellInpQty').value = defaultSellQty;
   document.getElementById('sellInpInv').value = defaultSellQty * currentPx; 
   
@@ -598,13 +629,11 @@ function openSell(tid, id) {
 
 function closeSim(type) {
   document.getElementById(type === 'buy' ? 'simModal' : 'sellModal').style.display = 'none';
-  activeSimRow = null;
-  activeSimTid = null;
+  activeSimRow = null; activeSimTid = null;
 }
 
 function calcSim(type, source = 'px') {
   if (!activeSimRow) return;
-  
   const prefix = type === 'buy' ? 'sim' : 'sell';
   const elPx = document.getElementById(`${prefix}InpPx`);
   const elInv = document.getElementById(`${prefix}InpInv`);
@@ -659,13 +688,9 @@ function confirmSell() {
   const sellPx = parseFloat(document.getElementById('sellInpPx').value) || 0;
   
   if (sellQty <= 0 || sellQty > activeSimRow.qty) {
-    alert('La cantidad a vender es inválida o supera tus fondos disponibles.');
-    return;
+    alert('La cantidad a vender es inválida o supera tus fondos disponibles.'); return;
   }
-  if (sellPx <= 0) {
-    alert('Precio de venta inválido.');
-    return;
-  }
+  if (sellPx <= 0) { alert('Precio de venta inválido.'); return; }
   
   saveStateToHistory(); 
   
@@ -676,11 +701,7 @@ function confirmSell() {
   activeSimRow.inv -= sellQty * avgCost; 
   activeSimRow.invFormula = '' + activeSimRow.inv.toFixed(4);
   
-  if(activeSimRow.qty < 0.000001) { 
-      activeSimRow.qty = 0; 
-      activeSimRow.inv = 0; 
-      activeSimRow.invFormula = '0'; 
-  }
+  if(activeSimRow.qty < 0.000001) { activeSimRow.qty = 0; activeSimRow.inv = 0; activeSimRow.invFormula = '0'; }
   
   recalc(false); 
   closeSim('sell');
@@ -689,14 +710,27 @@ function confirmSell() {
 
 function renderTable(data, tid) {
   const opp = rv(document.getElementById('oppInput').value) || 10;
-  const rows = data.map(calc);
+  const rows = data; // La data ya viene ordenada
   const isCrypto = tid === 'cr';
   
-  const walletHeader = isCrypto ? '<th>Wallet / Exchange</th>' : '';
+  const walletHeader = isCrypto ? getTh(tid, 'Wallet / Exchange', 'wallet') : '';
 
-  const thead = `<thead><tr><th></th><th>${isCrypto ? 'Moneda' : 'Activo'}</th>${walletHeader}<th>Cant.</th><th>Precio Prom</th><th>Precio Actual</th><th>Valor USD</th><th>Invertido USD</th><th>% G/L</th><th>Profit</th><th></th></tr></thead>`;
+  const thead = `<thead><tr>
+    <th></th>
+    ${getTh(tid, isCrypto ? 'Moneda' : 'Activo', 't')}
+    ${walletHeader}
+    ${getTh(tid, 'Cant.', 'qty')}
+    ${getTh(tid, 'Precio Prom', 'avg')}
+    ${getTh(tid, 'Precio Actual', 'px')}
+    ${getTh(tid, 'Valor USD', 'cur')}
+    ${getTh(tid, 'Invertido USD', 'inv')}
+    ${getTh(tid, '% G/L', 'gl')}
+    ${getTh(tid, 'Profit', 'pnl')}
+    <th></th>
+  </tr></thead>`;
   
   const tbody = rows.map(row => {
+    calc(row); // Asegura cálculos visuales
     const isPend = row.p || !row.qty;
     const isOpp = !isPend && row.avg > 0 && row.px > 0 && ((row.avg - row.px) / row.avg * 100) >= opp;
     
@@ -739,6 +773,8 @@ function renderTable(data, tid) {
               const movedItem = dataArr.splice(oldIndex, 1)[0];
               dataArr.splice(newIndex, 0, movedItem);
               
+              // Al arrastrar manual, borramos el "estado" de ordenamiento visual para no confundir
+              sortState[tid].col = null;
               recalc(); 
           },
       });
@@ -747,16 +783,13 @@ function renderTable(data, tid) {
 
 function upd(tid, id, field, val) {
   const row = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id); if(!row) return;
-  if (field === 't') {
-    row[field] = val.toUpperCase().trim();
-  } else if (field === 'wallet') {
-    row[field] = val.trim();
-  } else {
-    row[field] = rv(val);
-  }
+  if (field === 't') { row[field] = val.toUpperCase().trim(); } 
+  else if (field === 'wallet') { row[field] = val.trim(); } 
+  else { row[field] = rv(val); }
   if(field === 'qty' && rv(val) > 0) row.p = false; 
   recalc();
 }
+
 function addRow(tid) { (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).push({id: nid++, t: '', wallet: '', qty: 0, inv: 0, invFormula: '0', px: 0, p: true}); recalc(); }
 function delRow(tid, id) { if(!confirm('¿Eliminar este activo?')) return; if(tid === 'sw') SW = SW.filter(x => x.id !== id); else if (tid === 'xt') XT = XT.filter(x => x.id !== id); else CR = CR.filter(x => x.id !== id); recalc(); }
 
@@ -878,11 +911,10 @@ function renderCharts() {
   const activeData = currentView === 'stocks' ? [...SW.map(calc), ...XT.map(calc)] : [...CR.map(calc)];
   const all = activeData.filter(x => x.qty > 0 && x.t);
   
-  // 🔥 LÓGICA DE ETIQUETAS MEJORADA (MUESTRA LA WALLET EN STABLECOINS) 🔥
   const labels = all.map(x => {
       let name = x.t;
       if (STABLECOINS.includes(name.toUpperCase()) && x.wallet) {
-          name += ` (${x.wallet})`; // Ej: USDT (Binance)
+          name += ` (${x.wallet})`; 
       }
       return name;
   });
@@ -920,19 +952,16 @@ async function fetchRealTimeData() {
   
   const fetchCryptoPrice = async ticker => {
     const tUpper = ticker.toUpperCase();
+    if (STABLECOINS.includes(tUpper)) return 1.00; 
     
-    if (STABLECOINS.includes(tUpper)) return 1.00; // Forzar a $1
-    
-    // Primero intenta con MEXC
     try {
       const res = await fetch('https://api.mexc.com/api/v3/ticker/price?symbol=' + tUpper + 'USDT');
       if (res.ok) {
          const d = await res.json(); 
          if (d.price) return parseFloat(d.price);
       }
-      throw new Error('No encontrado en MEXC');
+      throw new Error('No encontrado');
     } catch (e) { 
-      // 🔥 PLAN B: Si falla MEXC, busca en CryptoPrices.cc (Para monedas como ACU o RUNWAGO) 🔥
       try {
           const fallbackRes = await fetch('https://cryptoprices.cc/' + tUpper + '/');
           if (fallbackRes.ok) {
@@ -941,9 +970,7 @@ async function fetchRealTimeData() {
              if (!isNaN(parsedVal)) return parsedVal;
           }
           return null;
-      } catch(err) {
-          return null;
-      }
+      } catch(err) { return null; }
     }
   };
   
