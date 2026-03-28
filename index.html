@@ -330,7 +330,7 @@
 
       <div class="view-tabs" id="view-tabs">
         <button id="btn-tab-stocks" class="view-tab active" onclick="switchTab('stocks')">📈 Acciones</button>
-        <button id="btn-tab-crypto" class="view-tab"        onclick="switchTab('crypto')">₿ Criptomonedas</button>
+        <button id="btn-tab-crypto" class="view-tab"        onclick="switchTab('crypto')">₿ Cripto</button>
       </div>
 
       <button class="fab-btn" id="fab-btn" onclick="toggleFab()">💰</button>
@@ -367,7 +367,7 @@
 
         <div class="broker">
           <div class="bhdr cr">
-            <span>₿🚀🪙 Billetera Cripto</span>
+            <span>₿🚀🪙 Criptomonedas</span>
             <div class="bhdr-controls">
               <div class="opp-mini" title="Oportunidad Compra %">🎯 <input type="number" class="opp-crypto" value="20" onfocus="saveStateToHistory()" onblur="updateOpp('crypto', this.value)" onkeyup="if(event.key==='Enter')this.blur()">%</div>
               <button class="btn-undo-redo btn-undo-action" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span class="undo-cnt">0</span>)</button>
@@ -591,7 +591,7 @@
       document.getElementById('btn-tab-' + tabId).classList.add('active');
       document.getElementById('content-' + tabId).classList.add('active');
       document.getElementById('lbl-donut').textContent   = tabId === 'stocks' ? 'Distribución de Acciones' : 'Distribución Cripto';
-      document.getElementById('lbl-summary').textContent = tabId === 'stocks' ? '📋 Resumen Consolidado de Acciones' : '📋 Resumen Billetera Cripto';
+      document.getElementById('lbl-summary').textContent = tabId === 'stocks' ? '📋 Resumen Consolidado de Acciones' : '📋 Resumen Consolidado Cripto';
       document.getElementById('view-tabs').classList.remove('open');
       const fab = document.getElementById('fab-btn');
       if (fab) {
@@ -1069,7 +1069,7 @@
         document.getElementById('sum-content').innerHTML = `
           <div class="sum-grid">
             <div class="sum-card" style="border-color:#f3ba2f44">
-              <div style="font-size:.65rem;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">🪙 Billetera Cripto</div>
+              <div style="font-size:.65rem;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">₿ Inversion Cripto</div>
               <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.75rem;color:var(--sub)">Invertido</span><span style="font-size:.8rem;font-weight:600">$${f(cI)}</span></div>
               <div style="display:flex;justify-content:space-between">                <span style="font-size:.75rem;color:var(--sub)">Actual</span>   <span style="font-size:.8rem;font-weight:600" class="b">${fU(cC)}</span></div>
             </div>
