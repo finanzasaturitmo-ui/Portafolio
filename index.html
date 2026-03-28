@@ -330,7 +330,7 @@
 
       <div class="view-tabs" id="view-tabs">
         <button id="btn-tab-stocks" class="view-tab active" onclick="switchTab('stocks')">📈 Acciones</button>
-        <button id="btn-tab-crypto" class="view-tab"        onclick="switchTab('crypto')">₿ Cripto</button>
+        <button id="btn-tab-crypto" class="view-tab"        onclick="switchTab('crypto')">₿ Criptomonedas</button>
       </div>
 
       <button class="fab-btn" id="fab-btn" onclick="toggleFab()">💰</button>
@@ -367,7 +367,7 @@
 
         <div class="broker">
           <div class="bhdr cr">
-            <span>₿🚀🪙 Criptomonedas</span>
+            <span>₿🚀🪙 Billetera Cripto</span>
             <div class="bhdr-controls">
               <div class="opp-mini" title="Oportunidad Compra %">🎯 <input type="number" class="opp-crypto" value="20" onfocus="saveStateToHistory()" onblur="updateOpp('crypto', this.value)" onkeyup="if(event.key==='Enter')this.blur()">%</div>
               <button class="btn-undo-redo btn-undo-action" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span class="undo-cnt">0</span>)</button>
@@ -546,14 +546,14 @@
             if (d.ts) document.getElementById('lastSaved').textContent = 'Nube OK: ' + new Date(d.ts).toLocaleTimeString('es-CO');
           } else {
             SW = [
-              { id:1, t:'BABA',   qty:19,      inv:1460.91, invFormula:'1460.91', px:129.87, p:false },
-              { id:2, t:'BRK-B',  qty:7.5562,  inv:2974.72, invFormula:'2974.72', px:476.19, p:false }
+              { id:1, t:'BABA',   qty:19, qtyFormula:'19', inv:1460.91, invFormula:'1460.91', px:129.87, p:false },
+              { id:2, t:'BRK-B',  qty:7.5562, qtyFormula:'7.5562', inv:2974.72, invFormula:'2974.72', px:476.19, p:false }
             ];
-            XT = [{ id:11, t:'EIMI.UK', qty:28.2244, inv:1125.02, invFormula:'1125.02', px:46.19, p:false }];
+            XT = [{ id:11, t:'EIMI.UK', qty:28.2244, qtyFormula:'28.2244', inv:1125.02, invFormula:'1125.02', px:46.19, p:false }];
             CR = [
-              { id:41, t:'ETH',  wallet:'Binance', qty:0, inv:0, invFormula:'0', px:0, p:true },
-              { id:42, t:'BTC',  wallet:'Ledger',  qty:0, inv:0, invFormula:'0', px:0, p:true },
-              { id:43, t:'USDT', wallet:'Binance', qty:0, inv:0, invFormula:'0', px:1, p:true }
+              { id:41, t:'ETH',  wallet:'Binance', qty:0, qtyFormula:'0', inv:0, invFormula:'0', px:0, p:true },
+              { id:42, t:'BTC',  wallet:'Ledger',  qty:0, qtyFormula:'0', inv:0, invFormula:'0', px:0, p:true },
+              { id:43, t:'USDT', wallet:'Binance', qty:0, qtyFormula:'0', inv:0, invFormula:'0', px:1, p:true }
             ];
             nid = 50;
           }
@@ -591,7 +591,7 @@
       document.getElementById('btn-tab-' + tabId).classList.add('active');
       document.getElementById('content-' + tabId).classList.add('active');
       document.getElementById('lbl-donut').textContent   = tabId === 'stocks' ? 'Distribución de Acciones' : 'Distribución Cripto';
-      document.getElementById('lbl-summary').textContent = tabId === 'stocks' ? '📋 Resumen Consolidado de Acciones' : '📋 Resumen Consolidado Cripto';
+      document.getElementById('lbl-summary').textContent = tabId === 'stocks' ? '📋 Resumen Consolidado de Acciones' : '📋 Resumen Billetera Cripto';
       document.getElementById('view-tabs').classList.remove('open');
       const fab = document.getElementById('fab-btn');
       if (fab) {
@@ -660,8 +660,8 @@
       return sum;
     }
 
+    // Funciones para INVERSIÓN
     function investFocus(el) { const r = el.getAttribute('data-raw-formula'); if (r) el.value = r; }
-
     function investBlur(el, tid, id) {
       const v = el.value, sum = calculateSumFromFormula(v);
       el.setAttribute('data-raw-formula', v);
@@ -671,8 +671,19 @@
       recalc();
     }
 
-    function skFocus(el) { saveStateToHistory(); el.value = el.id === 'skInv' ? skInvVal : skCurVal; }
+    // 🔥 NUEVAS FUNCIONES PARA CANTIDAD (CANT.) 🔥
+    function qtyFocus(el) { const r = el.getAttribute('data-raw-formula'); if (r) el.value = r; }
+    function qtyBlur(el, tid, id) {
+      const v = el.value, sum = calculateSumFromFormula(v);
+      el.setAttribute('data-raw-formula', v);
+      el.value = sum; el.title = 'Fórmula: ' + v;
+      const row = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
+      if (row) { row.qty = sum; row.qtyFormula = v; if(sum > 0) row.p = false; }
+      recalc();
+    }
 
+    // Funciones Skandia
+    function skFocus(el) { saveStateToHistory(); el.value = el.id === 'skInv' ? skInvVal : skCurVal; }
     function skBlur(el, type) {
       let raw = parseFloat(String(el.value).replace(/\./g, '')) || 0;
       if (type === 'inv') skInvVal = raw; else skCurVal = raw;
@@ -689,6 +700,8 @@
 
     function calc(row) {
       if (row.inv === undefined) row.inv = calculateSumFromFormula(row.invFormula) || 0;
+      if (row.qty === undefined) row.qty = calculateSumFromFormula(row.qtyFormula) || 0;
+      
       if (STABLECOINS.includes(String(row.t).toUpperCase())) row.px = 1.00;
       const cur = (row.qty || 0) * (row.px || 0);
       const avg = row.qty > 0 ? row.inv / row.qty : 0;
@@ -807,7 +820,11 @@
       activeSimRow.qty -= sellQty;
       activeSimRow.inv -= sellQty * avg;
       activeSimRow.invFormula = '' + activeSimRow.inv.toFixed(4);
-      if (activeSimRow.qty < 0.000001) { activeSimRow.qty = 0; activeSimRow.inv = 0; activeSimRow.invFormula = '0'; }
+      activeSimRow.qtyFormula = '' + activeSimRow.qty; // Actualiza la fórmula de cantidad post-venta
+      if (activeSimRow.qty < 0.000001) { 
+          activeSimRow.qty = 0; activeSimRow.qtyFormula = '0'; 
+          activeSimRow.inv = 0; activeSimRow.invFormula = '0'; 
+      }
       recalc(false);
       closeSim('sell');
       showToast('✅ Venta registrada. ' + (pnl >= 0 ? 'Ganancia' : 'Pérdida') + ': $' + f(Math.abs(pnl)) + ' USD');
@@ -840,14 +857,14 @@
         const isPend   = row.p || !row.qty;
         const isOpp    = !isPend && row.avg > 0 && row.px > 0 && ((row.avg - row.px) / row.avg * 100) >= opp;
         
-        // 🔥 ONKEYUP AGREGADO A TODOS LOS INPUTS (CELDAS EDITABLES DE LA TABLA) 🔥
         const walletTd = isCrypto ? `<td><input class="ci wallet" value="${row.wallet||''}" placeholder="Binance, Ledger..." onblur="upd('${tid}',${row.id},'wallet',this.value)" onkeyup="if(event.key==='Enter')this.blur()"></td>` : '';
         
+        // 🔥 AQUÍ ESTÁ EL CAMBIO PARA CANTIDAD: onfocus="qtyFocus(this)" onblur="qtyBlur(this,..." 🔥
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
           <td class="drag-handle" title="Mover">☰</td>
           <td><input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t||''}" placeholder="${isCrypto ? 'BTC, ETH...' : 'TICKER'}" onblur="upd('${tid}',${row.id},'t',this.value)" onkeyup="if(event.key==='Enter')this.blur()">${isPend ? '<span class="badge">próximo</span>' : ''}</td>
           ${walletTd}
-          <td><input class="ci" value="${row.qty||0}" style="text-align:center" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()"></td>
+          <td><input class="ci" value="${row.qty||0}" data-raw-formula="${row.qtyFormula||row.qty||0}" style="text-align:center" onfocus="qtyFocus(this)" onblur="qtyBlur(this,'${tid}',${row.id})" onkeyup="if(event.key==='Enter')this.blur()" title="Fórmula: ${row.qtyFormula||row.qty||0}"></td>
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)}</td>
           <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700">${row.px||0}</td>
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.cur)}</td>
@@ -896,7 +913,7 @@
     }
 
     function addRow(tid) {
-      (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).push({ id: nid++, t: '', wallet: '', qty: 0, inv: 0, invFormula: '0', px: 0, p: true });
+      (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).push({ id: nid++, t: '', wallet: '', qty: 0, qtyFormula: '0', inv: 0, invFormula: '0', px: 0, p: true });
       recalc();
     }
 
@@ -1069,7 +1086,7 @@
         document.getElementById('sum-content').innerHTML = `
           <div class="sum-grid">
             <div class="sum-card" style="border-color:#f3ba2f44">
-              <div style="font-size:.65rem;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">₿ Inversion Cripto</div>
+              <div style="font-size:.65rem;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">🪙 Billetera Cripto</div>
               <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.75rem;color:var(--sub)">Invertido</span><span style="font-size:.8rem;font-weight:600">$${f(cI)}</span></div>
               <div style="display:flex;justify-content:space-between">                <span style="font-size:.75rem;color:var(--sub)">Actual</span>   <span style="font-size:.8rem;font-weight:600" class="b">${fU(cC)}</span></div>
             </div>
