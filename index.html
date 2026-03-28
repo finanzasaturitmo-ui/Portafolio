@@ -5,14 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mi Portafolio Pro | Sincronizado</title>
 
-  <!-- ═══════════════════════════════════════════
-       FAVICON
-  ═══════════════════════════════════════════ -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpolyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='20' fill='%2358a6ff' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E" />
 
-  <!-- ═══════════════════════════════════════════
-       LIBRERÍAS EXTERNAS
-  ═══════════════════════════════════════════ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -284,9 +278,6 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════
-       PANTALLA DE LOGIN
-  ═══════════════════════════════════════════ -->
   <div id="login-screen">
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width="80" height="80" style="margin-bottom:20px">
       <rect width='32' height='32' rx='7' fill='#161b22'/>
@@ -308,15 +299,10 @@
     <p style="color:#444;font-size:0.7rem;margin-top:50px">Solo acceso autorizado.</p>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       APLICACIÓN PRINCIPAL (visible tras login)
-  ═══════════════════════════════════════════ -->
   <div id="app-content" style="display:none">
 
-    <!-- TRM oculto (usado por JS) -->
     <input id="rateInput" value="4180" type="hidden">
 
-    <!-- HEADER -->
     <div class="hdr">
       <div>
         <h1>📊 Mi Portafolio Pro</h1>
@@ -329,10 +315,8 @@
 
     <main>
 
-      <!-- TARJETAS DE RESUMEN -->
       <div class="cards" id="cards"></div>
 
-      <!-- GRÁFICOS -->
       <div class="charts">
         <div class="ch">
           <h3 id="lbl-donut">Distribución del Portafolio</h3>
@@ -344,24 +328,20 @@
         </div>
       </div>
 
-      <!-- PESTAÑAS DE NAVEGACIÓN -->
       <div class="view-tabs" id="view-tabs">
         <button id="btn-tab-stocks" class="view-tab active" onclick="switchTab('stocks')">📈 Acciones</button>
         <button id="btn-tab-crypto" class="view-tab"        onclick="switchTab('crypto')">₿ Criptomonedas</button>
       </div>
 
-      <!-- BOTÓN FLOTANTE MÓVIL -->
       <button class="fab-btn" id="fab-btn" onclick="toggleFab()">💰</button>
 
-      <!-- ─── TAB: ACCIONES ─── -->
       <div id="content-stocks" class="tab-content active">
 
-        <!-- Schwab USA -->
         <div class="broker">
           <div class="bhdr sw">
             <span>🇺🇸 Schwab USA</span>
             <div class="bhdr-controls">
-              <div class="opp-mini" title="Oportunidad Compra %">🎯 <input type="number" class="opp-stocks" value="10" onfocus="saveStateToHistory()" onblur="updateOpp('stocks', this.value)">%</div>
+              <div class="opp-mini" title="Oportunidad Compra %">🎯 <input type="number" class="opp-stocks" value="10" onfocus="saveStateToHistory()" onblur="updateOpp('stocks', this.value)" onkeyup="if(event.key==='Enter')this.blur()">%</div>
               <button class="btn-undo-redo btn-undo-action" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span class="undo-cnt">0</span>)</button>
               <button class="btn-undo-redo btn-redo-action" onclick="redo()" disabled>↪️ <span class="hide-mob">Rehacer</span> (<span class="redo-cnt">0</span>)</button>
               <button class="btn btn-add" onmousedown="addRow('sw')">+ Agregar activo</button>
@@ -370,12 +350,11 @@
           <div class="tbl-wrap"><table id="tbl-sw"></table></div>
         </div>
 
-        <!-- XTB Europe -->
         <div class="broker">
           <div class="bhdr xt">
             <span>🇪🇺 XTB Europe</span>
             <div class="bhdr-controls">
-              <div class="opp-mini" title="Oportunidad Compra %">🎯 <input type="number" class="opp-stocks" value="10" onfocus="saveStateToHistory()" onblur="updateOpp('stocks', this.value)">%</div>
+              <div class="opp-mini" title="Oportunidad Compra %">🎯 <input type="number" class="opp-stocks" value="10" onfocus="saveStateToHistory()" onblur="updateOpp('stocks', this.value)" onkeyup="if(event.key==='Enter')this.blur()">%</div>
               <button class="btn-undo-redo btn-undo-action" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span class="undo-cnt">0</span>)</button>
               <button class="btn-undo-redo btn-redo-action" onclick="redo()" disabled>↪️ <span class="hide-mob">Rehacer</span> (<span class="redo-cnt">0</span>)</button>
               <button class="btn btn-add" onmousedown="addRow('xt')">+ Agregar activo</button>
@@ -384,17 +363,13 @@
           <div class="tbl-wrap"><table id="tbl-xt"></table></div>
         </div>
 
-      </div><!-- /content-stocks -->
+      </div><div id="content-crypto" class="tab-content">
 
-      <!-- ─── TAB: CRIPTOMONEDAS ─── -->
-      <div id="content-crypto" class="tab-content">
-
-        <!-- Billetera Cripto -->
         <div class="broker">
           <div class="bhdr cr">
             <span>₿🚀🪙 Billetera Cripto</span>
             <div class="bhdr-controls">
-              <div class="opp-mini" title="Oportunidad Compra %">🎯 <input type="number" class="opp-crypto" value="20" onfocus="saveStateToHistory()" onblur="updateOpp('crypto', this.value)">%</div>
+              <div class="opp-mini" title="Oportunidad Compra %">🎯 <input type="number" class="opp-crypto" value="20" onfocus="saveStateToHistory()" onblur="updateOpp('crypto', this.value)" onkeyup="if(event.key==='Enter')this.blur()">%</div>
               <button class="btn-undo-redo btn-undo-action" onclick="undo()" disabled>↩️ <span class="hide-mob">Deshacer</span> (<span class="undo-cnt">0</span>)</button>
               <button class="btn-undo-redo btn-redo-action" onclick="redo()" disabled>↪️ <span class="hide-mob">Rehacer</span> (<span class="redo-cnt">0</span>)</button>
               <button class="btn btn-add" style="background:var(--yellow);color:#161b22;" onmousedown="addRow('cr')">+ Agregar Cripto</button>
@@ -403,10 +378,7 @@
           <div class="tbl-wrap"><table id="tbl-cr"></table></div>
         </div>
 
-      </div><!-- /content-crypto -->
-
-      <!-- PANEL RESUMEN CONSOLIDADO -->
-      <div class="bottom">
+      </div><div class="bottom">
         <div class="sum-box">
           <div class="box-title" id="lbl-summary">📋 Resumen Consolidado de Acciones</div>
           <div id="sum-content"></div>
@@ -414,12 +386,7 @@
       </div>
 
     </main>
-  </div><!-- /app-content -->
-
-  <!-- ═══════════════════════════════════════════
-       MODAL — SIMULADOR DE COMPRA
-  ═══════════════════════════════════════════ -->
-  <div class="modal-overlay" id="simModal" onclick="if(event.target===this) closeSim('buy')">
+  </div><div class="modal-overlay" id="simModal" onclick="if(event.target===this) closeSim('buy')">
     <div class="modal">
       <h2 id="simTitle">🧮 Simulador Compra</h2>
       <div class="modal-row"><span class="modal-label">Activos actuales:</span>      <span id="simCurQty" class="modal-val">0</span></div>
@@ -427,15 +394,15 @@
       <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
       <div class="modal-row" style="margin-bottom:15px">
         <span class="modal-label">Precio de compra ($):</span>
-        <input type="number" id="simInpPx"  class="modal-input" value="0" min="0" step="0.0001" oninput="calcSim('buy','px')">
+        <input type="number" id="simInpPx"  class="modal-input" value="0" min="0" step="0.0001" oninput="calcSim('buy','px')" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
         <span class="modal-label" style="color:var(--b)">Inversión a comprar (USD):</span>
-        <input type="number" id="simInpInv" class="modal-input" placeholder="Ej: 100" min="0" step="0.01" oninput="calcSim('buy','inv')" style="border-color:var(--b)">
+        <input type="number" id="simInpInv" class="modal-input" placeholder="Ej: 100" min="0" step="0.01" oninput="calcSim('buy','inv')" style="border-color:var(--b)" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
         <span class="modal-label">Cantidad a comprar:</span>
-        <input type="number" id="simInpQty" class="modal-input" value="1" min="0" step="0.000001" oninput="calcSim('buy','qty')">
+        <input type="number" id="simInpQty" class="modal-input" value="1" min="0" step="0.000001" oninput="calcSim('buy','qty')" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-res">
         <div class="modal-res-row"><span class="modal-label">Nuevo Promedio:</span>    <span id="simOutAvg" style="font-weight:800;font-size:1.1rem;transition:.3s">$0.00</span></div>
@@ -445,9 +412,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       MODAL — REGISTRAR VENTA
-  ═══════════════════════════════════════════ -->
   <div class="modal-overlay" id="sellModal" onclick="if(event.target===this) closeSim('sell')">
     <div class="modal">
       <h2 id="sellTitle">💸 Vender Activo</h2>
@@ -456,15 +420,15 @@
       <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
       <div class="modal-row" style="margin-bottom:15px">
         <span class="modal-label">Precio de venta ($):</span>
-        <input type="number" id="sellInpPx"  class="modal-input" value="0" min="0" step="0.0001" oninput="calcSim('sell','px')">
+        <input type="number" id="sellInpPx"  class="modal-input" value="0" min="0" step="0.0001" oninput="calcSim('sell','px')" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
         <span class="modal-label" style="color:var(--r)">Valor a retirar (USD):</span>
-        <input type="number" id="sellInpInv" class="modal-input" placeholder="Ej: 100" min="0" step="0.01" oninput="calcSim('sell','inv')" style="border-color:var(--r)">
+        <input type="number" id="sellInpInv" class="modal-input" placeholder="Ej: 100" min="0" step="0.01" oninput="calcSim('sell','inv')" style="border-color:var(--r)" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
         <span class="modal-label">Cantidad a vender:</span>
-        <input type="number" id="sellInpQty" class="modal-input" value="0" min="0" step="0.000001" oninput="calcSim('sell','qty')">
+        <input type="number" id="sellInpQty" class="modal-input" value="0" min="0" step="0.000001" oninput="calcSim('sell','qty')" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-res">
         <div class="modal-res-row"><span class="modal-label">Profit/Pérdida de la Venta:</span> <span id="sellOutPnl" style="font-weight:800;font-size:1.1rem;transition:.3s">$0.00</span></div>
@@ -474,9 +438,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       TOAST (NOTIFICACIONES)
-  ═══════════════════════════════════════════ -->
   <div class="toast" id="toast"></div>
 
   <script>
@@ -878,16 +839,19 @@
         calc(row);
         const isPend   = row.p || !row.qty;
         const isOpp    = !isPend && row.avg > 0 && row.px > 0 && ((row.avg - row.px) / row.avg * 100) >= opp;
-        const walletTd = isCrypto ? `<td><input class="ci wallet" value="${row.wallet||''}" placeholder="Binance, Ledger..." onblur="upd('${tid}',${row.id},'wallet',this.value)"></td>` : '';
+        
+        // 🔥 ONKEYUP AGREGADO A TODOS LOS INPUTS (CELDAS EDITABLES DE LA TABLA) 🔥
+        const walletTd = isCrypto ? `<td><input class="ci wallet" value="${row.wallet||''}" placeholder="Binance, Ledger..." onblur="upd('${tid}',${row.id},'wallet',this.value)" onkeyup="if(event.key==='Enter')this.blur()"></td>` : '';
+        
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
           <td class="drag-handle" title="Mover">☰</td>
-          <td><input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t||''}" placeholder="${isCrypto ? 'BTC, ETH...' : 'TICKER'}" onblur="upd('${tid}',${row.id},'t',this.value)">${isPend ? '<span class="badge">próximo</span>' : ''}</td>
+          <td><input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t||''}" placeholder="${isCrypto ? 'BTC, ETH...' : 'TICKER'}" onblur="upd('${tid}',${row.id},'t',this.value)" onkeyup="if(event.key==='Enter')this.blur()">${isPend ? '<span class="badge">próximo</span>' : ''}</td>
           ${walletTd}
-          <td><input class="ci" value="${row.qty||0}" style="text-align:center" onblur="upd('${tid}',${row.id},'qty',this.value)"></td>
+          <td><input class="ci" value="${row.qty||0}" style="text-align:center" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()"></td>
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)}</td>
           <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700">${row.px||0}</td>
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.cur)}</td>
-          <td><input type="text" class="ci invested-usd" value="${f(row.inv)}" data-raw-formula="${row.invFormula||row.inv||0}" onfocus="investFocus(this)" onblur="investBlur(this,'${tid}',${row.id})" title="Fórmula: ${row.invFormula||row.inv||0}"></td>
+          <td><input type="text" class="ci invested-usd" value="${f(row.inv)}" data-raw-formula="${row.invFormula||row.inv||0}" onfocus="investFocus(this)" onblur="investBlur(this,'${tid}',${row.id})" onkeyup="if(event.key==='Enter')this.blur()" title="Fórmula: ${row.invFormula||row.inv||0}"></td>
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fP(row.gl)}</td>
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fGain(row.pnl)}</td>
           <td class="action-btns">
@@ -1074,12 +1038,12 @@
             <div class="sk-grid">
               <div>
                 <label style="font-size:.7rem;color:var(--sub)">Capital Invertido</label>
-                <div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'inv')"></div>
+                <div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'inv')" onkeyup="if(event.key==='Enter')this.blur()"></div>
                 <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ $${f(skI_USD)} USD</div>
               </div>
               <div>
                 <label style="font-size:.7rem;color:var(--sub)">Valor Actual</label>
-                <div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'cur')"></div>
+                <div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'cur')" onkeyup="if(event.key==='Enter')this.blur()"></div>
                 <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ ${fU(skC_USD)} USD</div>
               </div>
             </div>
@@ -1129,7 +1093,7 @@
     // ═══════════════════════════════════════════════════════════════
     function renderCharts() {
       const activeData = currentView === 'stocks' ? [...SW.map(calc), ...XT.map(calc)] : [...CR.map(calc)];
-      const all    = activeData.filter(x => x.qty > 0 && x.t);
+      const all  = activeData.filter(x => x.qty > 0 && x.t);
       const labels = all.map(x => { let n = String(x.t); if (['USDT','USDC'].includes(n.toUpperCase()) && x.wallet) n += ` (${x.wallet})`; return n; });
       const vals   = all.map(x => x.cur);
       const gls    = all.map(x => x.gl);
