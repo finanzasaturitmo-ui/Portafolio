@@ -1499,22 +1499,28 @@
 
     setInterval(fetchRealTimeData, 60000);
 
-    async function pedirReporte() {
+   async function pedirReporte() {
       const loadingScreen = document.getElementById('pdfLoading');
       loadingScreen.style.display = 'flex'; 
 
       try {
-        const respuesta = await fetch('https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte');
+        // Se añade mode: 'no-cors' para evitar el bloqueo de seguridad del navegador.
+        // Esto "dispara" la orden en tu backend para que empiece a armar el PDF.
+        await fetch('https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte', {
+            method: 'GET',
+            mode: 'no-cors'
+        });
         
-        if (respuesta.ok) {
-          loadingScreen.style.display = 'none';
-          showToast('✅ ¡Reporte enviado a tu Telegram con éxito!');
-        } else {
-          throw new Error('Error en el servidor');
-        }
+        // Como toma entre 10 y 20 segundos consultar a Gemini y armar el PDF,
+        // quitamos la pantalla de carga y le avisamos al usuario que ya va en camino.
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            showToast('✅ ¡Reporte en proceso! Llegará a tu Telegram en unos segundos.');
+        }, 2500);
+
       } catch (error) {
         loadingScreen.style.display = 'none';
-        showToast('❌ Ocurrió un error. Intenta desde Telegram con /reporte');
+        showToast('❌ Ocurrió un error de red. Intenta desde Telegram con /reporte');
       }
     }
 
