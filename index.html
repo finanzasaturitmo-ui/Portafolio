@@ -418,7 +418,7 @@
   </div><div class="modal-overlay" id="buyModal" onclick="if(event.target===this) closeSim('buy')">
     <div class="modal">
       <h2 id="simTitle">🛒 Registrar Compra</h2>
-      <div class="modal-row"><span class="modal-label">Activos actuales:</span>     <span id="simCurQty" class="modal-val">0</span></div>
+      <div class="modal-row"><span class="modal-label">Activos actuales:</span>    <span id="simCurQty" class="modal-val">0</span></div>
       <div class="modal-row"><span class="modal-label">Precio Prom. actual:</span> <span id="simCurAvg" class="modal-val">$0.00</span></div>
       <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
 
@@ -457,7 +457,7 @@
   <div class="modal-overlay" id="sellModal" onclick="if(event.target===this) closeSim('sell')">
     <div class="modal">
       <h2 id="sellTitle">💸 Registrar Venta</h2>
-      <div class="modal-row"><span class="modal-label">Activos Disponibles:</span>    <span id="sellCurQty" class="modal-val">0</span></div>
+      <div class="modal-row"><span class="modal-label">Activos Disponibles:</span>  <span id="sellCurQty" class="modal-val">0</span></div>
       <div class="modal-row"><span class="modal-label">Precio Prom. Original:</span> <span id="sellCurAvg" class="modal-val">$0.00</span></div>
       <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
 
@@ -598,9 +598,11 @@
             SW = (d.SW || []).filter(Boolean);
             XT = (d.XT || []).filter(Boolean);
             CR = (d.CR || []).filter(Boolean);
-            TRADES = d.trades || [];
+            
+            // 🔥 CORRECCIÓN 1: Asegurar compatibilidad (leer transactions o trades) 🔥
+            TRADES = d.transactions || d.trades || [];
 
-            // Limpieza de datos antiguos: si venían con formula, asegurar que sean números
+            // Limpieza de datos antiguos
             const cleanRow = (row) => {
               if (typeof row.qty === 'string') row.qty = rv(row.qty);
               if (typeof row.inv === 'string') row.inv = rv(row.inv);
@@ -667,7 +669,7 @@
       if (!currentUser) return;
       db.ref('users/' + currentUser.uid).set({
         SW, XT, CR,
-        trades:    TRADES, 
+        transactions: TRADES, // 🔥 CORRECCIÓN 2: Guardarlo como transactions para el PDF 🔥
         rate:      document.getElementById('rateInput').value,
         oppStocks, oppCrypto,
         skInv:     skInvVal,
@@ -767,7 +769,6 @@
     // ═══════════════════════════════════════════════════════════════
     // 8. CÁLCULOS POR FILA
     // ═══════════════════════════════════════════════════════════════
-
     function skFocus(el) {
       saveStateToHistory();
       el.value = el.id === 'skInv' ? skInvVal : skCurVal;
@@ -925,12 +926,18 @@
       activeSimRow.inv = (activeSimRow.inv || 0) + buyInv;
       activeSimRow.p = false;
 
+      // 🔥 CORRECCIÓN 3: Formato de compra estructurado para que lo lea el PDF 🔥
       TRADES.push({
         id: Date.now(),
         date: new Date().toISOString(),
-        type: 'BUY',
-        asset: activeSimRow.t,
+        type: 'Buy',
+        symbol: activeSimRow.t,
+        assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS', // Clave para saber en qué tabla del PDF ponerlo
         qty: buyQty,
+        price: buyPx,
+        amount: -buyInv, // Negativo para compra
+        // (Dejamos los datos viejos también para que no se rompa nada si dependes de ellos en otra parte)
+        asset: activeSimRow.t,
         px: buyPx,
         inv: buyInv
       });
@@ -959,15 +966,21 @@
         activeSimRow.inv = 0;
       }
 
+      // 🔥 CORRECCIÓN 4: Formato de venta estructurado para que lo lea el PDF 🔥
       TRADES.push({
         id: Date.now(),
         date: new Date().toISOString(),
-        type: 'SELL',
-        asset: activeSimRow.t,
+        type: 'Sell',
+        symbol: activeSimRow.t,
+        assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS', // Clave para saber en qué tabla del PDF ponerlo
         qty: sellQty,
+        price: sellPx,
+        amount: sellQty * sellPx, // Positivo para venta
+        pnl: pnl,
+        // (Datos anteriores por si acaso)
+        asset: activeSimRow.t,
         px: sellPx,
-        inv: sellQty * avg,
-        pnl: pnl
+        inv: sellQty * avg
       });
 
       recalc(false);
@@ -976,7 +989,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 11. RENDERIZADO DE TABLAS (Columna cantidad e inversión a TEXTO PLANO)
+    // 11. RENDERIZADO DE TABLAS
     // ═══════════════════════════════════════════════════════════════
     function renderTable(data, tid) {
       const opp      = tid === 'cr' ? oppCrypto : oppStocks;
