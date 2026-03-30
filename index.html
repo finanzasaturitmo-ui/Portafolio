@@ -598,11 +598,8 @@
             SW = (d.SW || []).filter(Boolean);
             XT = (d.XT || []).filter(Boolean);
             CR = (d.CR || []).filter(Boolean);
-            
-            // 🔥 CORRECCIÓN 1: Asegurar compatibilidad (leer transactions o trades) 🔥
             TRADES = d.transactions || d.trades || [];
 
-            // Limpieza de datos antiguos
             const cleanRow = (row) => {
               if (typeof row.qty === 'string') row.qty = rv(row.qty);
               if (typeof row.inv === 'string') row.inv = rv(row.inv);
@@ -669,7 +666,7 @@
       if (!currentUser) return;
       db.ref('users/' + currentUser.uid).set({
         SW, XT, CR,
-        transactions: TRADES, // 🔥 CORRECCIÓN 2: Guardarlo como transactions para el PDF 🔥
+        transactions: TRADES, 
         rate:      document.getElementById('rateInput').value,
         oppStocks, oppCrypto,
         skInv:     skInvVal,
@@ -791,7 +788,10 @@
       if (!row.qty) row.qty = 0;
       if (!row.inv) row.inv = 0;
 
-      if (STABLECOINS.includes(String(row.t).toUpperCase())) row.px = 1.00;
+      if (STABLECOINS.includes(String(row.t).toUpperCase())) {
+        row.px = 1.00;
+        row.pxChange = 0;
+      }
 
       const cur = row.qty * (row.px || 0);
       const avg = row.qty > 0 ? row.inv / row.qty : 0;
@@ -926,17 +926,15 @@
       activeSimRow.inv = (activeSimRow.inv || 0) + buyInv;
       activeSimRow.p = false;
 
-      // 🔥 CORRECCIÓN 3: Formato de compra estructurado para que lo lea el PDF 🔥
       TRADES.push({
         id: Date.now(),
         date: new Date().toISOString(),
         type: 'Buy',
         symbol: activeSimRow.t,
-        assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS', // Clave para saber en qué tabla del PDF ponerlo
+        assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
         qty: buyQty,
         price: buyPx,
-        amount: -buyInv, // Negativo para compra
-        // (Dejamos los datos viejos también para que no se rompa nada si dependes de ellos en otra parte)
+        amount: -buyInv,
         asset: activeSimRow.t,
         px: buyPx,
         inv: buyInv
@@ -966,18 +964,16 @@
         activeSimRow.inv = 0;
       }
 
-      // 🔥 CORRECCIÓN 4: Formato de venta estructurado para que lo lea el PDF 🔥
       TRADES.push({
         id: Date.now(),
         date: new Date().toISOString(),
         type: 'Sell',
         symbol: activeSimRow.t,
-        assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS', // Clave para saber en qué tabla del PDF ponerlo
+        assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
         qty: sellQty,
         price: sellPx,
-        amount: sellQty * sellPx, // Positivo para venta
+        amount: sellQty * sellPx, 
         pnl: pnl,
-        // (Datos anteriores por si acaso)
         asset: activeSimRow.t,
         px: sellPx,
         inv: sellQty * avg
@@ -989,7 +985,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 11. RENDERIZADO DE TABLAS
+    // 11. RENDERIZADO DE TABLAS (CON BADGE 24H)
     // ═══════════════════════════════════════════════════════════════
     function renderTable(data, tid) {
       const opp      = tid === 'cr' ? oppCrypto : oppStocks;
@@ -1025,6 +1021,15 @@
           ? `<td><input class="ci wallet" value="${row.wallet||''}" placeholder="Binance, Ledger..." onblur="upd('${tid}',${row.id},'wallet',this.value)" onkeyup="if(event.key==='Enter')this.blur()"></td>`
           : '';
 
+        // Badge de 24h Change
+        let pxBadge = '';
+        if (row.pxChange !== undefined && !isPend) {
+          const isPos = row.pxChange >= 0;
+          const colorCls = isPos ? 'g' : 'r';
+          const sign = isPos ? '▲' : '▼';
+          pxBadge = `<div style="font-size:0.65rem; font-weight:700; padding:1px 4px; border-radius:4px; margin-top:2px; background: ${isPos ? '#3fb95022' : '#f7816622'}" class="${colorCls}">${sign} ${Math.abs(row.pxChange).toFixed(2)}%</div>`;
+        }
+
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
           <td class="drag-handle" title="Mover">☰</td>
           <td>
@@ -1040,7 +1045,14 @@
           <td class="computed" style="font-weight:600">${isPend ? '<span style="color:var(--sub)">—</span>' : row.qty}</td>
           
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)}</td>
-          <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700">${row.px||0}</td>
+          
+          <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700; vertical-align: middle;">
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <span>${row.px||0}</span>
+              ${pxBadge}
+            </div>
+          </td>
+          
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.cur)}</td>
           
           <td class="computed" style="color:var(--b)">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.inv)}</td>
@@ -1446,7 +1458,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 17. PRECIOS EN TIEMPO REAL Y PDF MÁGICO
+    // 17. PRECIOS EN TIEMPO REAL Y PDF MÁGICO (CORS ARREGLADO)
     // ═══════════════════════════════════════════════════════════════
     async function fetchRealTimeData() {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
@@ -1459,38 +1471,57 @@
           document.getElementById('rateInput').value = parseFloat(d.USDCOP.bid).toFixed(2);
       } catch (e) { console.log('Error TRM'); }
 
-      const fetchStockPrice = async ticker => {
+      const fetchStockPrice = async r => {
         try {
-          const sym = String(ticker).includes('.UK') ? String(ticker).replace('.UK', '.L') : ticker;
+          const sym = String(r.t).includes('.UK') ? String(r.t).replace('.UK', '.L') : r.t;
           const res = await fetch('https://finnhub.io/api/v1/quote?symbol=' + sym + '&token=' + FINNHUB_API_KEY);
-          return (await res.json()).c;
-        } catch (e) { return null; }
+          const data = await res.json();
+          if (data && data.c) {
+            r.px = data.c;
+            r.pxChange = data.dp; // Porcentaje de cambio de 24h
+          }
+        } catch (e) {}
       };
 
-      const fetchCryptoPrice = async ticker => {
-        const t = String(ticker).toUpperCase();
-        if (STABLECOINS.includes(t)) return 1.00;
+      const fetchCryptoPrice = async r => {
+        const t = String(r.t).toUpperCase();
+        if (STABLECOINS.includes(t)) {
+            r.px = 1.00;
+            r.pxChange = 0;
+            return;
+        }
         try {
-          const res = await fetch('https://api.mexc.com/api/v3/ticker/price?symbol=' + t + 'USDT');
+          // Binance es muy robusto para % de 24h
+          const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=' + t + 'USDT');
           if (res.ok) {
             const d = await res.json();
-            if (d.price) return parseFloat(d.price);
+            if (d.lastPrice) {
+                r.px = parseFloat(d.lastPrice);
+                r.pxChange = parseFloat(d.priceChangePercent);
+                return;
+            }
           }
-          throw new Error('No encontrado en MEXC');
+          throw new Error('Not found in Binance');
         } catch {
           try {
-            const fb = await fetch('https://cryptoprices.cc/' + t + '/');
-            if (fb.ok) { const v = parseFloat(await fb.text()); if (!isNaN(v)) return v; }
-            return null;
-          } catch { return null; }
+            const res = await fetch('https://api.mexc.com/api/v3/ticker/24hr?symbol=' + t + 'USDT');
+            if (res.ok) {
+                const d = await res.json();
+                if (d.lastPrice) {
+                    r.px = parseFloat(d.lastPrice);
+                    // MEXC a veces lo manda como decimal (ej. 0.045 para 4.5%), lo multiplicamos
+                    r.pxChange = parseFloat(d.priceChangePercent) * 100;
+                }
+            }
+          } catch(e) {}
         }
       };
 
       try {
         await Promise.all([
-          ...SW.filter(r => r.t).map(async r => { const p = await fetchStockPrice(r.t);  if (p) r.px = p; }),
-          ...XT.filter(r => r.t).map(async r => { const p = await fetchStockPrice(r.t);  if (p) r.px = p; }),
-          ...CR.filter(r => r.t).map(async r => { const p = await fetchCryptoPrice(r.t); if (p) r.px = p; })
+          ...SW.filter(r => r.t).map(fetchStockPrice),
+          ...XT.filter(r => r.t).map(fetchStockPrice),
+          ...CR.filter(r => r.t).map(fetchCryptoPrice)
         ]);
       } catch (e) {}
 
@@ -1499,7 +1530,7 @@
 
     setInterval(fetchRealTimeData, 60000);
 
-   async function pedirReporte() {
+    async function pedirReporte() {
       const loadingScreen = document.getElementById('pdfLoading');
       loadingScreen.style.display = 'flex'; 
 
@@ -1511,7 +1542,7 @@
             mode: 'no-cors'
         });
         
-        // Como toma entre 10 y 20 segundos consultar a Gemini y armar el PDF,
+        // Como toma unos segundos consultar a Gemini y armar el PDF,
         // quitamos la pantalla de carga y le avisamos al usuario que ya va en camino.
         setTimeout(() => {
             loadingScreen.style.display = 'none';
