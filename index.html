@@ -1533,20 +1533,20 @@
       const fetchStockPrice = async r => {
         try {
           if (String(r.t).toUpperCase().includes('.UK')) {
-              // XTB EUROPE: Yahoo Finance vía proxy (Tiempo Real y Gratis)
+              // XTB EUROPE: Yahoo Finance (Porcentaje de cambio 24h directo)
               const sym = String(r.t).toUpperCase().replace('.UK', '.L');
-              const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d')}`;
+              const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+sym)}`;
               const res = await fetch(proxyUrl);
               const data = await res.json();
-              if (data && data.chart && data.chart.result && data.chart.result.length > 0) {
-                  const meta = data.chart.result[0].meta;
-                  r.px = meta.regularMarketPrice;
-                  r.pxChange = ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100;
-                  return; // Detiene la ejecución aquí para que no llame a Finnhub
+              if (data && data.quoteResponse && data.quoteResponse.result && data.quoteResponse.result.length > 0) {
+                  const quote = data.quoteResponse.result[0];
+                  r.px = quote.regularMarketPrice;
+                  r.pxChange = quote.regularMarketChangePercent; // Coge el porcentaje directo sin matemáticas
+                  return;
               }
           }
           
-          // SCHWAB USA: Finnhub API (Se mantiene igual)
+          // SCHWAB USA: Finnhub API
           const sym = r.t;
           const res = await fetch('https://finnhub.io/api/v1/quote?symbol=' + sym + '&token=' + FINNHUB_API_KEY);
           const data = await res.json();
