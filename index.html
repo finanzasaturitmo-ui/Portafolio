@@ -71,7 +71,6 @@
     .btn-logout:hover { background: var(--r); color: #fff; }
     .btn-add       { background: var(--g); color: #fff; border: none; font-size: 0.75rem; padding: 5px 12px; font-weight: 600; box-shadow: 0 0 5px rgba(63,185,80,0.3); }
     .btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63,185,80,0.6); transform: scale(1.03); }
-    /* 🔥 NUEVO BOTÓN PDF 🔥 */
     .btn-pdf       { background: #1f6feb; color: #fff; border: none; font-size: 0.68rem; padding: 5px 10px; border-radius: 5px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 0 8px rgba(31,111,235,0.4); }
     .btn-pdf:hover { background: #388bfd; transform: scale(1.05); }
 
@@ -201,7 +200,7 @@
     .totals-panel { background: linear-gradient(135deg, #161b22, #0d1117); border: 1px solid #58a6ff44; border-radius: 8px; padding: 16px; }
 
     /* ═══════════════════════════════════════════
-       17. MODALES — SIMULADOR Y VENTA
+       17. MODALES — REGISTRO DE COMPRA Y VENTA
     ═══════════════════════════════════════════ */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 100000; backdrop-filter: blur(4px); }
     .modal         { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; width: 90%; max-width: 360px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
@@ -222,7 +221,6 @@
     .toast      { position: fixed; bottom: 18px; right: 18px; background: #1f6feb; color: #fff; padding: 9px 16px; border-radius: 7px; font-size: 0.78rem; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 99999; }
     .toast.show { opacity: 1; }
 
-    /* 🔥 NUEVO SPINNER DE CARGA PARA EL PDF 🔥 */
     .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 100000; backdrop-filter: blur(5px); }
     .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--b); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -234,23 +232,19 @@
       body { font-size: 11px; }
       main { padding: 10px; padding-bottom: 100px; }
 
-      /* Header */
       .hdr       { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px; }
       .hdr-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
       .hide-mob  { display: none; }
 
-      /* Tarjetas */
       .cards     { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
       .card      { padding: 8px; }
       .card .lbl { font-size: 0.6rem; margin-bottom: 1px; }
       .card .val { font-size: 1rem; }
       .card .s2  { font-size: 0.65rem; }
 
-      /* Gráficos */
       .charts  { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
       .ch-wrap { height: 280px !important; }
 
-      /* Botón Flotante (FAB) */
       .fab-btn {
         display: flex; position: fixed; bottom: 20px; right: 20px;
         width: 56px; height: 56px; border-radius: 50%;
@@ -262,7 +256,6 @@
       }
       .fab-btn:active { transform: scale(0.9); }
 
-      /* Menú de pestañas flotante */
       .view-tabs {
         position: fixed; bottom: 85px; right: 20px; left: auto;
         flex-direction: column; align-items: flex-end;
@@ -274,7 +267,6 @@
       .view-tabs .view-tab.active     { display: none !important; }
       .view-tab { background: rgba(22,27,34,0.95); backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-align: right; padding: 12px 20px; }
 
-      /* Cabeceras de broker */
       .bhdr          { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
       .bhdr > span   { font-size: 1rem; text-align: center; }
       .bhdr-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; width: 100%; }
@@ -282,21 +274,16 @@
       .bhdr-controls .btn-undo-redo { justify-content: center; padding: 8px 0; }
       .bhdr-controls .btn-add       { grid-column: 1 / -1; margin-top: 5px; padding: 12px; font-size: 1rem; border-radius: 8px; }
 
-      /* Tablas */
       .tbl-wrap          { overflow-x: auto; -webkit-overflow-scrolling: touch; border-bottom: 1px solid var(--border); }
       table th, table td { font-size: 0.75rem; padding: 4px 3px; }
       .ci                { padding: 3px 5px; width: 75px; font-size: 0.75rem; }
       .ci.ticker         { width: 70px; }
       .ci.wallet         { width: 90px; }
 
-      /* Panel resumen */
       .sum-box  { padding: 12px; }
       .sk-grid  { grid-template-columns: 1fr; gap: 12px; }
     }
 
-    /* ═══════════════════════════════════════════
-       20. RESPONSIVE — MÓVILES PEQUEÑOS (≤ 480px)
-    ═══════════════════════════════════════════ */
     @media (max-width: 480px) {
       .cards { grid-template-columns: 1fr; }
     }
@@ -428,9 +415,9 @@
       </div>
 
     </main>
-  </div><div class="modal-overlay" id="simModal" onclick="if(event.target===this) closeSim('buy')">
+  </div><div class="modal-overlay" id="buyModal" onclick="if(event.target===this) closeSim('buy')">
     <div class="modal">
-      <h2 id="simTitle">🧮 Simulador Compra</h2>
+      <h2 id="simTitle">🛒 Registrar Compra</h2>
       <div class="modal-row"><span class="modal-label">Activos actuales:</span>     <span id="simCurQty" class="modal-val">0</span></div>
       <div class="modal-row"><span class="modal-label">Precio Prom. actual:</span> <span id="simCurAvg" class="modal-val">$0.00</span></div>
       <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
@@ -441,12 +428,12 @@
           oninput="calcSim('buy','px')" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
-        <span class="modal-label" style="color:var(--b)">Inversión a comprar (USD):</span>
+        <span class="modal-label" style="color:var(--b)">Inversión (USD):</span>
         <input type="number" id="simInpInv" class="modal-input" placeholder="Ej: 100" min="0" step="0.01"
           oninput="calcSim('buy','inv')" style="border-color:var(--b)" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
-        <span class="modal-label">Cantidad a comprar:</span>
+        <span class="modal-label">Cantidad a sumar:</span>
         <input type="number" id="simInpQty" class="modal-input" value="1" min="0" step="0.000001"
           oninput="calcSim('buy','qty')" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
@@ -461,13 +448,15 @@
           <span id="simOutInv" style="font-weight:700;color:var(--b)">$0.00</span>
         </div>
       </div>
-      <button class="modal-btn" onclick="closeSim('buy')">Cerrar</button>
+      
+      <button class="modal-btn" style="background:var(--g);border-color:#2ea043" onclick="confirmBuy()">Confirmar Compra</button>
+      <button class="modal-btn" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('buy')">Cancelar</button>
     </div>
   </div>
 
   <div class="modal-overlay" id="sellModal" onclick="if(event.target===this) closeSim('sell')">
     <div class="modal">
-      <h2 id="sellTitle">💸 Vender Activo</h2>
+      <h2 id="sellTitle">💸 Registrar Venta</h2>
       <div class="modal-row"><span class="modal-label">Activos Disponibles:</span>    <span id="sellCurQty" class="modal-val">0</span></div>
       <div class="modal-row"><span class="modal-label">Precio Prom. Original:</span> <span id="sellCurAvg" class="modal-val">$0.00</span></div>
       <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
@@ -483,7 +472,7 @@
           oninput="calcSim('sell','inv')" style="border-color:var(--r)" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
-        <span class="modal-label">Cantidad a vender:</span>
+        <span class="modal-label">Cantidad a restar:</span>
         <input type="number" id="sellInpQty" class="modal-input" value="0" min="0" step="0.000001"
           oninput="calcSim('sell','qty')" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
@@ -498,7 +487,9 @@
           <span id="sellOutQty" style="font-weight:700;color:var(--sub)">0</span>
         </div>
       </div>
+      
       <button class="modal-btn" style="background:var(--g);border-color:#2ea043" onclick="confirmSell()">Confirmar Venta</button>
+      <button class="modal-btn" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('sell')">Cancelar</button>
     </div>
   </div>
 
@@ -531,16 +522,17 @@
     const db   = firebase.database();
 
     // ═══════════════════════════════════════════════════════════════
-    // 2. VARIABLES GLOBALES
+    // 2. VARIABLES GLOBALES Y CEREBRO DE TRANSACCIONES (TRADES)
     // ═══════════════════════════════════════════════════════════════
     let currentUser = null;
-    let currentView = 'stocks';     // pestaña activa: 'stocks' | 'crypto'
-    let SW = [], XT = [], CR = [];  // datos de Schwab, XTB y Cripto
-    let nid = 1;                    // contador de IDs únicos para nuevas filas
-    let skInvVal = 14613200;        // Skandia: capital invertido (COP)
-    let skCurVal = 12627217;        // Skandia: valor actual (COP)
-    let oppStocks = 10;             // umbral de oportunidad para acciones (%)
-    let oppCrypto = 20;             // umbral de oportunidad para cripto (%)
+    let currentView = 'stocks';     
+    let SW = [], XT = [], CR = [];  
+    let TRADES = [];                // 🔥 NUEVO: Memoria histórica de Compras y Ventas 🔥
+    let nid = 1;                    
+    let skInvVal = 14613200;        
+    let skCurVal = 12627217;        
+    let oppStocks = 10;             
+    let oppCrypto = 20;             
     let dChart = null, bChart = null, saveTimeout = null;
     let sortState = {
       sw: { col: null, dir: 1 },
@@ -604,24 +596,23 @@
           if (snap.exists()) {
             const d = snap.val();
 
-            // Filtro anti-fantasmas: elimina filas vacías/nulas
             SW = (d.SW || []).filter(Boolean);
             XT = (d.XT || []).filter(Boolean);
             CR = (d.CR || []).filter(Boolean);
+            
+            // 🔥 Cargar memoria de transacciones 🔥
+            TRADES = d.trades || [];
 
-            // Compatibilidad: inicializa campos nuevos en datos viejos
             CR.forEach(c => {
               if (c.wallet  === undefined) c.wallet  = '';
               if (c.staking === undefined) c.staking = false;
             });
 
-            // Calcula el próximo ID disponible
             const all = [...SW, ...XT, ...CR];
             if (all.length) nid = Math.max(...all.map(r => r.id)) + 1;
 
             if (d.rate) document.getElementById('rateInput').value = d.rate;
 
-            // Actualiza TRM al cargar
             fetch('https://economia.awesomeapi.com.br/json/last/USD-COP')
               .then(r => r.json())
               .then(data => {
@@ -633,7 +624,6 @@
             if (d.skInv) skInvVal = parseFloat(d.skInv);
             if (d.skCur) skCurVal = parseFloat(d.skCur);
 
-            // Compatibilidad con versiones anteriores que usaban un solo 'opp'
             oppStocks = d.oppStocks !== undefined ? parseFloat(d.oppStocks) : (d.opp ? parseFloat(d.opp) : 10);
             oppCrypto = d.oppCrypto !== undefined ? parseFloat(d.oppCrypto) : (d.opp ? parseFloat(d.opp) : 20);
             document.querySelectorAll('.opp-stocks').forEach(el => el.value = oppStocks);
@@ -642,7 +632,6 @@
             if (d.ts) document.getElementById('lastSaved').textContent = 'Nube OK: ' + new Date(d.ts).toLocaleTimeString('es-CO');
 
           } else {
-            // Datos de ejemplo para usuarios nuevos
             SW = [
               { id:1,  t:'BABA',   qty:19,      qtyFormula:'19',      inv:1460.91, invFormula:'1460.91', px:129.87, p:false, staking:false },
               { id:2,  t:'BRK-B',  qty:7.5562,  qtyFormula:'7.5562',  inv:2974.72, invFormula:'2974.72', px:476.19, p:false, staking:false }
@@ -655,6 +644,7 @@
               { id:42, t:'BTC',  wallet:'Ledger',  qty:0, qtyFormula:'0', inv:0, invFormula:'0', px:0, p:true, staking:false },
               { id:43, t:'USDT', wallet:'Binance', qty:0, qtyFormula:'0', inv:0, invFormula:'0', px:1, p:true, staking:false }
             ];
+            TRADES = [];
             nid = 50;
           }
 
@@ -669,6 +659,7 @@
       if (!currentUser) return;
       db.ref('users/' + currentUser.uid).set({
         SW, XT, CR,
+        trades:    TRADES, // 🔥 Guardar memoria de transacciones en la nube 🔥
         rate:      document.getElementById('rateInput').value,
         oppStocks, oppCrypto,
         skInv:     skInvVal,
@@ -682,29 +673,21 @@
     // ═══════════════════════════════════════════════════════════════
     // 6. NAVEGACIÓN ENTRE PESTAÑAS
     // ═══════════════════════════════════════════════════════════════
-
-    /** Abre/cierra el menú flotante de pestañas en móvil */
     function toggleFab() {
       document.getElementById('view-tabs').classList.toggle('open');
     }
 
     function switchTab(tabId) {
       currentView = tabId;
-
-      // Activa la pestaña y el contenido correspondiente
       document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('btn-tab-' + tabId).classList.add('active');
       document.getElementById('content-' + tabId).classList.add('active');
 
-      // Actualiza etiquetas de gráficos y resumen
       document.getElementById('lbl-donut').textContent   = tabId === 'stocks' ? 'Distribución de Acciones' : 'Distribución Cripto';
       document.getElementById('lbl-summary').textContent = tabId === 'stocks' ? '📋 Resumen Consolidado de Acciones' : '📋 Resumen Consolidado Cripto';
 
-      // Cierra menú flotante en móvil
       document.getElementById('view-tabs').classList.remove('open');
-
-      // Color del botón flotante según destino
       const fab = document.getElementById('fab-btn');
       if (fab) {
         fab.style.borderColor = tabId === 'stocks' ? 'var(--yellow)' : 'var(--g)';
@@ -712,7 +695,6 @@
           ? '0 8px 20px rgba(0,0,0,0.6), 0 0 12px rgba(243,186,47,0.5)'
           : '0 8px 20px rgba(0,0,0,0.6), 0 0 12px rgba(63,185,80,0.5)';
       }
-
       recalc(false);
     }
 
@@ -723,7 +705,7 @@
 
     function saveStateToHistory() {
       const s = JSON.stringify({
-        SW, XT, CR,
+        SW, XT, CR, TRADES, // 🔥 Incluir TRADES en el historial Ctrl+Z
         rate:      document.getElementById('rateInput').value,
         oppStocks, oppCrypto,
         skInv:     skInvVal,
@@ -748,7 +730,7 @@
 
     function applyState(s) {
       const p = JSON.parse(s);
-      SW = p.SW; XT = p.XT; CR = p.CR || [];
+      SW = p.SW; XT = p.XT; CR = p.CR || []; TRADES = p.TRADES || [];
       document.getElementById('rateInput').value = p.rate;
       oppStocks = p.oppStocks || 10;
       oppCrypto = p.oppCrypto || 20;
@@ -766,7 +748,6 @@
       if (historyIndex < historyArr.length-1) { historyIndex++; applyState(historyArr[historyIndex]); showToast('↪️ Rehecho'); updateUndoRedoButtons(); }
     }
 
-    // Atajos de teclado: Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z
     document.addEventListener('keydown', e => {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
       if (e.ctrlKey || e.metaKey) {
@@ -778,8 +759,6 @@
     // ═══════════════════════════════════════════════════════════════
     // 8. CÁLCULOS POR FILA
     // ═══════════════════════════════════════════════════════════════
-
-    /** Evalúa sumas simples tipo "100+50+25" en un campo */
     function calculateSumFromFormula(fStr) {
       if (!fStr || String(fStr).trim() === '') return 0;
       let s = String(fStr).replace(/\s/g, '').replace(',', '.').replace(/[^\d.+\-]/g, '');
@@ -788,7 +767,6 @@
       return sum;
     }
 
-    // ── Inversión (campo "Invertido USD") ──
     function investFocus(el) {
       const r = el.getAttribute('data-raw-formula');
       if (r) el.value = r;
@@ -803,7 +781,6 @@
       recalc();
     }
 
-    // ── Cantidad (campo "Cant.") ──
     function qtyFocus(el) {
       const r = el.getAttribute('data-raw-formula');
       if (r) el.value = r;
@@ -818,7 +795,6 @@
       recalc();
     }
 
-    // ── Skandia (inputs COP especiales) ──
     function skFocus(el) {
       saveStateToHistory();
       el.value = el.id === 'skInv' ? skInvVal : skCurVal;
@@ -829,7 +805,6 @@
       recalc();
     }
 
-    /** Actualiza el umbral de oportunidad de compra (%) para acciones o cripto */
     function updateOpp(tab, val) {
       saveStateToHistory();
       const v = rv(val);
@@ -838,12 +813,10 @@
       recalc();
     }
 
-    /** Calcula todos los valores derivados de una fila (avg, cur, gl, pnl) */
     function calc(row) {
       if (row.inv === undefined) row.inv = calculateSumFromFormula(row.invFormula) || 0;
       if (row.qty === undefined) row.qty = calculateSumFromFormula(row.qtyFormula) || 0;
 
-      // Las stablecoins siempre valen $1.00
       if (STABLECOINS.includes(String(row.t).toUpperCase())) row.px = 1.00;
 
       const cur = (row.qty || 0) * (row.px || 0);
@@ -862,7 +835,6 @@
       const arr = tid === 'sw' ? SW : tid === 'xt' ? XT : CR;
       arr.forEach(calc);
 
-      // Invierte dirección si se vuelve a clicar la misma columna
       if (sortState[tid].col === field) sortState[tid].dir *= -1;
       else { sortState[tid].col = field; sortState[tid].dir = -1; }
 
@@ -879,7 +851,6 @@
       recalc();
     }
 
-    /** Genera el HTML de una cabecera de tabla con icono de ordenamiento */
     function getTh(tid, label, field) {
       const sorted = sortState[tid].col === field;
       const icon   = sorted ? (sortState[tid].dir === 1 ? '▲' : '▼') : '⇕';
@@ -887,7 +858,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 10. MODALES — SIMULADOR DE COMPRA Y VENTA
+    // 10. MODALES — REGISTRAR COMPRA Y VENTA
     // ═══════════════════════════════════════════════════════════════
     let activeSimRow = null, activeSimTid = null;
 
@@ -897,7 +868,7 @@
       if (!activeSimRow || !activeSimRow.t) { showToast('Primero asigna un nombre.'); return; }
       calc(activeSimRow);
 
-      document.getElementById('simTitle').innerHTML = `🧮 Simular Compra: <span style="color:#e6edf3;margin-left:5px">${activeSimRow.t}</span>`;
+      document.getElementById('simTitle').innerHTML = `🛒 Registrar Compra: <span style="color:#e6edf3;margin-left:5px">${activeSimRow.t}</span>`;
       document.getElementById('simCurQty').textContent = activeSimRow.qty || 0;
       document.getElementById('simCurAvg').textContent = '$' + f(activeSimRow.avg);
 
@@ -905,7 +876,7 @@
       document.getElementById('simInpPx').value  = px;
       document.getElementById('simInpQty').value = 1;
       document.getElementById('simInpInv').value = px;
-      document.getElementById('simModal').style.display = 'flex';
+      document.getElementById('buyModal').style.display = 'flex';
       calcSim('buy', 'px');
     }
 
@@ -915,7 +886,7 @@
       if (!activeSimRow || !activeSimRow.qty || activeSimRow.qty <= 0) { alert('No tienes saldo válido para vender.'); return; }
       calc(activeSimRow);
 
-      document.getElementById('sellTitle').innerHTML = `💸 Vender: <span style="color:#e6edf3;margin-left:5px">${activeSimRow.t}</span>`;
+      document.getElementById('sellTitle').innerHTML = `💸 Registrar Venta: <span style="color:#e6edf3;margin-left:5px">${activeSimRow.t}</span>`;
       document.getElementById('sellCurQty').textContent = activeSimRow.qty;
       document.getElementById('sellCurAvg').textContent = '$' + f(activeSimRow.avg);
 
@@ -929,7 +900,7 @@
     }
 
     function closeSim(type) {
-      document.getElementById(type === 'buy' ? 'simModal' : 'sellModal').style.display = 'none';
+      document.getElementById(type === 'buy' ? 'buyModal' : 'sellModal').style.display = 'none';
       activeSimRow = null; activeSimTid = null;
     }
 
@@ -968,6 +939,41 @@
       }
     }
 
+    // 🔥 NUEVA FUNCIÓN: CONFIRMAR COMPRA Y GUARDAR HISTORIAL 🔥
+    function confirmBuy() {
+      if (!activeSimRow) return;
+      const buyQty = parseFloat(document.getElementById('simInpQty').value) || 0;
+      const buyPx  = parseFloat(document.getElementById('simInpPx').value)  || 0;
+      if (buyQty <= 0) { alert('Cantidad inválida.'); return; }
+      if (buyPx  <= 0 && !STABLECOINS.includes(String(activeSimRow.t).toUpperCase())) { alert('Precio de compra inválido.'); return; }
+
+      saveStateToHistory();
+      const buyInv = buyQty * buyPx;
+
+      // Suma la cantidad y el dinero automáticamente
+      activeSimRow.qty = (activeSimRow.qty || 0) + buyQty;
+      activeSimRow.inv = (activeSimRow.inv || 0) + buyInv;
+      activeSimRow.qtyFormula = String(activeSimRow.qty);
+      activeSimRow.invFormula = String(activeSimRow.inv);
+      activeSimRow.p = false;
+
+      // Guardar en la Memoria de Transacciones
+      TRADES.push({
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: 'BUY',
+        asset: activeSimRow.t,
+        qty: buyQty,
+        px: buyPx,
+        inv: buyInv
+      });
+
+      recalc(false);
+      closeSim('buy');
+      showToast('✅ Compra registrada: ' + activeSimRow.t);
+    }
+
+    // 🔥 MODIFICADA: CONFIRMAR VENTA Y GUARDAR HISTORIAL 🔥
     function confirmSell() {
       if (!activeSimRow) return;
       const sellQty = parseFloat(document.getElementById('sellInpQty').value) || 0;
@@ -988,6 +994,18 @@
         activeSimRow.qty = 0; activeSimRow.qtyFormula = '0';
         activeSimRow.inv = 0; activeSimRow.invFormula = '0';
       }
+
+      // Guardar en la Memoria de Transacciones
+      TRADES.push({
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: 'SELL',
+        asset: activeSimRow.t,
+        qty: sellQty,
+        px: sellPx,
+        inv: sellQty * avg,
+        pnl: pnl
+      });
 
       recalc(false);
       closeSim('sell');
@@ -1066,7 +1084,7 @@
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fP(row.gl)}</td>
           <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fGain(row.pnl)}</td>
           <td class="action-btns">
-            <button class="icon-btn" onmousedown="openSim('${tid}',${row.id})"  title="Simular Compra">🧮</button>
+            <button class="icon-btn" onmousedown="openSim('${tid}',${row.id})"  title="Registrar Compra">🛒</button>
             <button class="icon-btn" onmousedown="openSell('${tid}',${row.id})" title="Registrar Venta">💸</button>
             <button class="icon-btn btn-del" onmousedown="delRow('${tid}',${row.id})" title="Eliminar">✕</button>
           </td>
@@ -1177,7 +1195,6 @@
         htmlSub   = 'Billetera Digital <span style="color:#e6edf3;font-weight:600">$' + f(tCur) + '</span>';
       }
 
-      // Mejor y peor activo (excluye stablecoins)
       const named = activeAssets.filter(x => x.t && !STABLECOINS.includes(String(x.t).toUpperCase()));
       const best  = named.length ? [...named].sort((a, b) => b.gl - a.gl)[0] : null;
       const worst = named.length ? [...named].sort((a, b) => a.gl - b.gl)[0] : null;
@@ -1185,34 +1202,29 @@
       const wCls  = worst && worst.gl >= 0 ? 'g' : 'r';
 
       document.getElementById('cards').innerHTML =
-        // Card 1: Portafolio Global
         '<div class="card" style="border-color:#58a6ff33">' +
           '<div class="lbl">' + lblGlobal + '</div>' +
           '<div class="val b">$' + f(gC) + '</div>' +
           '<div class="s2" style="color:#8b949e;margin-top:3px">' + htmlSub + '</div>' +
           '<div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">' + fCOP(gC * rt) + '</div>' +
         '</div>' +
-        // Card 2: Capital Invertido
         '<div class="card">' +
           '<div class="lbl">📥 Capital Invertido</div>' +
           '<div class="val">' + valInvStr + '</div>' +
           '<div class="s2" style="color:#8b949e;margin-top:3px">' + fCOP(tInv * rt) + '</div>' +
         '</div>' +
-        // Card 3: Retorno Total
         '<div class="card" style="border-color:' + (tPnl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
           '<div class="lbl">📈 Retorno Total</div>' +
           '<div class="val ' + (tPnl >= 0 ? 'g' : 'r') + '">' + (tPnl >= 0 ? '+' : '-') + ' $' + f(Math.abs(tPnl)) + '</div>' +
           '<div class="s2 ' + (tPct >= 0 ? 'g' : 'r') + '" style="margin-top:3px">' + (tPct >= 0 ? '+' : '') + f(tPct, 1) + '% sobre invertido</div>' +
           '<div class="s2 ' + (tPnl >= 0 ? 'g' : 'r') + '" style="margin-top:2px;font-weight:600">' + (tPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(tPnl) * rt) + '</div>' +
         '</div>' +
-        // Card 4: TRM en Vivo
         '<div class="card" style="border-color:#ffa65733">' +
           '<div class="lbl">💱 TRM en Vivo</div>' +
           '<div class="val" style="color:#ffa657">' + f(rt, 0) + ' <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div>' +
           '<div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">1 USD = ' + f(rt, 0) + ' COP</div>' +
           '<div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">Act: ' + lastUpd + '</div>' +
         '</div>' +
-        // Card 5: Mejor Activo
         '<div class="card" style="border-color:' + (best && best.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
           '<div class="lbl">🏆 Mejor Activo</div>' +
           '<div class="val ' + bCls + '">' + (best ? best.t : '—') + '</div>' +
@@ -1220,7 +1232,6 @@
           '<div class="s2 ' + bCls + '" style="margin-top:2px">' + (best ? (best.gl >= 0 ? '+' : '') + f(best.gl, 1) + '%' : '') + '</div>' +
           '<div class="s2 hide-mob ' + bCls + '" style="margin-top:2px;font-size:.68rem">' + (best ? (best.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(best.pnl) * rt) : '') + '</div>' +
         '</div>' +
-        // Card 6: Más Rezagado
         '<div class="card" style="border-color:' + (worst && worst.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
           '<div class="lbl">⚠️ Más Rezagado</div>' +
           '<div class="val ' + wCls + '">' + (worst ? worst.t : '—') + '</div>' +
@@ -1237,7 +1248,6 @@
       const rt = rate();
 
       if (currentView === 'stocks') {
-        // ── Acciones ──
         const sA = SW.map(calc).filter(x => x.qty > 0);
         const xA = XT.map(calc).filter(x => x.qty > 0);
         const sI = sA.reduce((s, x) => s + x.inv, 0),  sC = sA.reduce((s, x) => s + x.cur, 0);
@@ -1335,7 +1345,6 @@
           </div>`;
 
       } else {
-        // ── Cripto ──
         const cA = CR.map(calc).filter(x => x.qty > 0);
         const cI = cA.reduce((s, x) => s + x.inv, 0),  cC = cA.reduce((s, x) => s + x.cur, 0);
 
@@ -1391,7 +1400,6 @@
       const all    = activeData.filter(x => x.qty > 0 && x.t);
       const labels = all.map(x => {
         let n = String(x.t);
-        // Diferencia wallets para USDT/USDC (pueden existir en varias billeteras)
         if (['USDT','USDC'].includes(n.toUpperCase()) && x.wallet) n += ` (${x.wallet})`;
         return n;
       });
@@ -1401,7 +1409,6 @@
       const labelsPct = labels.map((t, i) => t + ' (' + (total > 0 ? (vals[i]/total*100).toFixed(1) : 0) + '%)');
       const isMob     = window.innerWidth <= 768;
 
-      // ── Donut ──
       if (dChart) dChart.destroy();
       if (labels.length) {
         dChart = new Chart(document.getElementById('donut'), {
@@ -1417,14 +1424,11 @@
         });
       }
 
-      // ── Barras ──
       if (bChart) bChart.destroy();
       if (labels.length) {
-        // Altura dinámica en móvil según cantidad de activos
         const barWrap = document.getElementById('bar-wrap');
         barWrap.style.height = isMob ? Math.max(280, labels.length * 40) + 'px' : '200px';
 
-        // Plugin para mostrar % encima/debajo de cada barra
         const pctPlugin = {
           id: 'pct',
           afterDraw: chart => {
@@ -1436,14 +1440,12 @@
                 const v    = ds.data[j];
                 const pctT = (v >= 0 ? '+' : '') + f(v, 1) + '%';
                 if (isMob && isH) {
-                  // Móvil horizontal: etiqueta + % junto a la barra
                   ctx.font          = 'bold 11px sans-serif';
                   ctx.textBaseline  = 'middle';
                   const zeroX       = chart.scales.x.getPixelForValue(0);
                   ctx.textAlign     = v >= 0 ? 'right' : 'left';
                   ctx.fillText(`${chart.data.labels[j]} (${pctT})`, zeroX + (v >= 0 ? -8 : 8), el.y);
                 } else {
-                  // PC vertical: % encima/debajo de la barra
                   ctx.font         = 'bold 10px sans-serif';
                   ctx.textAlign    = 'center';
                   ctx.textBaseline = v >= 0 ? 'bottom' : 'top';
@@ -1488,7 +1490,6 @@
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
       if (!currentUser) return;
 
-      // ── TRM (COP/USD) ──
       try {
         const res = await fetch('https://economia.awesomeapi.com.br/json/last/USD-COP');
         const d   = await res.json();
@@ -1496,7 +1497,6 @@
           document.getElementById('rateInput').value = parseFloat(d.USDCOP.bid).toFixed(2);
       } catch (e) { console.log('Error TRM'); }
 
-      // ── Precios de acciones (Finnhub) ──
       const fetchStockPrice = async ticker => {
         try {
           const sym = String(ticker).includes('.UK') ? String(ticker).replace('.UK', '.L') : ticker;
@@ -1505,7 +1505,6 @@
         } catch (e) { return null; }
       };
 
-      // ── Precios de cripto (MEXC con fallback a cryptoprices.cc) ──
       const fetchCryptoPrice = async ticker => {
         const t = String(ticker).toUpperCase();
         if (STABLECOINS.includes(t)) return 1.00;
@@ -1525,7 +1524,6 @@
         }
       };
 
-      // ── Lanza todas las peticiones en paralelo ──
       try {
         await Promise.all([
           ...SW.filter(r => r.t).map(async r => { const p = await fetchStockPrice(r.t);  if (p) r.px = p; }),
@@ -1537,16 +1535,13 @@
       recalc(false);
     }
 
-    // Refresco automático cada 60 segundos
     setInterval(fetchRealTimeData, 60000);
 
-    // 🔥 LA FUNCIÓN DEL BOTÓN MÁGICO PARA EL PDF 🔥
     async function pedirReporte() {
       const loadingScreen = document.getElementById('pdfLoading');
-      loadingScreen.style.display = 'flex'; // Muestra la pantalla negra de carga
+      loadingScreen.style.display = 'flex'; 
 
       try {
-        // Llama a la URL de tu función de Firebase
         const respuesta = await fetch('https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte');
         
         if (respuesta.ok) {
