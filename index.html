@@ -5,14 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mi Portafolio Pro | Sincronizado</title>
 
-  <!-- ═══════════════════════════════════════════
-       FAVICON
-  ═══════════════════════════════════════════ -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpolyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='20' fill='%2358a6ff' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E" />
 
-  <!-- ═══════════════════════════════════════════
-       LIBRERÍAS EXTERNAS
-  ═══════════════════════════════════════════ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -26,12 +20,12 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: "Segoe UI", sans-serif; background: #0d1117; color: #e6edf3; font-size: 13px; }
     :root {
-      --g:      #3fb950;
-      --r:      #f78166;
-      --b:      #58a6ff;
+      --g: #3fb950;
+      --r: #f78166;
+      --b: #58a6ff;
       --border: #21262d;
-      --card:   #161b22;
-      --sub:    #8b949e;
+      --card: #161b22;
+      --sub: #8b949e;
       --yellow: #f3ba2f;
     }
 
@@ -61,10 +55,10 @@
       display: flex; align-items: center; justify-content: space-between;
       flex-wrap: wrap; gap: 8px;
     }
-    .hdr h1    { font-size: 1.15rem; color: var(--b); font-weight: 700; }
-    .hdr-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .hdr input { background: transparent; border: none; color: var(--b); font-weight: 700; font-size: 0.88rem; width: 85px; outline: none; text-align: right; }
-    .opp-inp   { width: 35px !important; text-align: center !important; color: var(--g) !important; padding: 0 !important; }
+    .hdr h1        { font-size: 1.15rem; color: var(--b); font-weight: 700; }
+    .hdr-right     { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .hdr input     { background: transparent; border: none; color: var(--b); font-weight: 700; font-size: 0.88rem; width: 85px; outline: none; text-align: right; }
+    .opp-inp       { width: 35px !important; text-align: center !important; color: var(--g) !important; padding: 0 !important; }
 
     /* ═══════════════════════════════════════════
        4. BOTONES
@@ -77,7 +71,7 @@
     .btn-logout:hover { background: var(--r); color: #fff; }
     .btn-add       { background: var(--g); color: #fff; border: none; font-size: 0.75rem; padding: 5px 12px; font-weight: 600; box-shadow: 0 0 5px rgba(63,185,80,0.3); }
     .btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63,185,80,0.6); transform: scale(1.03); }
-    .btn-pdf       { background: #1f6feb; color: #fff; border: none; font-size: 0.68rem; padding: 5px 10px; border-radius: 5px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 0 8px rgba(31,111,235,0.4); }
+    .btn-pdf       { background: #1f6feb; color: #fff; border: none; font-size: 0.68rem; padding: 5px 10px; border-radius: 5px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 0 8px rgba(31,111,235,0.4); cursor: pointer; }
     .btn-pdf:hover { background: #388bfd; transform: scale(1.05); }
 
     /* ═══════════════════════════════════════════
@@ -122,8 +116,8 @@
     ═══════════════════════════════════════════ */
     .broker     { background: var(--card); border: 1px solid var(--border); border-radius: 9px; margin-bottom: 12px; overflow: hidden; }
     .bhdr       { padding: 9px 14px; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
-    .bhdr.sw    { color: #79c0ff;    background: linear-gradient(90deg, #1a3a5c22, transparent); }
-    .bhdr.xt    { color: #56d364;    background: linear-gradient(90deg, #1a5c3a22, transparent); }
+    .bhdr.sw    { color: #79c0ff; background: linear-gradient(90deg, #1a3a5c22, transparent); }
+    .bhdr.xt    { color: #56d364; background: linear-gradient(90deg, #1a5c3a22, transparent); }
     .bhdr.cr    { color: var(--yellow); background: linear-gradient(90deg, #f3ba2f22, transparent); }
     .bhdr-controls { display: flex; gap: 6px; align-items: center; }
     .tbl-wrap   { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -138,21 +132,21 @@
     /* ═══════════════════════════════════════════
        10. INPUTS DE TABLA Y CHECKBOX DE STAKING
     ═══════════════════════════════════════════ */
-    .ci          { background: #0d1117; border: 1px solid var(--border); color: #e6edf3; border-radius: 5px; padding: 4px 7px; width: 90px; font-size: 0.8rem; outline: none; transition: 0.15s; text-align: center; }
-    .ci.wallet   { width: 110px; color: var(--sub); font-size: 0.75rem; }
-    .ci:focus    { border-color: var(--b); background: #0d1c2e; }
-    .ci.ticker   { width: 85px; text-transform: uppercase; font-weight: 700; color: var(--b); text-align: center; }
+    .ci         { background: #0d1117; border: 1px solid var(--border); color: #e6edf3; border-radius: 5px; padding: 4px 7px; width: 90px; font-size: 0.8rem; outline: none; transition: 0.15s; text-align: center; }
+    .ci.wallet  { width: 110px; color: var(--sub); font-size: 0.75rem; }
+    .ci:focus   { border-color: var(--b); background: #0d1c2e; }
+    .ci.ticker  { width: 85px; text-transform: uppercase; font-weight: 700; color: var(--b); text-align: center; }
     .pending .ci { color: var(--sub); }
     .chk-staking { transform: scale(1.3); cursor: pointer; accent-color: var(--g); margin-top: 3px; }
 
     /* ═══════════════════════════════════════════
        11. BOTONES DE ACCIÓN EN FILAS
     ═══════════════════════════════════════════ */
-    .action-btns    { display: flex; gap: 4px; justify-content: center; align-items: center; }
-    .icon-btn       { background: transparent; border: none; cursor: pointer; padding: 2px 5px; font-size: 0.95rem; transition: 0.15s; opacity: 0.7; }
+    .action-btns   { display: flex; gap: 4px; justify-content: center; align-items: center; }
+    .icon-btn      { background: transparent; border: none; cursor: pointer; padding: 2px 5px; font-size: 0.95rem; transition: 0.15s; opacity: 0.7; }
     .icon-btn:hover { opacity: 1; transform: scale(1.1); }
-    .btn-del        { color: #ff4444; opacity: 1; }
-    .btn-del:hover  { color: #ff6666; }
+    .btn-del       { color: #ff4444; opacity: 1; }
+    .btn-del:hover { color: #ff6666; }
 
     /* ═══════════════════════════════════════════
        12. DRAG & DROP (REORDENAR FILAS)
@@ -184,7 +178,7 @@
 
     /* ═══════════════════════════════════════════
        15. PANEL DE RESUMEN CONSOLIDADO
-    ═══════════════════════════════════════════ */
+    ════════════════════════════════════════════ */
     .bottom    { display: block; margin-bottom: 14px; }
     .sum-box   { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
     .box-title { font-size: 0.85rem; color: #e6edf3; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
@@ -222,14 +216,14 @@
     .modal-btn:hover { background: #30363d; border-color: #8b949e; }
 
     /* ═══════════════════════════════════════════
-       18. TOAST Y SPINNER DE CARGA DEL PDF
+       18. TOAST Y SPINNER (NOTIFICACIONES)
     ═══════════════════════════════════════════ */
     .toast      { position: fixed; bottom: 18px; right: 18px; background: #1f6feb; color: #fff; padding: 9px 16px; border-radius: 7px; font-size: 0.78rem; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 99999; }
     .toast.show { opacity: 1; }
 
     .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 100000; backdrop-filter: blur(5px); }
     .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--b); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     /* ═══════════════════════════════════════════
        19. RESPONSIVE — TABLETAS Y CELULARES (≤ 768px)
@@ -238,23 +232,19 @@
       body { font-size: 11px; }
       main { padding: 10px; padding-bottom: 100px; }
 
-      /* Header */
       .hdr       { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px; }
       .hdr-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
       .hide-mob  { display: none; }
 
-      /* Tarjetas */
       .cards     { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
       .card      { padding: 8px; }
       .card .lbl { font-size: 0.6rem; margin-bottom: 1px; }
       .card .val { font-size: 1rem; }
       .card .s2  { font-size: 0.65rem; }
 
-      /* Gráficos */
       .charts  { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
       .ch-wrap { height: 280px !important; }
 
-      /* Botón flotante (FAB) */
       .fab-btn {
         display: flex; position: fixed; bottom: 20px; right: 20px;
         width: 56px; height: 56px; border-radius: 50%;
@@ -266,7 +256,6 @@
       }
       .fab-btn:active { transform: scale(0.9); }
 
-      /* Menú de pestañas flotante */
       .view-tabs {
         position: fixed; bottom: 85px; right: 20px; left: auto;
         flex-direction: column; align-items: flex-end;
@@ -278,7 +267,6 @@
       .view-tabs .view-tab.active     { display: none !important; }
       .view-tab { background: rgba(22,27,34,0.95); backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-align: right; padding: 12px 20px; }
 
-      /* Cabeceras de brokers */
       .bhdr          { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
       .bhdr > span   { font-size: 1rem; text-align: center; }
       .bhdr-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; width: 100%; }
@@ -286,21 +274,16 @@
       .bhdr-controls .btn-undo-redo { justify-content: center; padding: 8px 0; }
       .bhdr-controls .btn-add       { grid-column: 1 / -1; margin-top: 5px; padding: 12px; font-size: 1rem; border-radius: 8px; }
 
-      /* Tablas */
       .tbl-wrap          { overflow-x: auto; -webkit-overflow-scrolling: touch; border-bottom: 1px solid var(--border); }
       table th, table td { font-size: 0.75rem; padding: 4px 3px; }
       .ci                { padding: 3px 5px; width: 75px; font-size: 0.75rem; }
       .ci.ticker         { width: 70px; }
       .ci.wallet         { width: 90px; }
 
-      /* Panel resumen */
-      .sum-box { padding: 12px; }
-      .sk-grid { grid-template-columns: 1fr; gap: 12px; }
+      .sum-box  { padding: 12px; }
+      .sk-grid  { grid-template-columns: 1fr; gap: 12px; }
     }
 
-    /* ═══════════════════════════════════════════
-       20. RESPONSIVE — MÓVILES PEQUEÑOS (≤ 480px)
-    ═══════════════════════════════════════════ */
     @media (max-width: 480px) {
       .cards { grid-template-columns: 1fr; }
     }
@@ -308,9 +291,6 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       PANTALLA DE LOGIN
-  ═══════════════════════════════════════════════════════════════ -->
   <div id="login-screen">
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width="80" height="80" style="margin-bottom:20px">
       <rect width='32' height='32' rx='7' fill='#161b22'/>
@@ -332,32 +312,26 @@
     <p style="color:#444;font-size:0.7rem;margin-top:50px">Solo acceso autorizado.</p>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       APLICACIÓN PRINCIPAL (visible tras login)
-  ═══════════════════════════════════════════════════════════════ -->
   <div id="app-content" style="display:none">
 
-    <!-- TRM oculto — leído internamente por JS para cálculos COP -->
     <input id="rateInput" value="4180" type="hidden">
 
-    <!-- HEADER -->
     <div class="hdr">
       <div>
         <h1>📊 Mi Portafolio Pro</h1>
         <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Conectando a la nube...</div>
       </div>
       <div class="hdr-right">
-        <button class="btn-pdf" onclick="pedirReporte()">📥 Descargar Extracto Mensual</button>
+        <button class="btn-pdf" onclick="pedirReporte('es')">📥 Descargar PDF (ES)</button>
+        <button class="btn-pdf" onclick="pedirReporte('en')" style="background:#2ea043; box-shadow: 0 0 8px rgba(46,160,67,0.4)">📥 Descargar PDF (EN)</button>
         <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
       </div>
     </div>
 
     <main>
 
-      <!-- TARJETAS DE RESUMEN (generadas por renderCards) -->
       <div class="cards" id="cards"></div>
 
-      <!-- GRÁFICOS (generados por renderCharts) -->
       <div class="charts">
         <div class="ch">
           <h3 id="lbl-donut">Distribución del Portafolio</h3>
@@ -369,21 +343,15 @@
         </div>
       </div>
 
-      <!-- PESTAÑAS DE NAVEGACIÓN (PC) -->
       <div class="view-tabs" id="view-tabs">
         <button id="btn-tab-stocks" class="view-tab active" onclick="switchTab('stocks')">📈 Portfolio Acciones</button>
         <button id="btn-tab-crypto" class="view-tab"        onclick="switchTab('crypto')">₿ Portfolio Cripto</button>
       </div>
 
-      <!-- BOTÓN FLOTANTE (solo visible en móvil) -->
       <button class="fab-btn" id="fab-btn" onclick="toggleFab()">💰</button>
 
-      <!-- ─────────────────────────────────────────
-           TAB: ACCIONES (Schwab + XTB)
-      ───────────────────────────────────────── -->
       <div id="content-stocks" class="tab-content active">
 
-        <!-- Broker: Schwab USA -->
         <div class="broker">
           <div class="bhdr sw">
             <span>🇺🇸 Schwab USA</span>
@@ -402,7 +370,6 @@
           <div class="tbl-wrap"><table id="tbl-sw"></table></div>
         </div>
 
-        <!-- Broker: XTB Europe -->
         <div class="broker">
           <div class="bhdr xt">
             <span>🇪🇺 XTB Europe</span>
@@ -421,14 +388,8 @@
           <div class="tbl-wrap"><table id="tbl-xt"></table></div>
         </div>
 
-      </div><!-- /content-stocks -->
+      </div><div id="content-crypto" class="tab-content">
 
-      <!-- ─────────────────────────────────────────
-           TAB: CRIPTOMONEDAS
-      ───────────────────────────────────────── -->
-      <div id="content-crypto" class="tab-content">
-
-        <!-- Billetera Cripto -->
         <div class="broker">
           <div class="bhdr cr">
             <span>₿🚀🪙 Criptomonedas</span>
@@ -447,10 +408,7 @@
           <div class="tbl-wrap"><table id="tbl-cr"></table></div>
         </div>
 
-      </div><!-- /content-crypto -->
-
-      <!-- PANEL DE RESUMEN CONSOLIDADO (generado por renderSummary) -->
-      <div class="bottom">
+      </div><div class="bottom">
         <div class="sum-box">
           <div class="box-title" id="lbl-summary">📋 Resumen Consolidado de Acciones</div>
           <div id="sum-content"></div>
@@ -458,12 +416,7 @@
       </div>
 
     </main>
-  </div><!-- /app-content -->
-
-  <!-- ═══════════════════════════════════════════════════════════════
-       MODAL — REGISTRAR COMPRA
-  ═══════════════════════════════════════════════════════════════ -->
-  <div class="modal-overlay" id="buyModal" onclick="if(event.target===this) closeSim('buy')">
+  </div><div class="modal-overlay" id="buyModal" onclick="if(event.target===this) closeSim('buy')">
     <div class="modal">
       <h2 id="simTitle">🛒 Registrar Compra</h2>
       <div class="modal-row"><span class="modal-label">Activos actuales:</span>    <span id="simCurQty" class="modal-val">0</span></div>
@@ -496,15 +449,12 @@
           <span id="simOutInv" style="font-weight:700;color:var(--b)">$0.00</span>
         </div>
       </div>
-
+      
       <button class="modal-btn" style="background:var(--g);border-color:#2ea043" onclick="confirmBuy()">Confirmar Compra</button>
       <button class="modal-btn" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('buy')">Cancelar</button>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       MODAL — REGISTRAR VENTA
-  ═══════════════════════════════════════════════════════════════ -->
   <div class="modal-overlay" id="sellModal" onclick="if(event.target===this) closeSim('sell')">
     <div class="modal">
       <h2 id="sellTitle">💸 Registrar Venta</h2>
@@ -538,22 +488,17 @@
           <span id="sellOutQty" style="font-weight:700;color:var(--sub)">0</span>
         </div>
       </div>
-
+      
       <button class="modal-btn" style="background:var(--g);border-color:#2ea043" onclick="confirmSell()">Confirmar Venta</button>
       <button class="modal-btn" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('sell')">Cancelar</button>
     </div>
   </div>
 
-  <!-- TOAST (notificaciones temporales) -->
   <div class="toast" id="toast"></div>
-
-  <!-- SPINNER — se muestra mientras se genera el PDF -->
   <div id="pdfLoading" class="loading-overlay">
     <div class="spinner"></div>
     <h3 style="color:var(--b);font-size:1.2rem;margin-bottom:10px">Generando Reporte...</h3>
-    <p style="color:var(--sub);text-align:center;max-width:300px">
-      La Inteligencia Artificial está analizando tus activos y redactando tus insights.
-    </p>
+    <p style="color:var(--sub);text-align:center;max-width:300px">La Inteligencia Artificial está analizando tus activos y redactando tus insights.</p>
   </div>
 
   <script>
@@ -562,17 +507,14 @@
     // ═══════════════════════════════════════════════════════════════
     const FINNHUB_API_KEY = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
 
-    // URL del Cloud Function para generar el PDF
-    const PDF_FUNCTION_URL = 'https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte';
-
     const firebaseConfig = {
-      apiKey:            'AIzaSyDAPrYB2pyJ7fQcMoC72DojH1ZKdzLgKwY',
-      authDomain:        'mi-portafolio-cristhian.firebaseapp.com',
-      databaseURL:       'https://mi-portafolio-cristhian-default-rtdb.firebaseio.com',
-      projectId:         'mi-portafolio-cristhian',
-      storageBucket:     'mi-portafolio-cristhian.firebasestorage.app',
-      messagingSenderId: '857924881558',
-      appId:             '1:857924881558:web:091fa5c2fb44b0a650c6b7'
+      apiKey:            "AIzaSyDAPrYB2pyJ7fQcMoC72DojH1ZKdzLgKwY",
+      authDomain:        "mi-portafolio-cristhian.firebaseapp.com",
+      databaseURL:       "https://mi-portafolio-cristhian-default-rtdb.firebaseio.com",
+      projectId:         "mi-portafolio-cristhian",
+      storageBucket:     "mi-portafolio-cristhian.firebasestorage.app",
+      messagingSenderId: "857924881558",
+      appId:             "1:857924881558:web:091fa5c2fb44b0a650c6b7"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -580,17 +522,17 @@
     const db   = firebase.database();
 
     // ═══════════════════════════════════════════════════════════════
-    // 2. VARIABLES GLOBALES
+    // 2. VARIABLES GLOBALES Y CEREBRO DE TRANSACCIONES (TRADES)
     // ═══════════════════════════════════════════════════════════════
     let currentUser = null;
-    let currentView = 'stocks';       // pestaña activa: 'stocks' | 'crypto'
-    let SW = [], XT = [], CR = [];    // posiciones Schwab, XTB y Cripto
-    let TRADES = [];                  // historial de transacciones (compras/ventas)
-    let nid = 1;                      // contador de IDs únicos para filas nuevas
-    let skInvVal = 14613200;          // Skandia: capital invertido (COP)
-    let skCurVal = 12627217;          // Skandia: valor actual (COP)
-    let oppStocks = 10;               // umbral de oportunidad acciones (%)
-    let oppCrypto = 20;               // umbral de oportunidad cripto (%)
+    let currentView = 'stocks';     
+    let SW = [], XT = [], CR = [];  
+    let TRADES = [];                
+    let nid = 1;                    
+    let skInvVal = 14613200;        
+    let skCurVal = 12627217;        
+    let oppStocks = 10;             
+    let oppCrypto = 20;             
     let dChart = null, bChart = null, saveTimeout = null;
     let sortState = {
       sw: { col: null, dir: 1 },
@@ -598,7 +540,7 @@
       cr: { col: null, dir: 1 }
     };
 
-    const COLS       = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc','#f3ba2f','#8c52ff'];
+    const COLS = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc','#f3ba2f','#8c52ff'];
     const STABLECOINS = ['USDT','USDC','EUSD'];
 
     // ═══════════════════════════════════════════════════════════════
@@ -654,19 +596,18 @@
           if (snap.exists()) {
             const d = snap.val();
 
-            // Filtro anti-fantasmas + limpieza de tipos
-            SW     = (d.SW || []).filter(Boolean);
-            XT     = (d.XT || []).filter(Boolean);
-            CR     = (d.CR || []).filter(Boolean);
+            SW = (d.SW || []).filter(Boolean);
+            XT = (d.XT || []).filter(Boolean);
+            CR = (d.CR || []).filter(Boolean);
             TRADES = d.transactions || d.trades || [];
 
-            // Normaliza valores numéricos que pueden llegar como string
-            const cleanRow = row => {
+            const cleanRow = (row) => {
               if (typeof row.qty === 'string') row.qty = rv(row.qty);
               if (typeof row.inv === 'string') row.inv = rv(row.inv);
               if (!row.qty) row.qty = 0;
               if (!row.inv) row.inv = 0;
             };
+            
             SW.forEach(cleanRow);
             XT.forEach(cleanRow);
             CR.forEach(c => {
@@ -680,7 +621,6 @@
 
             if (d.rate) document.getElementById('rateInput').value = d.rate;
 
-            // Actualiza TRM al cargar (awesomeapi)
             fetch('https://economia.awesomeapi.com.br/json/last/USD-COP')
               .then(r => r.json())
               .then(data => {
@@ -692,7 +632,6 @@
             if (d.skInv) skInvVal = parseFloat(d.skInv);
             if (d.skCur) skCurVal = parseFloat(d.skCur);
 
-            // Compatibilidad con versión anterior (un solo campo 'opp')
             oppStocks = d.oppStocks !== undefined ? parseFloat(d.oppStocks) : (d.opp ? parseFloat(d.opp) : 10);
             oppCrypto = d.oppCrypto !== undefined ? parseFloat(d.oppCrypto) : (d.opp ? parseFloat(d.opp) : 20);
             document.querySelectorAll('.opp-stocks').forEach(el => el.value = oppStocks);
@@ -701,13 +640,12 @@
             if (d.ts) document.getElementById('lastSaved').textContent = 'Nube OK: ' + new Date(d.ts).toLocaleTimeString('es-CO');
 
           } else {
-            // Datos de ejemplo para usuarios nuevos
             SW = [
               { id:1,  t:'BABA',   qty:19,      inv:1460.91, px:129.87, p:false, staking:false },
               { id:2,  t:'BRK-B',  qty:7.5562,  inv:2974.72, px:476.19, p:false, staking:false }
             ];
             XT = [
-              { id:11, t:'EIMI.UK', qty:28.2244, inv:1125.02, px:46.19, p:false, staking:false }
+              { id:11, t:'EIMI.UK', qty:28.2244, inv:1125.02, px:46.19,  p:false, staking:false }
             ];
             CR = [
               { id:41, t:'ETH',  wallet:'Binance', qty:0, inv:0, px:0, p:true, staking:false },
@@ -715,7 +653,7 @@
               { id:43, t:'USDT', wallet:'Binance', qty:0, inv:0, px:1, p:true, staking:false }
             ];
             TRADES = [];
-            nid    = 50;
+            nid = 50;
           }
 
           fetchRealTimeData();
@@ -729,12 +667,12 @@
       if (!currentUser) return;
       db.ref('users/' + currentUser.uid).set({
         SW, XT, CR,
-        transactions: TRADES,   // historial de compras/ventas
-        rate:         document.getElementById('rateInput').value,
-        oppStocks,    oppCrypto,
-        skInv:        skInvVal,
-        skCur:        skCurVal,
-        ts:           new Date().toISOString()
+        transactions: TRADES, 
+        rate:      document.getElementById('rateInput').value,
+        oppStocks, oppCrypto,
+        skInv:     skInvVal,
+        skCur:     skCurVal,
+        ts:        new Date().toISOString()
       }).then(() => {
         document.getElementById('lastSaved').textContent = 'Nube sincronizada: ' + new Date().toLocaleTimeString('es-CO');
       });
@@ -743,29 +681,21 @@
     // ═══════════════════════════════════════════════════════════════
     // 6. NAVEGACIÓN ENTRE PESTAÑAS
     // ═══════════════════════════════════════════════════════════════
-
-    /** Abre/cierra el menú flotante de pestañas (solo móvil) */
     function toggleFab() {
       document.getElementById('view-tabs').classList.toggle('open');
     }
 
     function switchTab(tabId) {
       currentView = tabId;
-
-      // Activa la pestaña y el contenido correspondiente
       document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('btn-tab-' + tabId).classList.add('active');
       document.getElementById('content-' + tabId).classList.add('active');
 
-      // Actualiza etiquetas contextuales
-      document.getElementById('lbl-donut').textContent   = tabId === 'stocks' ? 'Distribución de Acciones'          : 'Distribución Cripto';
+      document.getElementById('lbl-donut').textContent   = tabId === 'stocks' ? 'Distribución de Acciones' : 'Distribución Cripto';
       document.getElementById('lbl-summary').textContent = tabId === 'stocks' ? '📋 Resumen Consolidado de Acciones' : '📋 Resumen Consolidado Cripto';
 
-      // Cierra el menú flotante en móvil
       document.getElementById('view-tabs').classList.remove('open');
-
-      // Cambia el color del FAB según el destino
       const fab = document.getElementById('fab-btn');
       if (fab) {
         fab.style.borderColor = tabId === 'stocks' ? 'var(--yellow)' : 'var(--g)';
@@ -773,7 +703,6 @@
           ? '0 8px 20px rgba(0,0,0,0.6), 0 0 12px rgba(243,186,47,0.5)'
           : '0 8px 20px rgba(0,0,0,0.6), 0 0 12px rgba(63,185,80,0.5)';
       }
-
       recalc(false);
     }
 
@@ -827,7 +756,6 @@
       if (historyIndex < historyArr.length-1) { historyIndex++; applyState(historyArr[historyIndex]); showToast('↪️ Rehecho'); updateUndoRedoButtons(); }
     }
 
-    // Atajos de teclado: Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y
     document.addEventListener('keydown', e => {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
       if (e.ctrlKey || e.metaKey) {
@@ -839,8 +767,6 @@
     // ═══════════════════════════════════════════════════════════════
     // 8. CÁLCULOS POR FILA
     // ═══════════════════════════════════════════════════════════════
-
-    // ── Skandia (inputs COP especiales) ──
     function skFocus(el) {
       saveStateToHistory();
       el.value = el.id === 'skInv' ? skInvVal : skCurVal;
@@ -851,7 +777,6 @@
       recalc();
     }
 
-    /** Actualiza el umbral de oportunidad de compra (%) para acciones o cripto */
     function updateOpp(tab, val) {
       saveStateToHistory();
       const v = rv(val);
@@ -860,15 +785,13 @@
       recalc();
     }
 
-    /** Calcula todos los valores derivados de una fila (avg, cur, gl, pnl, pxChange) */
     function calc(row) {
       if (!row.qty) row.qty = 0;
       if (!row.inv) row.inv = 0;
 
-      // Las stablecoins siempre valen $1.00 y no tienen variación 24h
       if (STABLECOINS.includes(String(row.t).toUpperCase())) {
-        row.px       = 1.00;
-        row.pxChange = null;
+        row.px = 1.00;
+        row.pxChange = null; 
       }
 
       const cur = row.qty * (row.px || 0);
@@ -903,7 +826,6 @@
       recalc();
     }
 
-    /** Genera el HTML de una cabecera con icono de ordenamiento */
     function getTh(tid, label, field) {
       const sorted = sortState[tid].col === field;
       const icon   = sorted ? (sortState[tid].dir === 1 ? '▲' : '▼') : '⇕';
@@ -968,7 +890,6 @@
       let inv = parseFloat(elInv.value) || 0;
       let qty = parseFloat(elQty.value) || 0;
 
-      // Sincroniza campos entre sí según cuál fue editado
       if (source === 'inv') { qty = px > 0 ? inv/px : 0; elQty.value = qty > 0 ? parseFloat(qty.toFixed(6)) : ''; }
       else                  { inv = qty*px; elInv.value = inv > 0 ? parseFloat(inv.toFixed(2)) : ''; }
 
@@ -992,7 +913,6 @@
       }
     }
 
-    /** Confirma la compra: actualiza la posición y registra el trade */
     function confirmBuy() {
       if (!activeSimRow) return;
       const buyQty = parseFloat(document.getElementById('simInpQty').value) || 0;
@@ -1005,20 +925,20 @@
 
       activeSimRow.qty = (activeSimRow.qty || 0) + buyQty;
       activeSimRow.inv = (activeSimRow.inv || 0) + buyInv;
-      activeSimRow.p   = false;
+      activeSimRow.p = false;
 
       TRADES.push({
-        id:        Date.now(),
-        date:      new Date().toISOString(),
-        type:      'Buy',
-        symbol:    activeSimRow.t,
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: 'Buy',
+        symbol: activeSimRow.t,
         assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
-        qty:       buyQty,
-        price:     buyPx,
-        amount:    -buyInv,
-        asset:     activeSimRow.t,
-        px:        buyPx,
-        inv:       buyInv
+        qty: buyQty,
+        price: buyPx,
+        amount: -buyInv,
+        asset: activeSimRow.t,
+        px: buyPx,
+        inv: buyInv
       });
 
       recalc(false);
@@ -1026,7 +946,6 @@
       showToast('✅ Compra registrada: ' + activeSimRow.t);
     }
 
-    /** Confirma la venta: actualiza la posición y registra el trade con P&L */
     function confirmSell() {
       if (!activeSimRow) return;
       const sellQty = parseFloat(document.getElementById('sellInpQty').value) || 0;
@@ -1047,18 +966,18 @@
       }
 
       TRADES.push({
-        id:        Date.now(),
-        date:      new Date().toISOString(),
-        type:      'Sell',
-        symbol:    activeSimRow.t,
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: 'Sell',
+        symbol: activeSimRow.t,
         assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
-        qty:       sellQty,
-        price:     sellPx,
-        amount:    sellQty * sellPx,
-        pnl:       pnl,
-        asset:     activeSimRow.t,
-        px:        sellPx,
-        inv:       sellQty * avg
+        qty: sellQty,
+        price: sellPx,
+        amount: sellQty * sellPx, 
+        pnl: pnl,
+        asset: activeSimRow.t,
+        px: sellPx,
+        inv: sellQty * avg
       });
 
       recalc(false);
@@ -1067,13 +986,12 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 11. RENDERIZADO DE TABLAS (CON BADGE DE VARIACIÓN 24H)
+    // 11. RENDERIZADO DE TABLAS (CON BADGE 24H)
     // ═══════════════════════════════════════════════════════════════
     function renderTable(data, tid) {
       const opp      = tid === 'cr' ? oppCrypto : oppStocks;
       const isCrypto = tid === 'cr';
 
-      // Cabeceras exclusivas de cripto
       const stakingHeader = isCrypto ? getTh(tid, 'Stake',             'staking') : '';
       const walletHeader  = isCrypto ? getTh(tid, 'Wallet / Exchange', 'wallet')  : '';
 
@@ -1097,7 +1015,6 @@
         const isPend = row.p || !row.qty;
         const isOpp  = !isPend && row.avg > 0 && row.px > 0 && ((row.avg - row.px) / row.avg * 100) >= opp;
 
-        // Celdas exclusivas de cripto
         const stakingTd = isCrypto
           ? `<td><input type="checkbox" class="chk-staking" ${row.staking ? 'checked' : ''} onchange="upd('${tid}',${row.id},'staking',this.checked)"></td>`
           : '';
@@ -1105,13 +1022,13 @@
           ? `<td><input class="ci wallet" value="${row.wallet||''}" placeholder="Binance, Ledger..." onblur="upd('${tid}',${row.id},'wallet',this.value)" onkeyup="if(event.key==='Enter')this.blur()"></td>`
           : '';
 
-        // Badge de variación de precio en 24h (▲/▼ %)
         let pxBadge = '';
         const isStable = STABLECOINS.includes(String(row.t).toUpperCase());
         if (!isStable && row.pxChange !== undefined && row.pxChange !== null && !isPend && !isNaN(row.pxChange)) {
           const isPos = row.pxChange >= 0;
-          const sign  = isPos ? '▲' : '▼';
-          pxBadge = `<div style="font-size:0.65rem;font-weight:700;padding:1px 4px;border-radius:4px;margin-top:2px;background:${isPos ? '#3fb95022' : '#f7816622'}" class="${isPos ? 'g' : 'r'}">${sign} ${Math.abs(row.pxChange).toFixed(2)}%</div>`;
+          const colorCls = isPos ? 'g' : 'r';
+          const sign = isPos ? '▲' : '▼';
+          pxBadge = `<div style="font-size:0.65rem; font-weight:700; padding:1px 4px; border-radius:4px; margin-top:2px; background: ${isPos ? '#3fb95022' : '#f7816622'}" class="${colorCls}">${sign} ${Math.abs(row.pxChange).toFixed(2)}%</div>`;
         }
 
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
@@ -1125,30 +1042,24 @@
           </td>
           ${stakingTd}
           ${walletTd}
-          <td class="computed" style="font-weight:600">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : row.qty}
-          </td>
-          <td class="computed">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)}
-          </td>
-          <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700;vertical-align:middle">
-            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+          
+          <td class="computed" style="font-weight:600">${isPend ? '<span style="color:var(--sub)">—</span>' : row.qty}</td>
+          
+          <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)}</td>
+          
+          <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700; vertical-align: middle;">
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
               <span>${row.px||0}</span>
               ${pxBadge}
             </div>
           </td>
-          <td class="computed">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.cur)}
-          </td>
-          <td class="computed" style="color:var(--b)">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.inv)}
-          </td>
-          <td class="computed">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fP(row.gl)}
-          </td>
-          <td class="computed">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fGain(row.pnl)}
-          </td>
+          
+          <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.cur)}</td>
+          
+          <td class="computed" style="color:var(--b)">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.inv)}</td>
+          
+          <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fP(row.gl)}</td>
+          <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fGain(row.pnl)}</td>
           <td class="action-btns">
             <button class="icon-btn" onmousedown="openSim('${tid}',${row.id})"  title="Registrar Compra">🛒</button>
             <button class="icon-btn" onmousedown="openSell('${tid}',${row.id})" title="Registrar Venta">💸</button>
@@ -1160,15 +1071,14 @@
       const tbl     = document.getElementById('tbl-' + tid);
       tbl.innerHTML = thead + '<tbody>' + tbody + '</tbody>';
 
-      // Habilita drag & drop en la tabla
       const tbodyEl = tbl.querySelector('tbody');
       if (tbodyEl) {
         new Sortable(tbodyEl, {
-          handle:         '.drag-handle',
-          animation:      150,
-          ghostClass:     'sortable-ghost',
-          dragClass:      'sortable-drag',
-          forceFallback:  true,
+          handle:       '.drag-handle',
+          animation:    150,
+          ghostClass:   'sortable-ghost',
+          dragClass:    'sortable-drag',
+          forceFallback: true,
           fallbackOnBody: true,
           onEnd: evt => {
             if (evt.oldIndex === evt.newIndex) return;
@@ -1182,14 +1092,14 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 12. CRUD DE FILAS (Crear, Actualizar, Eliminar)
+    // 12. CRUD DE FILAS (Crear, Leer, Actualizar, Eliminar)
     // ═══════════════════════════════════════════════════════════════
     function upd(tid, id, field, val) {
       const row = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
       if (!row) return;
       if      (field === 't')       row[field] = String(val).toUpperCase().trim();
       else if (field === 'wallet')  row[field] = String(val).trim();
-      else if (field === 'staking') row[field] = val;   // booleano del checkbox
+      else if (field === 'staking') row[field] = val;   
       else                          row[field] = rv(val);
       recalc();
     }
@@ -1260,7 +1170,6 @@
         htmlSub   = 'Billetera Digital <span style="color:#e6edf3;font-weight:600">$' + f(tCur) + '</span>';
       }
 
-      // Mejor y peor activo (excluye stablecoins)
       const named = activeAssets.filter(x => x.t && !STABLECOINS.includes(String(x.t).toUpperCase()));
       const best  = named.length ? [...named].sort((a, b) => b.gl - a.gl)[0] : null;
       const worst = named.length ? [...named].sort((a, b) => a.gl - b.gl)[0] : null;
@@ -1268,34 +1177,29 @@
       const wCls  = worst && worst.gl >= 0 ? 'g' : 'r';
 
       document.getElementById('cards').innerHTML =
-        // Card 1: Portafolio Global
         '<div class="card" style="border-color:#58a6ff33">' +
           '<div class="lbl">' + lblGlobal + '</div>' +
           '<div class="val b">$' + f(gC) + '</div>' +
           '<div class="s2" style="color:#8b949e;margin-top:3px">' + htmlSub + '</div>' +
           '<div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">' + fCOP(gC * rt) + '</div>' +
         '</div>' +
-        // Card 2: Capital Invertido
         '<div class="card">' +
           '<div class="lbl">📥 Capital Invertido</div>' +
           '<div class="val">' + valInvStr + '</div>' +
           '<div class="s2" style="color:#8b949e;margin-top:3px">' + fCOP(tInv * rt) + '</div>' +
         '</div>' +
-        // Card 3: Retorno Total
         '<div class="card" style="border-color:' + (tPnl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
           '<div class="lbl">📈 Retorno Total</div>' +
           '<div class="val ' + (tPnl >= 0 ? 'g' : 'r') + '">' + (tPnl >= 0 ? '+' : '-') + ' $' + f(Math.abs(tPnl)) + '</div>' +
           '<div class="s2 ' + (tPct >= 0 ? 'g' : 'r') + '" style="margin-top:3px">' + (tPct >= 0 ? '+' : '') + f(tPct, 1) + '% sobre invertido</div>' +
           '<div class="s2 ' + (tPnl >= 0 ? 'g' : 'r') + '" style="margin-top:2px;font-weight:600">' + (tPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(tPnl) * rt) + '</div>' +
         '</div>' +
-        // Card 4: TRM en Vivo
         '<div class="card" style="border-color:#ffa65733">' +
           '<div class="lbl">💱 TRM en Vivo</div>' +
           '<div class="val" style="color:#ffa657">' + f(rt, 0) + ' <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div>' +
           '<div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">1 USD = ' + f(rt, 0) + ' COP</div>' +
           '<div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">Act: ' + lastUpd + '</div>' +
         '</div>' +
-        // Card 5: Mejor Activo
         '<div class="card" style="border-color:' + (best && best.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
           '<div class="lbl">🏆 Mejor Activo</div>' +
           '<div class="val ' + bCls + '">' + (best ? best.t : '—') + '</div>' +
@@ -1303,7 +1207,6 @@
           '<div class="s2 ' + bCls + '" style="margin-top:2px">' + (best ? (best.gl >= 0 ? '+' : '') + f(best.gl, 1) + '%' : '') + '</div>' +
           '<div class="s2 hide-mob ' + bCls + '" style="margin-top:2px;font-size:.68rem">' + (best ? (best.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(best.pnl) * rt) : '') + '</div>' +
         '</div>' +
-        // Card 6: Más Rezagado
         '<div class="card" style="border-color:' + (worst && worst.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
           '<div class="lbl">⚠️ Más Rezagado</div>' +
           '<div class="val ' + wCls + '">' + (worst ? worst.t : '—') + '</div>' +
@@ -1320,7 +1223,6 @@
       const rt = rate();
 
       if (currentView === 'stocks') {
-        // ── Acciones ──
         const sA = SW.map(calc).filter(x => x.qty > 0);
         const xA = XT.map(calc).filter(x => x.qty > 0);
         const sI = sA.reduce((s, x) => s + x.inv, 0),  sC = sA.reduce((s, x) => s + x.cur, 0);
@@ -1418,7 +1320,6 @@
           </div>`;
 
       } else {
-        // ── Cripto ──
         const cA = CR.map(calc).filter(x => x.qty > 0);
         const cI = cA.reduce((s, x) => s + x.inv, 0),  cC = cA.reduce((s, x) => s + x.cur, 0);
 
@@ -1474,7 +1375,6 @@
       const all    = activeData.filter(x => x.qty > 0 && x.t);
       const labels = all.map(x => {
         let n = String(x.t);
-        // Diferencia wallets para USDT/USDC (pueden existir en varias exchanges)
         if (['USDT','USDC'].includes(n.toUpperCase()) && x.wallet) n += ` (${x.wallet})`;
         return n;
       });
@@ -1484,7 +1384,6 @@
       const labelsPct = labels.map((t, i) => t + ' (' + (total > 0 ? (vals[i]/total*100).toFixed(1) : 0) + '%)');
       const isMob     = window.innerWidth <= 768;
 
-      // ── Donut ──
       if (dChart) dChart.destroy();
       if (labels.length) {
         dChart = new Chart(document.getElementById('donut'), {
@@ -1500,14 +1399,11 @@
         });
       }
 
-      // ── Barras ──
       if (bChart) bChart.destroy();
       if (labels.length) {
-        // Altura dinámica en móvil según cantidad de activos
         const barWrap = document.getElementById('bar-wrap');
         barWrap.style.height = isMob ? Math.max(280, labels.length * 40) + 'px' : '200px';
 
-        // Plugin: muestra % encima/debajo de cada barra
         const pctPlugin = {
           id: 'pct',
           afterDraw: chart => {
@@ -1519,14 +1415,12 @@
                 const v    = ds.data[j];
                 const pctT = (v >= 0 ? '+' : '') + f(v, 1) + '%';
                 if (isMob && isH) {
-                  // Móvil horizontal: ticker + % junto a la barra
-                  ctx.font         = 'bold 11px sans-serif';
-                  ctx.textBaseline = 'middle';
-                  const zeroX      = chart.scales.x.getPixelForValue(0);
-                  ctx.textAlign    = v >= 0 ? 'right' : 'left';
+                  ctx.font          = 'bold 11px sans-serif';
+                  ctx.textBaseline  = 'middle';
+                  const zeroX       = chart.scales.x.getPixelForValue(0);
+                  ctx.textAlign     = v >= 0 ? 'right' : 'left';
                   ctx.fillText(`${chart.data.labels[j]} (${pctT})`, zeroX + (v >= 0 ? -8 : 8), el.y);
                 } else {
-                  // PC vertical: % encima/debajo de la barra
                   ctx.font         = 'bold 10px sans-serif';
                   ctx.textAlign    = 'center';
                   ctx.textBaseline = v >= 0 ? 'bottom' : 'top';
@@ -1542,11 +1436,11 @@
           data: {
             labels,
             datasets: [{
-              label:           'Rendimiento',
-              data:            gls,
+              label: 'Rendimiento',
+              data:  gls,
               backgroundColor: gls.map(g => g >= 0 ? '#3fb95055' : '#f7816655'),
               borderColor:     gls.map(g => g >= 0 ? '#3fb950'   : '#f78166'),
-              borderWidth:     1
+              borderWidth: 1
             }]
           },
           plugins: [pctPlugin],
@@ -1565,16 +1459,12 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 17. PRECIOS EN TIEMPO REAL
-    //     TRM:     awesomeapi (COP/USD)
-    //     Acciones: Finnhub (incluye variación 24h)
-    //     Cripto:   Binance 24hr → fallback MEXC (incluye variación 24h)
+    // 17. PRECIOS EN TIEMPO REAL Y PDF MÁGICO (CORS ARREGLADO)
     // ═══════════════════════════════════════════════════════════════
     async function fetchRealTimeData() {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
       if (!currentUser) return;
 
-      // ── TRM (COP/USD) ──
       try {
         const res = await fetch('https://economia.awesomeapi.com.br/json/last/USD-COP');
         const d   = await res.json();
@@ -1582,36 +1472,37 @@
           document.getElementById('rateInput').value = parseFloat(d.USDCOP.bid).toFixed(2);
       } catch (e) { console.log('Error TRM'); }
 
-      // ── Precios de acciones (Finnhub) ──
       const fetchStockPrice = async r => {
         try {
-          const sym  = String(r.t).includes('.UK') ? String(r.t).replace('.UK', '.L') : r.t;
-          const res  = await fetch('https://finnhub.io/api/v1/quote?symbol=' + sym + '&token=' + FINNHUB_API_KEY);
+          const sym = String(r.t).includes('.UK') ? String(r.t).replace('.UK', '.L') : r.t;
+          const res = await fetch('https://finnhub.io/api/v1/quote?symbol=' + sym + '&token=' + FINNHUB_API_KEY);
           const data = await res.json();
           if (data && data.c) {
             r.px = data.c;
-            // Variación 24h: usa 'dp' directamente o la calcula con 'pc' (cierre anterior)
             if (data.dp !== undefined && data.dp !== null) {
-              r.pxChange = data.dp;
+                r.pxChange = data.dp;
             } else if (data.pc && data.pc > 0) {
-              r.pxChange = ((data.c - data.pc) / data.pc) * 100;
+                r.pxChange = ((data.c - data.pc) / data.pc) * 100;
             }
           }
         } catch (e) {}
       };
 
-      // ── Precios de cripto (Binance 24hr → fallback MEXC) ──
       const fetchCryptoPrice = async r => {
         const t = String(r.t).toUpperCase();
-        if (STABLECOINS.includes(t)) { r.px = 1.00; r.pxChange = null; return; }
+        if (STABLECOINS.includes(t)) {
+            r.px = 1.00;
+            r.pxChange = null;
+            return;
+        }
         try {
           const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=' + t + 'USDT');
           if (res.ok) {
             const d = await res.json();
             if (d.lastPrice) {
-              r.px       = parseFloat(d.lastPrice);
-              r.pxChange = parseFloat(d.priceChangePercent);
-              return;
+                r.px = parseFloat(d.lastPrice);
+                r.pxChange = parseFloat(d.priceChangePercent);
+                return;
             }
           }
           throw new Error('Not found in Binance');
@@ -1619,17 +1510,16 @@
           try {
             const res = await fetch('https://api.mexc.com/api/v3/ticker/24hr?symbol=' + t + 'USDT');
             if (res.ok) {
-              const d = await res.json();
-              if (d.lastPrice) {
-                r.px       = parseFloat(d.lastPrice);
-                r.pxChange = parseFloat(d.priceChangePercent) * 100;
-              }
+                const d = await res.json();
+                if (d.lastPrice) {
+                    r.px = parseFloat(d.lastPrice);
+                    r.pxChange = parseFloat(d.priceChangePercent) * 100;
+                }
             }
-          } catch (e) {}
+          } catch(e) {}
         }
       };
 
-      // ── Lanza todas las peticiones en paralelo ──
       try {
         await Promise.all([
           ...SW.filter(r => r.t).map(fetchStockPrice),
@@ -1641,31 +1531,29 @@
       recalc(false);
     }
 
-    // Refresco automático cada 60 segundos
     setInterval(fetchRealTimeData, 60000);
 
-    // ═══════════════════════════════════════════════════════════════
-    // 18. GENERACIÓN DEL PDF VÍA CLOUD FUNCTION
-    //     Llama al endpoint de Firebase Functions que genera el PDF
-    //     y lo envía por Telegram. Usa mode:'no-cors' para evitar
-    //     errores CORS desde el browser.
-    // ═══════════════════════════════════════════════════════════════
-    async function pedirReporte() {
+    // 🔥 AHORA RECIBE EL PARÁMETRO DE IDIOMA 🔥
+    async function pedirReporte(lang) {
       const loadingScreen = document.getElementById('pdfLoading');
-      loadingScreen.style.display = 'flex';
+      loadingScreen.style.display = 'flex'; 
 
       try {
-        await fetch(PDF_FUNCTION_URL, { method: 'GET', mode: 'no-cors' });
-
-        // La respuesta no-cors no retorna body, esperamos 2.5s como buffer
+        // Llama a la función pasándole el idioma deseado
+        await fetch(`https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte?lang=${lang}`, {
+            method: 'GET',
+            mode: 'no-cors'
+        });
+        
         setTimeout(() => {
-          loadingScreen.style.display = 'none';
-          showToast('✅ ¡Reporte en proceso! Llegará a tu Telegram en unos segundos.');
+            loadingScreen.style.display = 'none';
+            const langTexto = lang === 'en' ? 'Inglés' : 'Español';
+            showToast(`✅ ¡Reporte en ${langTexto} en proceso! Llegará a tu Telegram.`);
         }, 2500);
 
       } catch (error) {
         loadingScreen.style.display = 'none';
-        showToast('❌ Error de red. Intenta desde Telegram con /reporte');
+        showToast('❌ Ocurrió un error de red. Intenta desde Telegram con /reporte');
       }
     }
 
