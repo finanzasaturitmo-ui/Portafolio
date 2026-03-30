@@ -5,14 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mi Portafolio Pro | Sincronizado</title>
 
-  <!-- ═══════════════════════════════════════════
-       FAVICON
-  ═══════════════════════════════════════════ -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpolyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='20' fill='%2358a6ff' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E" />
 
-  <!-- ═══════════════════════════════════════════
-       LIBRERÍAS EXTERNAS
-  ═══════════════════════════════════════════ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -77,6 +71,9 @@
     .btn-logout:hover { background: var(--r); color: #fff; }
     .btn-add       { background: var(--g); color: #fff; border: none; font-size: 0.75rem; padding: 5px 12px; font-weight: 600; box-shadow: 0 0 5px rgba(63,185,80,0.3); }
     .btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63,185,80,0.6); transform: scale(1.03); }
+    /* 🔥 NUEVO BOTÓN PDF 🔥 */
+    .btn-pdf       { background: #1f6feb; color: #fff; border: none; font-size: 0.68rem; padding: 5px 10px; border-radius: 5px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 0 8px rgba(31,111,235,0.4); }
+    .btn-pdf:hover { background: #388bfd; transform: scale(1.05); }
 
     /* ═══════════════════════════════════════════
        5. CONTENEDOR PRINCIPAL Y TARJETAS (CARDS)
@@ -220,10 +217,15 @@
     .modal-btn:hover { background: #30363d; border-color: #8b949e; }
 
     /* ═══════════════════════════════════════════
-       18. TOAST (NOTIFICACIONES TEMPORALES)
+       18. TOAST Y SPINNER (NOTIFICACIONES)
     ═══════════════════════════════════════════ */
     .toast      { position: fixed; bottom: 18px; right: 18px; background: #1f6feb; color: #fff; padding: 9px 16px; border-radius: 7px; font-size: 0.78rem; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 99999; }
     .toast.show { opacity: 1; }
+
+    /* 🔥 NUEVO SPINNER DE CARGA PARA EL PDF 🔥 */
+    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 100000; backdrop-filter: blur(5px); }
+    .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--b); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     /* ═══════════════════════════════════════════
        19. RESPONSIVE — TABLETAS Y CELULARES (≤ 768px)
@@ -302,9 +304,6 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       PANTALLA DE LOGIN
-  ═══════════════════════════════════════════════════════════════ -->
   <div id="login-screen">
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width="80" height="80" style="margin-bottom:20px">
       <rect width='32' height='32' rx='7' fill='#161b22'/>
@@ -326,31 +325,25 @@
     <p style="color:#444;font-size:0.7rem;margin-top:50px">Solo acceso autorizado.</p>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       APLICACIÓN PRINCIPAL (visible tras login)
-  ═══════════════════════════════════════════════════════════════ -->
   <div id="app-content" style="display:none">
 
-    <!-- TRM oculto — usado internamente por JS para cálculos COP -->
     <input id="rateInput" value="4180" type="hidden">
 
-    <!-- HEADER -->
     <div class="hdr">
       <div>
         <h1>📊 Mi Portafolio Pro</h1>
         <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Conectando a la nube...</div>
       </div>
       <div class="hdr-right">
+        <button class="btn-pdf" onclick="pedirReporte()">📥 Descargar Extracto Mensual</button>
         <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
       </div>
     </div>
 
     <main>
 
-      <!-- TARJETAS DE RESUMEN (generadas por JS → renderCards) -->
       <div class="cards" id="cards"></div>
 
-      <!-- GRÁFICOS: Donut + Barras (generados por JS → renderCharts) -->
       <div class="charts">
         <div class="ch">
           <h3 id="lbl-donut">Distribución del Portafolio</h3>
@@ -362,21 +355,15 @@
         </div>
       </div>
 
-      <!-- PESTAÑAS DE NAVEGACIÓN (PC) -->
       <div class="view-tabs" id="view-tabs">
         <button id="btn-tab-stocks" class="view-tab active" onclick="switchTab('stocks')">📈 Portfolio Acciones</button>
         <button id="btn-tab-crypto" class="view-tab"        onclick="switchTab('crypto')">₿ Portfolio Cripto</button>
       </div>
 
-      <!-- BOTÓN FLOTANTE (solo visible en móvil) -->
       <button class="fab-btn" id="fab-btn" onclick="toggleFab()">💰</button>
 
-      <!-- ─────────────────────────────────────────
-           TAB: ACCIONES (Schwab + XTB)
-      ───────────────────────────────────────── -->
       <div id="content-stocks" class="tab-content active">
 
-        <!-- Broker: Schwab USA -->
         <div class="broker">
           <div class="bhdr sw">
             <span>🇺🇸 Schwab USA</span>
@@ -395,7 +382,6 @@
           <div class="tbl-wrap"><table id="tbl-sw"></table></div>
         </div>
 
-        <!-- Broker: XTB Europe -->
         <div class="broker">
           <div class="bhdr xt">
             <span>🇪🇺 XTB Europe</span>
@@ -414,14 +400,8 @@
           <div class="tbl-wrap"><table id="tbl-xt"></table></div>
         </div>
 
-      </div><!-- /content-stocks -->
+      </div><div id="content-crypto" class="tab-content">
 
-      <!-- ─────────────────────────────────────────
-           TAB: CRIPTOMONEDAS
-      ───────────────────────────────────────── -->
-      <div id="content-crypto" class="tab-content">
-
-        <!-- Billetera Cripto -->
         <div class="broker">
           <div class="bhdr cr">
             <span>₿🚀🪙 Criptomonedas</span>
@@ -440,10 +420,7 @@
           <div class="tbl-wrap"><table id="tbl-cr"></table></div>
         </div>
 
-      </div><!-- /content-crypto -->
-
-      <!-- PANEL DE RESUMEN CONSOLIDADO (generado por JS → renderSummary) -->
-      <div class="bottom">
+      </div><div class="bottom">
         <div class="sum-box">
           <div class="box-title" id="lbl-summary">📋 Resumen Consolidado de Acciones</div>
           <div id="sum-content"></div>
@@ -451,12 +428,7 @@
       </div>
 
     </main>
-  </div><!-- /app-content -->
-
-  <!-- ═══════════════════════════════════════════════════════════════
-       MODAL — SIMULADOR DE COMPRA
-  ═══════════════════════════════════════════════════════════════ -->
-  <div class="modal-overlay" id="simModal" onclick="if(event.target===this) closeSim('buy')">
+  </div><div class="modal-overlay" id="simModal" onclick="if(event.target===this) closeSim('buy')">
     <div class="modal">
       <h2 id="simTitle">🧮 Simulador Compra</h2>
       <div class="modal-row"><span class="modal-label">Activos actuales:</span>     <span id="simCurQty" class="modal-val">0</span></div>
@@ -493,9 +465,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       MODAL — REGISTRAR VENTA
-  ═══════════════════════════════════════════════════════════════ -->
   <div class="modal-overlay" id="sellModal" onclick="if(event.target===this) closeSim('sell')">
     <div class="modal">
       <h2 id="sellTitle">💸 Vender Activo</h2>
@@ -533,8 +502,13 @@
     </div>
   </div>
 
-  <!-- TOAST (notificaciones temporales) -->
   <div class="toast" id="toast"></div>
+
+  <div id="pdfLoading" class="loading-overlay">
+    <div class="spinner"></div>
+    <h3 style="color:var(--b);font-size:1.2rem;margin-bottom:10px">Generando Reporte...</h3>
+    <p style="color:var(--sub);text-align:center;max-width:300px">La Inteligencia Artificial está analizando tus activos y redactando tus insights.</p>
+  </div>
 
   <script>
     // ═══════════════════════════════════════════════════════════════
@@ -670,8 +644,8 @@
           } else {
             // Datos de ejemplo para usuarios nuevos
             SW = [
-              { id:1,  t:'BABA',    qty:19,      qtyFormula:'19',      inv:1460.91, invFormula:'1460.91', px:129.87, p:false, staking:false },
-              { id:2,  t:'BRK-B',   qty:7.5562,  qtyFormula:'7.5562',  inv:2974.72, invFormula:'2974.72', px:476.19, p:false, staking:false }
+              { id:1,  t:'BABA',   qty:19,      qtyFormula:'19',      inv:1460.91, invFormula:'1460.91', px:129.87, p:false, staking:false },
+              { id:2,  t:'BRK-B',  qty:7.5562,  qtyFormula:'7.5562',  inv:2974.72, invFormula:'2974.72', px:476.19, p:false, staking:false }
             ];
             XT = [
               { id:11, t:'EIMI.UK', qty:28.2244, qtyFormula:'28.2244', inv:1125.02, invFormula:'1125.02', px:46.19,  p:false, staking:false }
@@ -1508,8 +1482,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 17. PRECIOS EN TIEMPO REAL
-    //     TRM: awesomeapi  |  Acciones: Finnhub  |  Cripto: MEXC → cryptoprices.cc
+    // 17. PRECIOS EN TIEMPO REAL Y PDF MÁGICO
     // ═══════════════════════════════════════════════════════════════
     async function fetchRealTimeData() {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
@@ -1566,6 +1539,27 @@
 
     // Refresco automático cada 60 segundos
     setInterval(fetchRealTimeData, 60000);
+
+    // 🔥 LA FUNCIÓN DEL BOTÓN MÁGICO PARA EL PDF 🔥
+    async function pedirReporte() {
+      const loadingScreen = document.getElementById('pdfLoading');
+      loadingScreen.style.display = 'flex'; // Muestra la pantalla negra de carga
+
+      try {
+        // Llama a la URL de tu función de Firebase
+        const respuesta = await fetch('https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte');
+        
+        if (respuesta.ok) {
+          loadingScreen.style.display = 'none';
+          showToast('✅ ¡Reporte enviado a tu Telegram con éxito!');
+        } else {
+          throw new Error('Error en el servidor');
+        }
+      } catch (error) {
+        loadingScreen.style.display = 'none';
+        showToast('❌ Ocurrió un error. Intenta desde Telegram con /reporte');
+      }
+    }
 
   </script>
 </body>
