@@ -71,9 +71,10 @@
     .btn-logout:hover { background: var(--r); color: #fff; }
     .btn-add       { background: var(--g); color: #fff; border: none; font-size: 0.75rem; padding: 5px 12px; font-weight: 600; box-shadow: 0 0 5px rgba(63,185,80,0.3); }
     .btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63,185,80,0.6); transform: scale(1.03); }
+    
     .btn-pdf       { background: #1f6feb; color: #fff; border: none; font-size: 0.68rem; padding: 5px 10px; border-radius: 5px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 0 8px rgba(31,111,235,0.4); cursor: pointer; }
     .btn-pdf:hover { background: #388bfd; transform: scale(1.05); }
-    .btn-lang      { background: #21262d; color: #fff; border: 1px solid var(--border); font-size: 1rem; padding: 4px 8px; border-radius: 5px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 5px rgba(0,0,0,0.3); font-weight: bold; }
+    .btn-lang      { background: #21262d; color: #fff; border: 1px solid var(--border); font-size: 0.95rem; padding: 4px 8px; border-radius: 5px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 5px rgba(0,0,0,0.3); font-weight: bold; }
     .btn-lang:hover{ background: #30363d; transform: scale(1.05); }
 
     /* ═══════════════════════════════════════════
@@ -118,8 +119,8 @@
     ═══════════════════════════════════════════ */
     .broker     { background: var(--card); border: 1px solid var(--border); border-radius: 9px; margin-bottom: 12px; overflow: hidden; }
     .bhdr       { padding: 9px 14px; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
-    .bhdr.sw    { color: #79c0ff; background: linear-gradient(90deg, #1a3a5c22, transparent); }
-    .bhdr.xt    { color: #56d364; background: linear-gradient(90deg, #1a5c3a22, transparent); }
+    .bhdr.sw    { color: #79c0ff;    background: linear-gradient(90deg, #1a3a5c22, transparent); }
+    .bhdr.xt    { color: #56d364;    background: linear-gradient(90deg, #1a5c3a22, transparent); }
     .bhdr.cr    { color: var(--yellow); background: linear-gradient(90deg, #f3ba2f22, transparent); }
     .bhdr-controls { display: flex; gap: 6px; align-items: center; }
     .tbl-wrap   { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -225,7 +226,7 @@
 
     .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 100000; backdrop-filter: blur(5px); }
     .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--b); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     /* ═══════════════════════════════════════════
        19. RESPONSIVE — TABLETAS Y CELULARES (≤ 768px)
@@ -452,7 +453,7 @@
           <span id="simOutInv" style="font-weight:700;color:var(--b)">$0.00</span>
         </div>
       </div>
-
+      
       <button class="modal-btn" id="btn_conf_buy" style="background:var(--g);border-color:#2ea043" onclick="confirmBuy()">Confirmar Compra</button>
       <button class="modal-btn" id="btn_cancel_buy" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('buy')">Cancelar</button>
     </div>
@@ -491,7 +492,7 @@
           <span id="sellOutQty" style="font-weight:700;color:var(--sub)">0</span>
         </div>
       </div>
-
+      
       <button class="modal-btn" id="btn_conf_sell" style="background:var(--g);border-color:#2ea043" onclick="confirmSell()">Confirmar Venta</button>
       <button class="modal-btn" id="btn_cancel_sell" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('sell')">Cancelar</button>
     </div>
@@ -513,8 +514,6 @@
     // ═══════════════════════════════════════════════════════════════
     const FINNHUB_API_KEY = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
 
-    const PDF_FUNCTION_URL = 'https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte';
-
     const firebaseConfig = {
       apiKey:            'AIzaSyDAPrYB2pyJ7fQcMoC72DojH1ZKdzLgKwY',
       authDomain:        'mi-portafolio-cristhian.firebaseapp.com',
@@ -529,25 +528,22 @@
     const auth = firebase.auth();
     const db   = firebase.database();
 
-    // Variables Globales
     let currentUser = null;
     let currentView = 'stocks';       
-    let currentUiLang = 'es'; // Idioma base por defecto
+    let currentUiLang = 'es'; // Idioma base
     
     let SW = [], XT = [], CR = [];  
     let TRADES = [];                
     let nid = 1;                    
-    let skInvVal = 14613200;        
-    let skCurVal = 12627217;        
-    let oppStocks = 10;             
-    let oppCrypto = 20;             
+    let skInvVal = 14613200, skCurVal = 12627217;        
+    let oppStocks = 10, oppCrypto = 20;             
     let dChart = null, bChart = null, saveTimeout = null;
     let sortState = { sw: { col: null, dir: 1 }, xt: { col: null, dir: 1 }, cr: { col: null, dir: 1 } };
 
     const COLS       = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc','#f3ba2f','#8c52ff'];
     const STABLECOINS = ['USDT','USDC','EUSD'];
 
-    // 🔥 DICCIONARIO DE TRADUCCIONES WEB 🔥
+    // 🔥 DICCIONARIO 🔥
     const TRANSLATIONS = {
       es: {
         app_title: "📊 Mi Portafolio Pro", btn_logout: "Cerrar Sesión",
@@ -636,9 +632,6 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 4. AUTENTICACIÓN FIREBASE
-    // ═══════════════════════════════════════════════════════════════
     auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = user;
@@ -658,9 +651,6 @@
     }
     function cerrarSesion() { auth.signOut(); }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 5. CARGA Y GUARDADO EN FIREBASE
-    // ═══════════════════════════════════════════════════════════════
     function loadFromFirebase() {
       if (!currentUser) return;
       document.getElementById('lastSaved').textContent = currentUiLang==='en'?'Syncing...':'Sincronizando...';
@@ -675,13 +665,12 @@
             CR = (d.CR || []).filter(Boolean);
             TRADES = d.transactions || d.trades || [];
 
-            const cleanRow = (row) => {
+            const cleanRow = row => {
               if (typeof row.qty === 'string') row.qty = rv(row.qty);
               if (typeof row.inv === 'string') row.inv = rv(row.inv);
               if (!row.qty) row.qty = 0;
               if (!row.inv) row.inv = 0;
             };
-            
             SW.forEach(cleanRow);
             XT.forEach(cleanRow);
             CR.forEach(c => {
@@ -749,9 +738,6 @@
       });
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 6. NAVEGACIÓN ENTRE PESTAÑAS
-    // ═══════════════════════════════════════════════════════════════
     function toggleFab() { document.getElementById('view-tabs').classList.toggle('open'); }
 
     function switchTab(tabId) {
@@ -773,9 +759,6 @@
       recalc(false);
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 7. HISTORIAL — DESHACER / REHACER
-    // ═══════════════════════════════════════════════════════════════
     let historyArr = [], historyIndex = -1;
 
     function saveStateToHistory() {
@@ -819,9 +802,6 @@
       }
     });
 
-    // ═══════════════════════════════════════════════════════════════
-    // 8. CÁLCULOS POR FILA
-    // ═══════════════════════════════════════════════════════════════
     function skFocus(el) { saveStateToHistory(); el.value = el.id === 'skInv' ? skInvVal : skCurVal; }
     function skBlur(el, type) {
       let raw = parseFloat(String(el.value).replace(/\./g, '')) || 0;
@@ -849,9 +829,6 @@
       return row;
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 9. ORDENAMIENTO DE COLUMNAS
-    // ═══════════════════════════════════════════════════════════════
     function sortTable(tid, field) {
       const arr = tid === 'sw' ? SW : tid === 'xt' ? XT : CR;
       arr.forEach(calc);
@@ -878,9 +855,6 @@
       return `<th onclick="sortTable('${tid}','${field}')" title="${currentUiLang==='en'?'Sort by':'Ordenar por'} ${label}">${label} <span class="sort-icon ${sorted?'active':''}">${icon}</span></th>`;
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 10. MODALES — REGISTRO DE COMPRA Y VENTA
-    // ═══════════════════════════════════════════════════════════════
     let activeSimRow = null, activeSimTid = null;
 
     function openSim(tid, id) {
@@ -1022,12 +996,10 @@
 
       const D = currentUiLang === 'en' ? {
           thAsset: 'Asset', thCoin: 'Coin', thBroker: 'Broker', thQty: 'Qty.', thAvg: 'Avg Price',
-          thPx: 'Current Price', thVal: 'Value USD', thInv: 'Invested USD', thGl: '% P/L', thPnl: 'Profit',
-          next: 'next'
+          thPx: 'Current Price', thVal: 'Value USD', thInv: 'Invested USD', thGl: '% P/L', thPnl: 'Profit', next: 'next'
       } : {
           thAsset: 'Activo', thCoin: 'Moneda', thBroker: 'Broker', thQty: 'Cant.', thAvg: 'Precio Prom',
-          thPx: 'Precio Actual', thVal: 'Valor USD', thInv: 'Invertido USD', thGl: '% G/L', thPnl: 'Profit',
-          next: 'próximo'
+          thPx: 'Precio Actual', thVal: 'Valor USD', thInv: 'Invertido USD', thGl: '% G/L', thPnl: 'Profit', next: 'próximo'
       };
 
       const stakingHeader = isCrypto ? getTh(tid, 'Stake', 'staking') : '';
@@ -1068,9 +1040,7 @@
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
           <td class="drag-handle" title="Mover">☰</td>
           <td>
-            <input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t||''}"
-              placeholder="${isCrypto ? 'BTC, ETH...' : 'TICKER'}"
-              onblur="upd('${tid}',${row.id},'t',this.value)" onkeyup="if(event.key==='Enter')this.blur()">
+            <input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t||''}" placeholder="${isCrypto ? 'BTC, ETH...' : 'TICKER'}" onblur="upd('${tid}',${row.id},'t',this.value)" onkeyup="if(event.key==='Enter')this.blur()">
             ${isPend ? `<span class="badge">${D.next}</span>` : ''}
           </td>
           ${stakingTd}
@@ -1113,7 +1083,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 14. RENDERIZADO DE TARJETAS (CARDS) BILINGÜE
+    // 14. RENDERIZADO DE TARJETAS (CARDS)
     // ═══════════════════════════════════════════════════════════════
     function renderCards() {
       const rt      = rate();
@@ -1162,65 +1132,29 @@
       const wCls  = worst && worst.gl >= 0 ? 'g' : 'r';
 
       document.getElementById('cards').innerHTML =
-        '<div class="card" style="border-color:#58a6ff33">' +
-          '<div class="lbl">' + lblGlobal + '</div>' +
-          '<div class="val b">$' + f(gC) + '</div>' +
-          '<div class="s2" style="color:#8b949e;margin-top:3px">' + htmlSub + '</div>' +
-          '<div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">' + fCOP(gC * rt) + '</div>' +
-        '</div>' +
-        '<div class="card">' +
-          '<div class="lbl">' + D.cInv + '</div>' +
-          '<div class="val">' + valInvStr + '</div>' +
-          '<div class="s2" style="color:#8b949e;margin-top:3px">' + fCOP(tInv * rt) + '</div>' +
-        '</div>' +
-        '<div class="card" style="border-color:' + (tPnl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
-          '<div class="lbl">' + D.cRet + '</div>' +
-          '<div class="val ' + (tPnl >= 0 ? 'g' : 'r') + '">' + (tPnl >= 0 ? '+' : '-') + ' $' + f(Math.abs(tPnl)) + '</div>' +
-          '<div class="s2 ' + (tPct >= 0 ? 'g' : 'r') + '" style="margin-top:3px">' + (tPct >= 0 ? '+' : '') + f(tPct, 1) + ' ' + D.cRetSub + '</div>' +
-          '<div class="s2 ' + (tPnl >= 0 ? 'g' : 'r') + '" style="margin-top:2px;font-weight:600">' + (tPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(tPnl) * rt) + '</div>' +
-        '</div>' +
-        '<div class="card" style="border-color:#ffa65733">' +
-          '<div class="lbl">' + D.cTrm + '</div>' +
-          '<div class="val" style="color:#ffa657">' + f(rt, 0) + ' <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div>' +
-          '<div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">' + D.cTrmSub + '</div>' +
-          '<div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">' + D.cTrmAct + '</div>' +
-        '</div>' +
-        '<div class="card" style="border-color:' + (best && best.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
-          '<div class="lbl">' + D.cBest + '</div>' +
-          '<div class="val ' + bCls + '">' + (best ? best.t : '—') + '</div>' +
-          '<div class="s2 ' + bCls + '" style="margin-top:3px">' + (best ? (best.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(best.pnl)) : '') + '</div>' +
-          '<div class="s2 ' + bCls + '" style="margin-top:2px">' + (best ? (best.gl >= 0 ? '+' : '') + f(best.gl, 1) + '%' : '') + '</div>' +
-          '<div class="s2 hide-mob ' + bCls + '" style="margin-top:2px;font-size:.68rem">' + (best ? (best.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(best.pnl) * rt) : '') + '</div>' +
-        '</div>' +
-        '<div class="card" style="border-color:' + (worst && worst.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
-          '<div class="lbl">' + D.cWorst + '</div>' +
-          '<div class="val ' + wCls + '">' + (worst ? worst.t : '—') + '</div>' +
-          '<div class="s2 ' + wCls + '" style="margin-top:3px">' + (worst ? (worst.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(worst.pnl)) : '') + '</div>' +
-          '<div class="s2 ' + wCls + '" style="margin-top:2px">' + (worst ? f(worst.gl, 1) + '%' : '') + '</div>' +
-          '<div class="s2 hide-mob ' + wCls + '" style="margin-top:2px;font-size:.68rem">' + (worst ? (worst.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(worst.pnl) * rt) : '') + '</div>' +
-        '</div>';
+        '<div class="card" style="border-color:#58a6ff33"><div class="lbl">' + lblGlobal + '</div><div class="val b">$' + f(gC) + '</div><div class="s2" style="color:#8b949e;margin-top:3px">' + htmlSub + '</div><div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">' + fCOP(gC * rt) + '</div></div>' +
+        '<div class="card"><div class="lbl">' + D.cInv + '</div><div class="val">' + valInvStr + '</div><div class="s2" style="color:#8b949e;margin-top:3px">' + fCOP(tInv * rt) + '</div></div>' +
+        '<div class="card" style="border-color:' + (tPnl >= 0 ? '#3fb95033' : '#f7816633') + '"><div class="lbl">' + D.cRet + '</div><div class="val ' + (tPnl >= 0 ? 'g' : 'r') + '">' + (tPnl >= 0 ? '+' : '-') + ' $' + f(Math.abs(tPnl)) + '</div><div class="s2 ' + (tPct >= 0 ? 'g' : 'r') + '" style="margin-top:3px">' + (tPct >= 0 ? '+' : '') + f(tPct, 1) + ' ' + D.cRetSub + '</div><div class="s2 ' + (tPnl >= 0 ? 'g' : 'r') + '" style="margin-top:2px;font-weight:600">' + (tPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(tPnl) * rt) + '</div></div>' +
+        '<div class="card" style="border-color:#ffa65733"><div class="lbl">' + D.cTrm + '</div><div class="val" style="color:#ffa657">' + f(rt, 0) + ' <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div><div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">' + D.cTrmSub + '</div><div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">' + D.cTrmAct + '</div></div>' +
+        '<div class="card" style="border-color:' + (best && best.gl >= 0 ? '#3fb95033' : '#f7816633') + '"><div class="lbl">' + D.cBest + '</div><div class="val ' + bCls + '">' + (best ? best.t : '—') + '</div><div class="s2 ' + bCls + '" style="margin-top:3px">' + (best ? (best.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(best.pnl)) : '') + '</div><div class="s2 ' + bCls + '" style="margin-top:2px">' + (best ? (best.gl >= 0 ? '+' : '') + f(best.gl, 1) + '%' : '') + '</div><div class="s2 hide-mob ' + bCls + '" style="margin-top:2px;font-size:.68rem">' + (best ? (best.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(best.pnl) * rt) : '') + '</div></div>' +
+        '<div class="card" style="border-color:' + (worst && worst.gl >= 0 ? '#3fb95033' : '#f7816633') + '"><div class="lbl">' + D.cWorst + '</div><div class="val ' + wCls + '">' + (worst ? worst.t : '—') + '</div><div class="s2 ' + wCls + '" style="margin-top:3px">' + (worst ? (worst.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(worst.pnl)) : '') + '</div><div class="s2 ' + wCls + '" style="margin-top:2px">' + (worst ? f(worst.gl, 1) + '%' : '') + '</div><div class="s2 hide-mob ' + wCls + '" style="margin-top:2px;font-size:.68rem">' + (worst ? (worst.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(worst.pnl) * rt) : '') + '</div></div>';
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 15. RENDERIZADO DEL RESUMEN BILINGÜE
+    // 15. RENDERIZADO DEL RESUMEN
     // ═══════════════════════════════════════════════════════════════
     function renderSummary() {
       const rt = rate();
       const D = currentUiLang === 'en' ? {
-          inv: 'Invested', act: 'Current', sk: '🇨🇴 Skandia BITCOIN Portfolio ₿',
-          skCap: 'Invested Capital', skCur: 'Current Value', skRet: 'Skandia Return',
-          tInv: 'Total Invested', tEq: 'USD Equivalent', tCurCOP: 'Current Total COP', tCurUSD: 'Current Total USD',
-          crInv: '₿ Crypto Investment', tInvCr: 'Total Crypto Invested'
+          inv: 'Invested', act: 'Current', sk: '🇨🇴 Skandia BITCOIN Portfolio ₿', skCap: 'Invested Capital', skCur: 'Current Value', skRet: 'Skandia Return',
+          tInv: 'Total Invested', tEq: 'USD Equivalent', tCurCOP: 'Current Total COP', tCurUSD: 'Current Total USD', crInv: '₿ Crypto Investment', tInvCr: 'Total Crypto Invested'
       } : {
-          inv: 'Invertido', act: 'Actual', sk: '🇨🇴 Skandia Portafolio BITCOIN ₿',
-          skCap: 'Capital Invertido', skCur: 'Valor Actual', skRet: 'Rendimiento Skandia',
-          tInv: 'Total Invertido', tEq: 'Equivalente USD', tCurCOP: 'Total Actual COP', tCurUSD: 'Total Actual USD',
-          crInv: '₿ Inversión Cripto', tInvCr: 'Total Invertido Cripto'
+          inv: 'Invertido', act: 'Actual', sk: '🇨🇴 Skandia Portafolio BITCOIN ₿', skCap: 'Capital Invertido', skCur: 'Valor Actual', skRet: 'Rendimiento Skandia',
+          tInv: 'Total Invertido', tEq: 'Equivalente USD', tCurCOP: 'Total Actual COP', tCurUSD: 'Total Actual USD', crInv: '₿ Inversión Cripto', tInvCr: 'Total Invertido Cripto'
       };
 
       if (currentView === 'stocks') {
-        const sA = SW.map(calc).filter(x => x.qty > 0);
-        const xA = XT.map(calc).filter(x => x.qty > 0);
+        const sA = SW.map(calc).filter(x => x.qty > 0); const xA = XT.map(calc).filter(x => x.qty > 0);
         const sI = sA.reduce((s, x) => s + x.inv, 0),  sC = sA.reduce((s, x) => s + x.cur, 0);
         const xI = xA.reduce((s, x) => s + x.inv, 0),  xC = xA.reduce((s, x) => s + x.cur, 0);
         if (skInvVal <= 0) skInvVal = 14613200;
@@ -1231,123 +1165,31 @@
 
         document.getElementById('sum-content').innerHTML = `
           <div class="sum-grid">
-            <div class="sum-card">
-              <div style="font-size:.65rem;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">🇺🇸 Schwab USA</div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                <span style="font-size:.75rem;color:var(--sub)">${D.inv}</span>
-                <span style="font-size:.8rem;font-weight:600">$${f(sI)}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between">
-                <span style="font-size:.75rem;color:var(--sub)">${D.act}</span>
-                <span style="font-size:.8rem;font-weight:600" class="b">${fU(sC)}</span>
-              </div>
-            </div>
-            <div class="sum-card">
-              <div style="font-size:.65rem;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">🇪🇺 XTB Europe</div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                <span style="font-size:.75rem;color:var(--sub)">${D.inv}</span>
-                <span style="font-size:.8rem;font-weight:600">$${f(xI)}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between">
-                <span style="font-size:.75rem;color:var(--sub)">${D.act}</span>
-                <span style="font-size:.8rem;font-weight:600" class="b">${fU(xC)}</span>
-              </div>
-            </div>
+            <div class="sum-card"><div style="font-size:.65rem;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">🇺🇸 Schwab USA</div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.75rem;color:var(--sub)">${D.inv}</span><span style="font-size:.8rem;font-weight:600">$${f(sI)}</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:.75rem;color:var(--sub)">${D.act}</span><span style="font-size:.8rem;font-weight:600" class="b">${fU(sC)}</span></div></div>
+            <div class="sum-card"><div style="font-size:.65rem;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">🇪🇺 XTB Europe</div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.75rem;color:var(--sub)">${D.inv}</span><span style="font-size:.8rem;font-weight:600">$${f(xI)}</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:.75rem;color:var(--sub)">${D.act}</span><span style="font-size:.8rem;font-weight:600" class="b">${fU(xC)}</span></div></div>
           </div>
-
           <div class="sk-panel">
             <div class="sk-hdr"><div class="sk-title-badge">${D.sk}</div></div>
             <div class="sk-grid">
-              <div>
-                <label style="font-size:.7rem;color:var(--sub)">${D.skCap}</label>
-                <div class="sk-edit-group">
-                  <span class="sk-edit-badge">COP</span>
-                  <input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'inv')" onkeyup="if(event.key==='Enter')this.blur()">
-                </div>
-                <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ $${f(skI_USD)} USD</div>
-              </div>
-              <div>
-                <label style="font-size:.7rem;color:var(--sub)">${D.skCur}</label>
-                <div class="sk-edit-group">
-                  <span class="sk-edit-badge">COP</span>
-                  <input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'cur')" onkeyup="if(event.key==='Enter')this.blur()">
-                </div>
-                <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ ${fU(skC_USD)} USD</div>
-              </div>
+              <div><label style="font-size:.7rem;color:var(--sub)">${D.skCap}</label><div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'inv')" onkeyup="if(event.key==='Enter')this.blur()"></div><div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ $${f(skI_USD)} USD</div></div>
+              <div><label style="font-size:.7rem;color:var(--sub)">${D.skCur}</label><div class="sk-edit-group"><span class="sk-edit-badge">COP</span><input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'cur')" onkeyup="if(event.key==='Enter')this.blur()"></div><div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ ${fU(skC_USD)} USD</div></div>
             </div>
-            <div style="margin-top:12px;padding-top:12px;border-top:1px solid #3fb95022;display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:.7rem;color:var(--sub)">${D.skRet}</span>
-              <span style="font-size:.8rem;font-weight:700" class="${skPnl >= 0 ? 'g' : 'r'}">
-                ${skPnl >= 0 ? '+' : '-'} ${fCOP(Math.abs(skPnl))} (${skRet >= 0 ? '+' : ''}${f(skRet, 2)}%)
-              </span>
-            </div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid #3fb95022;display:flex;justify-content:space-between;align-items:center"><span style="font-size:.7rem;color:var(--sub)">${D.skRet}</span><span style="font-size:.8rem;font-weight:700" class="${skPnl >= 0 ? 'g' : 'r'}">${skPnl >= 0 ? '+' : '-'} ${fCOP(Math.abs(skPnl))} (${skRet >= 0 ? '+' : ''}${f(skRet, 2)}%)</span></div>
           </div>
-
           <div class="totals-panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div>
-                <div style="font-size:.75rem;color:var(--sub);margin-bottom:2px">${D.tInv}</div>
-                <div style="font-size:1.15rem;font-weight:700;color:#e6edf3;letter-spacing:.5px">${fCOP(tI_COP)}</div>
-              </div>
-              <div style="text-align:right">
-                <div style="font-size:.7rem;color:var(--sub);margin-bottom:2px">${D.tEq}</div>
-                <div style="font-size:.9rem;font-weight:600;color:var(--sub)">$${f(tI_USD)}</div>
-              </div>
-            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:.75rem;color:var(--sub);margin-bottom:2px">${D.tInv}</div><div style="font-size:1.15rem;font-weight:700;color:#e6edf3;letter-spacing:.5px">${fCOP(tI_COP)}</div></div><div style="text-align:right"><div style="font-size:.7rem;color:var(--sub);margin-bottom:2px">${D.tEq}</div><div style="font-size:.9rem;font-weight:600;color:var(--sub)">$${f(tI_USD)}</div></div></div>
             <div style="border-top:1px solid var(--border);margin:12px 0"></div>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:.8rem;color:#3fb950;font-weight:700;margin-bottom:2px">${D.tCurCOP}</div>
-                <div style="font-size:1.5rem;font-weight:800;color:#3fb950;letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(tC_COP)}</div>
-              </div>
-              <div style="text-align:right">
-                <div style="font-size:.75rem;color:var(--b);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div>
-                <div style="font-size:1.2rem;font-weight:800;color:var(--b)">$${f(tC_USD)}</div>
-              </div>
-            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:.8rem;color:#3fb950;font-weight:700;margin-bottom:2px">${D.tCurCOP}</div><div style="font-size:1.5rem;font-weight:800;color:#3fb950;letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(tC_COP)}</div></div><div style="text-align:right"><div style="font-size:.75rem;color:var(--b);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div><div style="font-size:1.2rem;font-weight:800;color:var(--b)">$${f(tC_USD)}</div></div></div>
           </div>`;
-
       } else {
         const cA = CR.map(calc).filter(x => x.qty > 0);
         const cI = cA.reduce((s, x) => s + x.inv, 0),  cC = cA.reduce((s, x) => s + x.cur, 0);
-
         document.getElementById('sum-content').innerHTML = `
-          <div class="sum-grid">
-            <div class="sum-card" style="border-color:#f3ba2f44">
-              <div style="font-size:.65rem;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">${D.crInv}</div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                <span style="font-size:.75rem;color:var(--sub)">${D.inv}</span>
-                <span style="font-size:.8rem;font-weight:600">$${f(cI)}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between">
-                <span style="font-size:.75rem;color:var(--sub)">${D.act}</span>
-                <span style="font-size:.8rem;font-weight:600" class="b">${fU(cC)}</span>
-              </div>
-            </div>
-          </div>
-
+          <div class="sum-grid"><div class="sum-card" style="border-color:#f3ba2f44"><div style="font-size:.65rem;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">${D.crInv}</div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.75rem;color:var(--sub)">${D.inv}</span><span style="font-size:.8rem;font-weight:600">$${f(cI)}</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:.75rem;color:var(--sub)">${D.act}</span><span style="font-size:.8rem;font-weight:600" class="b">${fU(cC)}</span></div></div></div>
           <div class="totals-panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div>
-                <div style="font-size:.75rem;color:var(--sub);margin-bottom:2px">${D.tInvCr}</div>
-                <div style="font-size:1.15rem;font-weight:700;color:#e6edf3;letter-spacing:.5px">${fCOP(cI * rt)}</div>
-              </div>
-              <div style="text-align:right">
-                <div style="font-size:.7rem;color:var(--sub);margin-bottom:2px">${D.tEq}</div>
-                <div style="font-size:.9rem;font-weight:600;color:var(--sub)">$${f(cI)}</div>
-              </div>
-            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:.75rem;color:var(--sub);margin-bottom:2px">${D.tInvCr}</div><div style="font-size:1.15rem;font-weight:700;color:#e6edf3;letter-spacing:.5px">${fCOP(cI * rt)}</div></div><div style="text-align:right"><div style="font-size:.7rem;color:var(--sub);margin-bottom:2px">${D.tEq}</div><div style="font-size:.9rem;font-weight:600;color:var(--sub)">$${f(cI)}</div></div></div>
             <div style="border-top:1px solid var(--border);margin:12px 0"></div>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:.8rem;color:#3fb950;font-weight:700;margin-bottom:2px">${D.tCurCOP}</div>
-                <div style="font-size:1.5rem;font-weight:800;color:#3fb950;letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(cC * rt)}</div>
-              </div>
-              <div style="text-align:right">
-                <div style="font-size:.75rem;color:var(--b);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div>
-                <div style="font-size:1.2rem;font-weight:800;color:var(--b)">$${f(cC)}</div>
-              </div>
-            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:.8rem;color:#3fb950;font-weight:700;margin-bottom:2px">${D.tCurCOP}</div><div style="font-size:1.5rem;font-weight:800;color:#3fb950;letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(cC * rt)}</div></div><div style="text-align:right"><div style="font-size:.75rem;color:var(--b);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div><div style="font-size:1.2rem;font-weight:800;color:var(--b)">$${f(cC)}</div></div></div>
           </div>`;
       }
     }
@@ -1417,7 +1259,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 17. PRECIOS EN TIEMPO REAL (FIX XTB YAHOO FINANCE)
+    // 17. PRECIOS EN TIEMPO REAL (XTB: Yahoo Finance / USA: Finnhub)
     // ═══════════════════════════════════════════════════════════════
     async function fetchRealTimeData() {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
@@ -1432,7 +1274,6 @@
       const fetchStockPrice = async r => {
         try {
           if (String(r.t).toUpperCase().includes('.UK')) {
-              // XTB EUROPE: Yahoo Finance vía proxy (Tiempo Real y Gratis)
               const sym = String(r.t).toUpperCase().replace('.UK', '.L');
               const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d')}`;
               const res = await fetch(proxyUrl);
@@ -1444,8 +1285,6 @@
                   return;
               }
           }
-          
-          // SCHWAB USA: Finnhub API
           const sym = r.t;
           const res = await fetch('https://finnhub.io/api/v1/quote?symbol=' + sym + '&token=' + FINNHUB_API_KEY);
           const data = await res.json();
@@ -1479,16 +1318,14 @@
       };
 
       try {
-        await Promise.all([
-          ...SW.filter(r => r.t).map(fetchStockPrice), ...XT.filter(r => r.t).map(fetchStockPrice), ...CR.filter(r => r.t).map(fetchCryptoPrice)
-        ]);
+        await Promise.all([...SW.filter(r => r.t).map(fetchStockPrice), ...XT.filter(r => r.t).map(fetchStockPrice), ...CR.filter(r => r.t).map(fetchCryptoPrice)]);
       } catch (e) {}
       recalc(false);
     }
     setInterval(fetchRealTimeData, 60000);
 
     // ═══════════════════════════════════════════════════════════════
-    // 18. GENERACIÓN DEL PDF BILINGÜE
+    // 18. GENERACIÓN DEL PDF
     // ═══════════════════════════════════════════════════════════════
     async function pedirReporte(lang) {
       const loadingScreen = document.getElementById('pdfLoading');
