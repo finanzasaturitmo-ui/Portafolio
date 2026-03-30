@@ -1533,20 +1533,22 @@
       const fetchStockPrice = async r => {
         try {
           if (String(r.t).toUpperCase().includes('.UK')) {
-              // XTB EUROPE: Yahoo Finance (Porcentaje de cambio 24h directo)
+              // XTB EUROPE: Usamos el endpoint V8 de Yahoo que NO bloquea conexiones
               const sym = String(r.t).toUpperCase().replace('.UK', '.L');
-              const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+sym)}`;
+              const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d')}`;
               const res = await fetch(proxyUrl);
               const data = await res.json();
-              if (data && data.quoteResponse && data.quoteResponse.result && data.quoteResponse.result.length > 0) {
-                  const quote = data.quoteResponse.result[0];
-                  r.px = quote.regularMarketPrice;
-                  r.pxChange = quote.regularMarketChangePercent; // Coge el porcentaje directo sin hacer matemáticas
-                  return;
+              
+              if (data && data.chart && data.chart.result && data.chart.result.length > 0) {
+                  const meta = data.chart.result[0].meta;
+                  r.px = meta.regularMarketPrice;
+                  // Calcula el porcentaje exacto de hoy comparando con el cierre de ayer
+                  r.pxChange = ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100;
+                  return; // Terminamos aquí para no consultar a Finnhub
               }
           }
           
-          // SCHWAB USA: Finnhub API
+          // SCHWAB USA: Sigue usando Finnhub con normalidad
           const sym = r.t;
           const res = await fetch('https://finnhub.io/api/v1/quote?symbol=' + sym + '&token=' + FINNHUB_API_KEY);
           const data = await res.json();
@@ -1555,7 +1557,9 @@
             if (data.dp !== undefined && data.dp !== null) r.pxChange = data.dp;
             else if (data.pc && data.pc > 0) r.pxChange = ((data.c - data.pc) / data.pc) * 100;
           }
-        } catch (e) {}
+        } catch (e) {
+          console.error("Error obteniendo precio para:", r.t, e);
+        }
       };
 
       const fetchCryptoPrice = async r => {
