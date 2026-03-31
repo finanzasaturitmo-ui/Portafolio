@@ -5,8 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mi Portafolio Pro | Sincronizado</title>
 
+  <!-- ═══════════════════════════════════════════
+       FAVICON
+  ═══════════════════════════════════════════ -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpolyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='20' fill='%2358a6ff' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E" />
 
+  <!-- ═══════════════════════════════════════════
+       LIBRERÍAS EXTERNAS
+  ═══════════════════════════════════════════ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -118,8 +124,8 @@
     ═══════════════════════════════════════════ */
     .broker     { background: var(--card); border: 1px solid var(--border); border-radius: 9px; margin-bottom: 12px; overflow: hidden; }
     .bhdr       { padding: 9px 14px; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
-    .bhdr.sw    { color: #79c0ff;    background: linear-gradient(90deg, #1a3a5c22, transparent); }
-    .bhdr.xt    { color: #56d364;    background: linear-gradient(90deg, #1a5c3a22, transparent); }
+    .bhdr.sw    { color: #79c0ff;       background: linear-gradient(90deg, #1a3a5c22, transparent); }
+    .bhdr.xt    { color: #56d364;       background: linear-gradient(90deg, #1a5c3a22, transparent); }
     .bhdr.cr    { color: var(--yellow); background: linear-gradient(90deg, #f3ba2f22, transparent); }
     .bhdr-controls { display: flex; gap: 6px; align-items: center; }
     .tbl-wrap   { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -134,21 +140,21 @@
     /* ═══════════════════════════════════════════
        10. INPUTS DE TABLA Y CHECKBOX DE STAKING
     ═══════════════════════════════════════════ */
-    .ci         { background: #0d1117; border: 1px solid var(--border); color: #e6edf3; border-radius: 5px; padding: 4px 7px; width: 90px; font-size: 0.8rem; outline: none; transition: 0.15s; text-align: center; }
-    .ci.wallet  { width: 110px; color: var(--sub); font-size: 0.75rem; }
-    .ci:focus   { border-color: var(--b); background: #0d1c2e; }
-    .ci.ticker  { width: 85px; text-transform: uppercase; font-weight: 700; color: var(--b); text-align: center; }
+    .ci          { background: #0d1117; border: 1px solid var(--border); color: #e6edf3; border-radius: 5px; padding: 4px 7px; width: 90px; font-size: 0.8rem; outline: none; transition: 0.15s; text-align: center; }
+    .ci.wallet   { width: 110px; color: var(--sub); font-size: 0.75rem; }
+    .ci:focus    { border-color: var(--b); background: #0d1c2e; }
+    .ci.ticker   { width: 85px; text-transform: uppercase; font-weight: 700; color: var(--b); text-align: center; }
     .pending .ci { color: var(--sub); }
     .chk-staking { transform: scale(1.3); cursor: pointer; accent-color: var(--g); margin-top: 3px; }
 
     /* ═══════════════════════════════════════════
        11. BOTONES DE ACCIÓN EN FILAS
     ═══════════════════════════════════════════ */
-    .action-btns   { display: flex; gap: 4px; justify-content: center; align-items: center; }
-    .icon-btn      { background: transparent; border: none; cursor: pointer; padding: 2px 5px; font-size: 0.95rem; transition: 0.15s; opacity: 0.7; }
+    .action-btns    { display: flex; gap: 4px; justify-content: center; align-items: center; }
+    .icon-btn       { background: transparent; border: none; cursor: pointer; padding: 2px 5px; font-size: 0.95rem; transition: 0.15s; opacity: 0.7; }
     .icon-btn:hover { opacity: 1; transform: scale(1.1); }
-    .btn-del       { color: #ff4444; opacity: 1; }
-    .btn-del:hover { color: #ff6666; }
+    .btn-del        { color: #ff4444; opacity: 1; }
+    .btn-del:hover  { color: #ff6666; }
 
     /* ═══════════════════════════════════════════
        12. DRAG & DROP (REORDENAR FILAS)
@@ -180,7 +186,7 @@
 
     /* ═══════════════════════════════════════════
        15. PANEL DE RESUMEN CONSOLIDADO
-    ════════════════════════════════════════════ */
+    ═══════════════════════════════════════════ */
     .bottom    { display: block; margin-bottom: 14px; }
     .sum-box   { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
     .box-title { font-size: 0.85rem; color: #e6edf3; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
@@ -304,6 +310,9 @@
 </head>
 <body>
 
+  <!-- ═══════════════════════════════════════════════════════════════
+       PANTALLA DE LOGIN
+  ═══════════════════════════════════════════════════════════════ -->
   <div id="login-screen">
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width="80" height="80" style="margin-bottom:20px">
       <rect width='32' height='32' rx='7' fill='#161b22'/>
@@ -325,18 +334,23 @@
     <p style="color:#444;font-size:0.7rem;margin-top:50px">Solo acceso autorizado.</p>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════
+       APLICACIÓN PRINCIPAL (visible tras login)
+  ═══════════════════════════════════════════════════════════════ -->
   <div id="app-content" style="display:none">
 
+    <!-- TRM oculto — leído internamente por JS para cálculos COP -->
     <input id="rateInput" value="4180" type="hidden">
 
+    <!-- HEADER -->
     <div class="hdr">
       <div>
         <h1 id="app-title">📊 Mi Portafolio Pro</h1>
         <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Conectando a la nube...</div>
       </div>
       <div class="hdr-right">
-        <button class="btn-pdf" onclick="pedirReporte('es')">📥 <span class="hide-mob" style="margin-right:3px;">Descargar </span>Reporte (ES)</button>
-        <button class="btn-pdf" onclick="pedirReporte('en')" style="background:#2ea043; box-shadow: 0 0 8px rgba(46,160,67,0.4)">📥 <span class="hide-mob" style="margin-right:3px;">Descargar </span>Reporte (EN)</button>
+        <button class="btn-pdf" onclick="pedirReporte('es')">📥 <span class="hide-mob" style="margin-right:3px">Descargar </span>Reporte (ES)</button>
+        <button class="btn-pdf" onclick="pedirReporte('en')" style="background:#2ea043;box-shadow:0 0 8px rgba(46,160,67,0.4)">📥 <span class="hide-mob" style="margin-right:3px">Descargar </span>Reporte (EN)</button>
         <button class="btn-lang" id="btn-toggle-lang" onclick="toggleLanguage()" title="Cambiar Idioma">🇺🇸 EN</button>
         <button class="btn-logout" id="btnLogout" onclick="cerrarSesion()">Cerrar Sesión</button>
       </div>
@@ -344,28 +358,37 @@
 
     <main>
 
+      <!-- TARJETAS DE RESUMEN (generadas por renderCards) -->
       <div class="cards" id="cards"></div>
 
+      <!-- GRÁFICOS (generados por renderCharts) -->
       <div class="charts">
         <div class="ch">
           <h3 id="lbl-donut">Distribución del Portafolio</h3>
           <div class="ch-wrap"><canvas id="donut"></canvas></div>
         </div>
         <div class="ch">
+          <!-- ⚠️ FIX: lbl-bar ahora se actualiza en renderCharts() con el idioma activo -->
           <h3 id="lbl-bar">Rendimiento % G/L</h3>
           <div class="ch-wrap" id="bar-wrap"><canvas id="bar"></canvas></div>
         </div>
       </div>
 
+      <!-- PESTAÑAS DE NAVEGACIÓN (PC) -->
       <div class="view-tabs" id="view-tabs">
         <button id="btn-tab-stocks" class="view-tab active" onclick="switchTab('stocks')">📈 Portfolio Acciones</button>
         <button id="btn-tab-crypto" class="view-tab"        onclick="switchTab('crypto')">₿ Portfolio Cripto</button>
       </div>
 
+      <!-- BOTÓN FLOTANTE (solo visible en móvil) -->
       <button class="fab-btn" id="fab-btn" onclick="toggleFab()">💰</button>
 
+      <!-- ─────────────────────────────────────────
+           TAB: ACCIONES (Schwab + XTB)
+      ───────────────────────────────────────── -->
       <div id="content-stocks" class="tab-content active">
 
+        <!-- Broker: Schwab USA -->
         <div class="broker">
           <div class="bhdr sw">
             <span>🇺🇸 Schwab USA</span>
@@ -384,6 +407,7 @@
           <div class="tbl-wrap"><table id="tbl-sw"></table></div>
         </div>
 
+        <!-- Broker: XTB Europe -->
         <div class="broker">
           <div class="bhdr xt">
             <span>🇪🇺 XTB Europe</span>
@@ -402,8 +426,14 @@
           <div class="tbl-wrap"><table id="tbl-xt"></table></div>
         </div>
 
-      </div><div id="content-crypto" class="tab-content">
+      </div><!-- /content-stocks -->
 
+      <!-- ─────────────────────────────────────────
+           TAB: CRIPTOMONEDAS
+      ───────────────────────────────────────── -->
+      <div id="content-crypto" class="tab-content">
+
+        <!-- Billetera Cripto -->
         <div class="broker">
           <div class="bhdr cr">
             <span>₿🚀🪙 Criptomonedas</span>
@@ -422,15 +452,24 @@
           <div class="tbl-wrap"><table id="tbl-cr"></table></div>
         </div>
 
-      </div><div class="bottom">
+      </div><!-- /content-crypto -->
+
+      <!-- PANEL DE RESUMEN CONSOLIDADO (generado por renderSummary) -->
+      <div class="bottom">
         <div class="sum-box">
+          <!-- ⚠️ FIX: lbl-summary ahora se actualiza en renderSummary() con idioma + vista activa -->
           <div class="box-title" id="lbl-summary">📋 Resumen Consolidado de Acciones</div>
           <div id="sum-content"></div>
         </div>
       </div>
 
     </main>
-  </div><div class="modal-overlay" id="buyModal" onclick="if(event.target===this) closeSim('buy')">
+  </div><!-- /app-content -->
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       MODAL — REGISTRAR COMPRA
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="buyModal" onclick="if(event.target===this) closeSim('buy')">
     <div class="modal">
       <h2><span id="simTitleBuyText">🛒 Registrar Compra</span>: <span style="color:#e6edf3;margin-left:5px" id="simTitleBuyAsset"></span></h2>
       <div class="modal-row"><span class="modal-label" id="lbl_buy_cur_qty">Activos actuales:</span>    <span id="simCurQty" class="modal-val">0</span></div>
@@ -464,11 +503,14 @@
         </div>
       </div>
 
-      <button class="modal-btn" id="btn_conf_buy" style="background:var(--g);border-color:#2ea043" onclick="confirmBuy()">Confirmar Compra</button>
-      <button class="modal-btn" id="btn_cancel_buy" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('buy')">Cancelar</button>
+      <button class="modal-btn" id="btn_conf_buy"    style="background:var(--g);border-color:#2ea043" onclick="confirmBuy()">Confirmar Compra</button>
+      <button class="modal-btn" id="btn_cancel_buy"  style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('buy')">Cancelar</button>
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════
+       MODAL — REGISTRAR VENTA
+  ═══════════════════════════════════════════════════════════════ -->
   <div class="modal-overlay" id="sellModal" onclick="if(event.target===this) closeSim('sell')">
     <div class="modal">
       <h2><span id="simTitleSellText">💸 Registrar Venta</span>: <span style="color:#e6edf3;margin-left:5px" id="simTitleSellAsset"></span></h2>
@@ -503,13 +545,15 @@
         </div>
       </div>
 
-      <button class="modal-btn" id="btn_conf_sell" style="background:var(--g);border-color:#2ea043" onclick="confirmSell()">Confirmar Venta</button>
+      <button class="modal-btn" id="btn_conf_sell"   style="background:var(--g);border-color:#2ea043" onclick="confirmSell()">Confirmar Venta</button>
       <button class="modal-btn" id="btn_cancel_sell" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('sell')">Cancelar</button>
     </div>
   </div>
 
+  <!-- TOAST (notificaciones temporales) -->
   <div class="toast" id="toast"></div>
 
+  <!-- SPINNER — visible mientras se genera el PDF -->
   <div id="pdfLoading" class="loading-overlay">
     <div class="spinner"></div>
     <h3 id="lbl_loading_title" style="color:var(--b);font-size:1.2rem;margin-bottom:10px">Generando Reporte...</h3>
@@ -520,10 +564,9 @@
 
   <script>
     // ═══════════════════════════════════════════════════════════════
-    // 1. CONFIGURACIÓN Y DICCIONARIO BILINGÜE
+    // 1. CONFIGURACIÓN — LLAVES, FIREBASE Y CONSTANTES
     // ═══════════════════════════════════════════════════════════════
-    const FINNHUB_API_KEY = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
-
+    const FINNHUB_API_KEY  = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
     const PDF_FUNCTION_URL = 'https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte';
 
     const firebaseConfig = {
@@ -540,99 +583,127 @@
     const auth = firebase.auth();
     const db   = firebase.database();
 
-    // Variables Globales
-    let currentUser = null;
-    let currentView = 'stocks';       
-    let currentUiLang = 'es'; // Idioma base por defecto
-    
-    let SW = [], XT = [], CR = [];  
-    let TRADES = [];                
-    let nid = 1;                    
-    let skInvVal = 14613200;        
-    let skCurVal = 12627217;        
-    let oppStocks = 10;             
-    let oppCrypto = 20;             
+    // ═══════════════════════════════════════════════════════════════
+    // 2. VARIABLES GLOBALES
+    // ═══════════════════════════════════════════════════════════════
+    let currentUser    = null;
+    let currentView    = 'stocks';    // pestaña activa: 'stocks' | 'crypto'
+    let currentUiLang  = 'es';        // idioma activo: 'es' | 'en'
+    let SW = [], XT = [], CR = [];    // posiciones Schwab, XTB y Cripto
+    let TRADES = [];                  // historial de transacciones (compras/ventas)
+    let nid = 1;                      // contador de IDs únicos para filas nuevas
+    let skInvVal = 14613200;          // Skandia: capital invertido (COP)
+    let skCurVal = 12627217;          // Skandia: valor actual (COP)
+    let oppStocks = 10;               // umbral de oportunidad acciones (%)
+    let oppCrypto = 20;               // umbral de oportunidad cripto (%)
     let dChart = null, bChart = null, saveTimeout = null;
-    let sortState = { sw: { col: null, dir: 1 }, xt: { col: null, dir: 1 }, cr: { col: null, dir: 1 } };
+    let sortState = {
+      sw: { col: null, dir: 1 },
+      xt: { col: null, dir: 1 },
+      cr: { col: null, dir: 1 }
+    };
 
-    const COLS       = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc','#f3ba2f','#8c52ff'];
+    const COLS        = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc','#f3ba2f','#8c52ff'];
     const STABLECOINS = ['USDT','USDC','EUSD'];
 
-    // 🔥 DICCIONARIO DE TRADUCCIONES WEB 🔥
+    // ═══════════════════════════════════════════════════════════════
+    // 3. SISTEMA BILINGÜE — DICCIONARIO Y FUNCIONES DE TRADUCCIÓN
+    // ═══════════════════════════════════════════════════════════════
     const TRANSLATIONS = {
       es: {
-        app_title: "📊 Mi Portafolio Pro", btn_logout: "Cerrar Sesión",
-        tab_stocks: "📈 Portfolio Acciones", tab_crypto: "₿ Portfolio Cripto",
-        undo: "Deshacer", redo: "Rehacer", add_asset: "+ Agregar activo", add_crypto: "+ Agregar Cripto",
-        sim_buy_title: "🛒 Registrar Compra", sim_buy_cur_qty: "Activos actuales:", sim_buy_cur_avg: "Precio Prom. actual:",
-        sim_buy_px: "Precio de compra ($):", sim_buy_inv: "Inversión (USD):", sim_buy_qty: "Cantidad a sumar:",
-        sim_buy_new_avg: "Nuevo Promedio:", sim_buy_new_inv: "Nueva Inv. Total:", btn_conf_buy: "Confirmar Compra", btn_cancel: "Cancelar",
-        sim_sell_title: "💸 Registrar Venta", sim_sell_cur_qty: "Activos Disponibles:", sim_sell_cur_avg: "Precio Prom. Original:",
-        sim_sell_px: "Precio de venta ($):", sim_sell_inv: "Valor a retirar (USD):", sim_sell_qty: "Cantidad a restar:",
-        sim_sell_pnl: "Profit/Pérdida de la Venta:", sim_sell_rem: "Activos restantes:", btn_conf_sell: "Confirmar Venta",
-        loading_title: "Generando Reporte...", loading_desc: "La Inteligencia Artificial está analizando tus activos y redactando tus insights."
+        app_title:        '📊 Mi Portafolio Pro',       btn_logout:       'Cerrar Sesión',
+        tab_stocks:       '📈 Portfolio Acciones',       tab_crypto:       '₿ Portfolio Cripto',
+        undo:             'Deshacer',                    redo:             'Rehacer',
+        add_asset:        '+ Agregar activo',            add_crypto:       '+ Agregar Cripto',
+        // Modal Compra
+        sim_buy_title:    '🛒 Registrar Compra',         sim_buy_cur_qty:  'Activos actuales:',
+        sim_buy_cur_avg:  'Precio Prom. actual:',        sim_buy_px:       'Precio de compra ($):',
+        sim_buy_inv:      'Inversión (USD):',             sim_buy_qty:      'Cantidad a sumar:',
+        sim_buy_new_avg:  'Nuevo Promedio:',              sim_buy_new_inv:  'Nueva Inv. Total:',
+        btn_conf_buy:     'Confirmar Compra',             btn_cancel:       'Cancelar',
+        // Modal Venta
+        sim_sell_title:   '💸 Registrar Venta',          sim_sell_cur_qty: 'Activos Disponibles:',
+        sim_sell_cur_avg: 'Precio Prom. Original:',      sim_sell_px:      'Precio de venta ($):',
+        sim_sell_inv:     'Valor a retirar (USD):',       sim_sell_qty:     'Cantidad a restar:',
+        sim_sell_pnl:     'Profit/Pérdida de la Venta:', sim_sell_rem:     'Activos restantes:',
+        btn_conf_sell:    'Confirmar Venta',
+        // Loading
+        loading_title:    'Generando Reporte...',
+        loading_desc:     'La Inteligencia Artificial está analizando tus activos y redactando tus insights.'
       },
       en: {
-        app_title: "📊 My Portfolio Pro", btn_logout: "Logout",
-        tab_stocks: "📈 Stocks Portfolio", tab_crypto: "₿ Crypto Portfolio",
-        undo: "Undo", redo: "Redo", add_asset: "+ Add asset", add_crypto: "+ Add Crypto",
-        sim_buy_title: "🛒 Register Buy", sim_buy_cur_qty: "Current assets:", sim_buy_cur_avg: "Current Avg Price:",
-        sim_buy_px: "Buy Price ($):", sim_buy_inv: "Investment (USD):", sim_buy_qty: "Quantity to add:",
-        sim_buy_new_avg: "New Avg Price:", sim_buy_new_inv: "New Total Inv.:", btn_conf_buy: "Confirm Buy", btn_cancel: "Cancel",
-        sim_sell_title: "💸 Register Sell", sim_sell_cur_qty: "Available assets:", sim_sell_cur_avg: "Original Avg Price:",
-        sim_sell_px: "Sell Price ($):", sim_sell_inv: "Value to withdraw (USD):", sim_sell_qty: "Quantity to subtract:",
-        sim_sell_pnl: "Trade Profit/Loss:", sim_sell_rem: "Remaining assets:", btn_conf_sell: "Confirm Sell",
-        loading_title: "Generating Report...", loading_desc: "Artificial Intelligence is analyzing your assets and drafting your insights."
+        app_title:        '📊 My Portfolio Pro',         btn_logout:       'Logout',
+        tab_stocks:       '📈 Stocks Portfolio',          tab_crypto:       '₿ Crypto Portfolio',
+        undo:             'Undo',                         redo:             'Redo',
+        add_asset:        '+ Add asset',                  add_crypto:       '+ Add Crypto',
+        // Buy Modal
+        sim_buy_title:    '🛒 Register Buy',              sim_buy_cur_qty:  'Current assets:',
+        sim_buy_cur_avg:  'Current Avg Price:',           sim_buy_px:       'Buy Price ($):',
+        sim_buy_inv:      'Investment (USD):',             sim_buy_qty:      'Quantity to add:',
+        sim_buy_new_avg:  'New Avg Price:',               sim_buy_new_inv:  'New Total Inv.:',
+        btn_conf_buy:     'Confirm Buy',                   btn_cancel:       'Cancel',
+        // Sell Modal
+        sim_sell_title:   '💸 Register Sell',             sim_sell_cur_qty: 'Available assets:',
+        sim_sell_cur_avg: 'Original Avg Price:',          sim_sell_px:      'Sell Price ($):',
+        sim_sell_inv:     'Value to withdraw (USD):',      sim_sell_qty:     'Quantity to subtract:',
+        sim_sell_pnl:     'Trade Profit/Loss:',           sim_sell_rem:     'Remaining assets:',
+        btn_conf_sell:    'Confirm Sell',
+        // Loading
+        loading_title:    'Generating Report...',
+        loading_desc:     'Artificial Intelligence is analyzing your assets and drafting your insights.'
       }
     };
 
+    /** Aplica el diccionario activo a todos los elementos de la UI con id fijo */
     function translateUI() {
       const T = TRANSLATIONS[currentUiLang];
-      document.getElementById('app-title').innerText = T.app_title;
-      document.getElementById('btnLogout').innerText = T.btn_logout;
-      document.getElementById('btn-tab-stocks').innerHTML = T.tab_stocks;
-      document.getElementById('btn-tab-crypto').innerHTML = T.tab_crypto;
-      
+      document.getElementById('app-title').innerText        = T.app_title;
+      document.getElementById('btnLogout').innerText         = T.btn_logout;
+      document.getElementById('btn-tab-stocks').innerHTML    = T.tab_stocks;
+      document.getElementById('btn-tab-crypto').innerHTML    = T.tab_crypto;
       document.querySelectorAll('.lbl-undo').forEach(e => e.innerText = T.undo);
       document.querySelectorAll('.lbl-redo').forEach(e => e.innerText = T.redo);
-      document.querySelectorAll('.btn-add-stock').forEach(e => e.innerText = T.add_asset);
+      document.querySelectorAll('.btn-add-stock').forEach(e => e.innerText  = T.add_asset);
       document.querySelectorAll('.btn-add-crypto').forEach(e => e.innerText = T.add_crypto);
-
-      document.getElementById('simTitleBuyText').innerText = T.sim_buy_title;
-      document.getElementById('lbl_buy_cur_qty').innerText = T.sim_buy_cur_qty;
-      document.getElementById('lbl_buy_cur_avg').innerText = T.sim_buy_cur_avg;
-      document.getElementById('lbl_buy_px').innerText = T.sim_buy_px;
-      document.getElementById('lbl_buy_inv').innerText = T.sim_buy_inv;
-      document.getElementById('lbl_buy_qty').innerText = T.sim_buy_qty;
-      document.getElementById('lbl_buy_new_avg').innerText = T.sim_buy_new_avg;
-      document.getElementById('lbl_buy_new_inv').innerText = T.sim_buy_new_inv;
-      document.getElementById('btn_conf_buy').innerText = T.btn_conf_buy;
-      document.getElementById('btn_cancel_buy').innerText = T.btn_cancel;
-
-      document.getElementById('simTitleSellText').innerText = T.sim_sell_title;
-      document.getElementById('lbl_sell_cur_qty').innerText = T.sim_sell_cur_qty;
-      document.getElementById('lbl_sell_cur_avg').innerText = T.sim_sell_cur_avg;
-      document.getElementById('lbl_sell_px').innerText = T.sim_sell_px;
-      document.getElementById('lbl_sell_inv').innerText = T.sim_sell_inv;
-      document.getElementById('lbl_sell_qty').innerText = T.sim_sell_qty;
-      document.getElementById('lbl_sell_pnl').innerText = T.sim_sell_pnl;
-      document.getElementById('lbl_sell_rem').innerText = T.sim_sell_rem;
-      document.getElementById('btn_conf_sell').innerText = T.btn_conf_sell;
-      document.getElementById('btn_cancel_sell').innerText = T.btn_cancel;
-
+      // Modal Compra
+      document.getElementById('simTitleBuyText').innerText   = T.sim_buy_title;
+      document.getElementById('lbl_buy_cur_qty').innerText   = T.sim_buy_cur_qty;
+      document.getElementById('lbl_buy_cur_avg').innerText   = T.sim_buy_cur_avg;
+      document.getElementById('lbl_buy_px').innerText        = T.sim_buy_px;
+      document.getElementById('lbl_buy_inv').innerText       = T.sim_buy_inv;
+      document.getElementById('lbl_buy_qty').innerText       = T.sim_buy_qty;
+      document.getElementById('lbl_buy_new_avg').innerText   = T.sim_buy_new_avg;
+      document.getElementById('lbl_buy_new_inv').innerText   = T.sim_buy_new_inv;
+      document.getElementById('btn_conf_buy').innerText      = T.btn_conf_buy;
+      document.getElementById('btn_cancel_buy').innerText    = T.btn_cancel;
+      // Modal Venta
+      document.getElementById('simTitleSellText').innerText  = T.sim_sell_title;
+      document.getElementById('lbl_sell_cur_qty').innerText  = T.sim_sell_cur_qty;
+      document.getElementById('lbl_sell_cur_avg').innerText  = T.sim_sell_cur_avg;
+      document.getElementById('lbl_sell_px').innerText       = T.sim_sell_px;
+      document.getElementById('lbl_sell_inv').innerText      = T.sim_sell_inv;
+      document.getElementById('lbl_sell_qty').innerText      = T.sim_sell_qty;
+      document.getElementById('lbl_sell_pnl').innerText      = T.sim_sell_pnl;
+      document.getElementById('lbl_sell_rem').innerText      = T.sim_sell_rem;
+      document.getElementById('btn_conf_sell').innerText     = T.btn_conf_sell;
+      document.getElementById('btn_cancel_sell').innerText   = T.btn_cancel;
+      // Spinner PDF
       document.getElementById('lbl_loading_title').innerText = T.loading_title;
-      document.getElementById('lbl_loading_desc').innerText = T.loading_desc;
+      document.getElementById('lbl_loading_desc').innerText  = T.loading_desc;
     }
 
+    /** Cambia el idioma de la UI entre ES ↔ EN y re-renderiza todo */
     function toggleLanguage() {
       currentUiLang = currentUiLang === 'es' ? 'en' : 'es';
-      const btn = document.getElementById('btn-toggle-lang');
-      // Muestra la bandera del idioma al que te vas a cambiar
-      btn.innerHTML = currentUiLang === 'es' ? '🇺🇸 EN' : '🇨🇴 ES';
+      // Muestra la bandera del idioma al que se puede cambiar
+      document.getElementById('btn-toggle-lang').innerHTML = currentUiLang === 'es' ? '🇺🇸 EN' : '🇨🇴 ES';
       translateUI();
-      recalc(false); 
+      recalc(false);
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // 4. UTILIDADES DE FORMATO
+    // ═══════════════════════════════════════════════════════════════
     const f     = (n, d=2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO', { minimumFractionDigits:d, maximumFractionDigits:d }).format(n);
     const fCOP  = n        => new Intl.NumberFormat('es-CO', { minimumFractionDigits:0, maximumFractionDigits:0 }).format(n) + ' COP';
     const fU    = (n, d=2) => (n < 0 ? '-' : '') + '$' + f(Math.abs(n), d);
@@ -649,7 +720,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 4. AUTENTICACIÓN FIREBASE
+    // 5. AUTENTICACIÓN FIREBASE
     // ═══════════════════════════════════════════════════════════════
     auth.onAuthStateChanged(user => {
       if (user) {
@@ -672,20 +743,21 @@
     function cerrarSesion() { auth.signOut(); }
 
     // ═══════════════════════════════════════════════════════════════
-    // 5. CARGA Y GUARDADO EN FIREBASE
+    // 6. CARGA Y GUARDADO EN FIREBASE
     // ═══════════════════════════════════════════════════════════════
     function loadFromFirebase() {
       if (!currentUser) return;
-      document.getElementById('lastSaved').textContent = currentUiLang==='en'?'Syncing...':'Sincronizando...';
+      document.getElementById('lastSaved').textContent = currentUiLang === 'en' ? 'Syncing...' : 'Sincronizando...';
 
       db.ref('users/' + currentUser.uid).once('value').then(snap => {
         try {
           if (snap.exists()) {
             const d = snap.val();
 
-            SW = (d.SW || []).filter(Boolean);
-            XT = (d.XT || []).filter(Boolean);
-            CR = (d.CR || []).filter(Boolean);
+            // Filtro anti-fantasmas + normalización de tipos
+            SW     = (d.SW || []).filter(Boolean);
+            XT     = (d.XT || []).filter(Boolean);
+            CR     = (d.CR || []).filter(Boolean);
             TRADES = d.transactions || d.trades || [];
 
             const cleanRow = row => {
@@ -707,6 +779,7 @@
 
             if (d.rate) document.getElementById('rateInput').value = d.rate;
 
+            // Actualiza TRM al cargar (awesomeapi)
             fetch('https://economia.awesomeapi.com.br/json/last/USD-COP')
               .then(r => r.json())
               .then(data => {
@@ -717,17 +790,19 @@
             if (d.skInv) skInvVal = parseFloat(d.skInv);
             if (d.skCur) skCurVal = parseFloat(d.skCur);
 
+            // Compatibilidad con versión anterior (un solo campo 'opp')
             oppStocks = d.oppStocks !== undefined ? parseFloat(d.oppStocks) : (d.opp ? parseFloat(d.opp) : 10);
             oppCrypto = d.oppCrypto !== undefined ? parseFloat(d.oppCrypto) : (d.opp ? parseFloat(d.opp) : 20);
             document.querySelectorAll('.opp-stocks').forEach(el => el.value = oppStocks);
             document.querySelectorAll('.opp-crypto').forEach(el => el.value = oppCrypto);
 
-            if (d.ts) document.getElementById('lastSaved').textContent = (currentUiLang==='en'?'Cloud OK: ':'Nube OK: ') + new Date(d.ts).toLocaleTimeString('es-CO');
+            if (d.ts) document.getElementById('lastSaved').textContent = (currentUiLang === 'en' ? 'Cloud OK: ' : 'Nube OK: ') + new Date(d.ts).toLocaleTimeString('es-CO');
 
           } else {
+            // Datos de ejemplo para usuarios nuevos
             SW = [
-              { id:1,  t:'BABA',   qty:19,      inv:1460.91, px:129.87, p:false, staking:false },
-              { id:2,  t:'BRK-B',  qty:7.5562,  inv:2974.72, px:476.19, p:false, staking:false }
+              { id:1,  t:'BABA',    qty:19,      inv:1460.91, px:129.87, p:false, staking:false },
+              { id:2,  t:'BRK-B',   qty:7.5562,  inv:2974.72, px:476.19, p:false, staking:false }
             ];
             XT = [
               { id:11, t:'EIMI.UK', qty:28.2244, inv:1125.02, px:46.19,  p:false, staking:false }
@@ -738,7 +813,7 @@
               { id:43, t:'USDT', wallet:'Binance', qty:0, inv:0, px:1, p:true, staking:false }
             ];
             TRADES = [];
-            nid = 50;
+            nid    = 50;
           }
 
           fetchRealTimeData();
@@ -746,42 +821,49 @@
           recalc(true);
 
         } catch (err) { console.error('Error al procesar datos:', err); }
-      }).catch(e => { console.error(e); showToast(currentUiLang==='en'?'❌ Cloud sync error':'❌ Error al descargar de la nube'); });
+      }).catch(e => { console.error(e); showToast(currentUiLang === 'en' ? '❌ Cloud sync error' : '❌ Error al descargar de la nube'); });
     }
 
     function saveDataToFirebase() {
       if (!currentUser) return;
       db.ref('users/' + currentUser.uid).set({
         SW, XT, CR,
-        transactions: TRADES,  
+        transactions: TRADES,  // historial de compras/ventas
         rate:      document.getElementById('rateInput').value,
         oppStocks, oppCrypto,
         skInv:     skInvVal,
         skCur:     skCurVal,
         ts:        new Date().toISOString()
       }).then(() => {
-        document.getElementById('lastSaved').textContent = (currentUiLang==='en'?'Cloud synced: ':'Nube sincronizada: ') + new Date().toLocaleTimeString('es-CO');
+        document.getElementById('lastSaved').textContent = (currentUiLang === 'en' ? 'Cloud synced: ' : 'Nube sincronizada: ') + new Date().toLocaleTimeString('es-CO');
       });
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 6. NAVEGACIÓN ENTRE PESTAÑAS
+    // 7. NAVEGACIÓN ENTRE PESTAÑAS
     // ═══════════════════════════════════════════════════════════════
+
+    /** Abre/cierra el menú flotante de pestañas (solo móvil) */
     function toggleFab() {
       document.getElementById('view-tabs').classList.toggle('open');
     }
 
     function switchTab(tabId) {
       currentView = tabId;
+
       document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('btn-tab-' + tabId).classList.add('active');
       document.getElementById('content-' + tabId).classList.add('active');
 
-      document.getElementById('lbl-donut').textContent   = tabId === 'stocks' ? (currentUiLang==='en'?'Stocks Distribution':'Distribución de Acciones') : (currentUiLang==='en'?'Crypto Distribution':'Distribución Cripto');
-      document.getElementById('lbl-summary').textContent = tabId === 'stocks' ? (currentUiLang==='en'?'📋 Consolidated Stocks Summary':'📋 Resumen Consolidado de Acciones') : (currentUiLang==='en'?'📋 Consolidated Crypto Summary':'📋 Resumen Consolidado Cripto');
+      // Actualiza etiquetas del gráfico donut según idioma y pestaña
+      document.getElementById('lbl-donut').textContent = tabId === 'stocks'
+        ? (currentUiLang === 'en' ? 'Stocks Distribution' : 'Distribución de Acciones')
+        : (currentUiLang === 'en' ? 'Crypto Distribution' : 'Distribución Cripto');
 
       document.getElementById('view-tabs').classList.remove('open');
+
+      // Color del FAB según destino
       const fab = document.getElementById('fab-btn');
       if (fab) {
         fab.style.borderColor = tabId === 'stocks' ? 'var(--yellow)' : 'var(--g)';
@@ -789,11 +871,12 @@
           ? '0 8px 20px rgba(0,0,0,0.6), 0 0 12px rgba(243,186,47,0.5)'
           : '0 8px 20px rgba(0,0,0,0.6), 0 0 12px rgba(63,185,80,0.5)';
       }
+
       recalc(false);
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 7. HISTORIAL — DESHACER / REHACER
+    // 8. HISTORIAL — DESHACER / REHACER
     // ═══════════════════════════════════════════════════════════════
     let historyArr = [], historyIndex = -1;
 
@@ -836,12 +919,13 @@
     }
 
     function undo() {
-      if (historyIndex > 0) { historyIndex--; applyState(historyArr[historyIndex]); showToast(currentUiLang==='en'?'↩️ Undone':'↩️ Deshecho'); updateUndoRedoButtons(); }
+      if (historyIndex > 0)                   { historyIndex--; applyState(historyArr[historyIndex]); showToast(currentUiLang === 'en' ? '↩️ Undone' : '↩️ Deshecho'); updateUndoRedoButtons(); }
     }
     function redo() {
-      if (historyIndex < historyArr.length-1) { historyIndex++; applyState(historyArr[historyIndex]); showToast(currentUiLang==='en'?'↪️ Redone':'↪️ Rehecho'); updateUndoRedoButtons(); }
+      if (historyIndex < historyArr.length-1) { historyIndex++; applyState(historyArr[historyIndex]); showToast(currentUiLang === 'en' ? '↪️ Redone' : '↪️ Rehecho'); updateUndoRedoButtons(); }
     }
 
+    // Atajos de teclado Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y
     document.addEventListener('keydown', e => {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
       if (e.ctrlKey || e.metaKey) {
@@ -851,18 +935,21 @@
     });
 
     // ═══════════════════════════════════════════════════════════════
-    // 8. CÁLCULOS POR FILA
+    // 9. CÁLCULOS POR FILA
     // ═══════════════════════════════════════════════════════════════
+
+    // ── Skandia (inputs COP) ──
     function skFocus(el) {
       saveStateToHistory();
       el.value = el.id === 'skInv' ? skInvVal : skCurVal;
     }
     function skBlur(el, type) {
-      let raw = parseFloat(String(el.value).replace(/\./g, '')) || 0;
+      const raw = parseFloat(String(el.value).replace(/\./g, '')) || 0;
       if (type === 'inv') skInvVal = raw; else skCurVal = raw;
       recalc();
     }
 
+    /** Actualiza el umbral de oportunidad de compra (%) para acciones o cripto */
     function updateOpp(tab, val) {
       saveStateToHistory();
       const v = rv(val);
@@ -871,62 +958,55 @@
       recalc();
     }
 
+    /** Calcula avg, cur, gl, pnl de una fila. Las stablecoins siempre valen $1.00 */
     function calc(row) {
       if (!row.qty) row.qty = 0;
       if (!row.inv) row.inv = 0;
-
-      if (STABLECOINS.includes(String(row.t).toUpperCase())) {
-        row.px = 1.00;
-        row.pxChange = null;
-      }
-
-      const cur = row.qty * (row.px || 0);
-      const avg = row.qty > 0 ? row.inv / row.qty : 0;
-      row.avg = avg;
-      row.cur = cur;
-      row.gl  = row.inv > 0 ? (cur - row.inv) / row.inv * 100 : 0;
-      row.pnl = cur - row.inv;
+      if (STABLECOINS.includes(String(row.t).toUpperCase())) { row.px = 1.00; row.pxChange = null; }
+      const cur  = row.qty * (row.px || 0);
+      const avg  = row.qty > 0 ? row.inv / row.qty : 0;
+      row.avg    = avg;
+      row.cur    = cur;
+      row.gl     = row.inv > 0 ? (cur - row.inv) / row.inv * 100 : 0;
+      row.pnl    = cur - row.inv;
       return row;
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 9. ORDENAMIENTO DE COLUMNAS
+    // 10. ORDENAMIENTO DE COLUMNAS
     // ═══════════════════════════════════════════════════════════════
     function sortTable(tid, field) {
       const arr = tid === 'sw' ? SW : tid === 'xt' ? XT : CR;
       arr.forEach(calc);
-
       if (sortState[tid].col === field) sortState[tid].dir *= -1;
       else { sortState[tid].col = field; sortState[tid].dir = -1; }
-
       const dir = sortState[tid].dir;
       arr.sort((a, b) => {
         let vA = a[field], vB = b[field];
-        if (field === 't' || field === 'wallet') {
-          vA = String(vA||''); vB = String(vB||'');
-          return vA.localeCompare(vB) * dir;
-        }
+        if (field === 't' || field === 'wallet') { vA = String(vA||''); vB = String(vB||''); return vA.localeCompare(vB) * dir; }
         if (field === 'staking') return ((vA ? 1 : 0) - (vB ? 1 : 0)) * dir;
         return ((parseFloat(vA)||0) - (parseFloat(vB)||0)) * dir;
       });
       recalc();
     }
 
+    /** Genera el HTML de una cabecera con icono de ordenamiento bilingüe */
     function getTh(tid, label, field) {
-      const sorted = sortState[tid].col === field;
-      const icon   = sorted ? (sortState[tid].dir === 1 ? '▲' : '▼') : '⇕';
-      return `<th onclick="sortTable('${tid}','${field}')" title="${currentUiLang==='en'?'Sort by':'Ordenar por'} ${label}">${label} <span class="sort-icon ${sorted?'active':''}">${icon}</span></th>`;
+      const sorted  = sortState[tid].col === field;
+      const icon    = sorted ? (sortState[tid].dir === 1 ? '▲' : '▼') : '⇕';
+      const tooltip = currentUiLang === 'en' ? 'Sort by' : 'Ordenar por';
+      return `<th onclick="sortTable('${tid}','${field}')" title="${tooltip} ${label}">${label} <span class="sort-icon ${sorted?'active':''}">${icon}</span></th>`;
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 10. MODALES — REGISTRO DE COMPRA Y VENTA
+    // 11. MODALES — REGISTRO DE COMPRA Y VENTA
     // ═══════════════════════════════════════════════════════════════
     let activeSimRow = null, activeSimTid = null;
 
     function openSim(tid, id) {
       activeSimTid = tid;
       activeSimRow = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
-      if (!activeSimRow || !activeSimRow.t) { showToast(currentUiLang==='en'?'Assign a name first.':'Primero asigna un nombre.'); return; }
+      if (!activeSimRow || !activeSimRow.t) { showToast(currentUiLang === 'en' ? 'Assign a name first.' : 'Primero asigna un nombre.'); return; }
       calc(activeSimRow);
 
       document.getElementById('simTitleBuyAsset').innerText = activeSimRow.t;
@@ -944,7 +1024,7 @@
     function openSell(tid, id) {
       activeSimTid = tid;
       activeSimRow = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
-      if (!activeSimRow || !activeSimRow.qty || activeSimRow.qty <= 0) { alert(currentUiLang==='en'?'No valid balance to sell.':'No tienes saldo válido para vender.'); return; }
+      if (!activeSimRow || !activeSimRow.qty || activeSimRow.qty <= 0) { alert(currentUiLang === 'en' ? 'No valid balance to sell.' : 'No tienes saldo válido para vender.'); return; }
       calc(activeSimRow);
 
       document.getElementById('simTitleSellAsset').innerText = activeSimRow.t;
@@ -994,81 +1074,75 @@
         pnlEl.textContent = (pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(pnl));
         pnlEl.style.color = pnl >= 0 ? 'var(--g)' : 'var(--r)';
         const qtyEl = document.getElementById('sellOutQty');
-        qtyEl.textContent = rem < 0 ? (currentUiLang==='en'?'⚠️ Invalid':'⚠️ Inválido') : f(rem, 6);
+        qtyEl.textContent = rem < 0 ? (currentUiLang === 'en' ? '⚠️ Invalid' : '⚠️ Inválido') : f(rem, 6);
         qtyEl.style.color = rem < 0 ? 'var(--r)' : 'var(--sub)';
       }
     }
 
+    /** Confirma la compra: actualiza posición y agrega trade al historial */
     function confirmBuy() {
       if (!activeSimRow) return;
       const buyQty = parseFloat(document.getElementById('simInpQty').value) || 0;
       const buyPx  = parseFloat(document.getElementById('simInpPx').value)  || 0;
-      if (buyQty <= 0) { alert(currentUiLang==='en'?'Invalid Quantity.':'Cantidad inválida.'); return; }
-      if (buyPx  <= 0 && !STABLECOINS.includes(String(activeSimRow.t).toUpperCase())) { alert(currentUiLang==='en'?'Invalid Price.':'Precio de compra inválido.'); return; }
+      if (buyQty <= 0) { alert(currentUiLang === 'en' ? 'Invalid Quantity.' : 'Cantidad inválida.'); return; }
+      if (buyPx  <= 0 && !STABLECOINS.includes(String(activeSimRow.t).toUpperCase())) { alert(currentUiLang === 'en' ? 'Invalid Price.' : 'Precio de compra inválido.'); return; }
 
       saveStateToHistory();
-      const buyInv = buyQty * buyPx;
-
-      activeSimRow.qty = (activeSimRow.qty || 0) + buyQty;
-      activeSimRow.inv = (activeSimRow.inv || 0) + buyInv;
-      activeSimRow.p = false;
+      const buyInv         = buyQty * buyPx;
+      activeSimRow.qty     = (activeSimRow.qty || 0) + buyQty;
+      activeSimRow.inv     = (activeSimRow.inv || 0) + buyInv;
+      activeSimRow.p       = false;
 
       TRADES.push({
-        id: Date.now(), date: new Date().toISOString(), type: 'Buy', symbol: activeSimRow.t,
-        assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
+        id: Date.now(), date: new Date().toISOString(), type: 'Buy',
+        symbol: activeSimRow.t, assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
         qty: buyQty, price: buyPx, amount: -buyInv, asset: activeSimRow.t, px: buyPx, inv: buyInv
       });
 
       recalc(false);
       closeSim('buy');
-      showToast((currentUiLang==='en'?'✅ Buy registered: ':'✅ Compra registrada: ') + activeSimRow.t);
+      showToast((currentUiLang === 'en' ? '✅ Buy registered: ' : '✅ Compra registrada: ') + activeSimRow.t);
     }
 
+    /** Confirma la venta: actualiza posición, calcula P&L y agrega trade al historial */
     function confirmSell() {
       if (!activeSimRow) return;
       const sellQty = parseFloat(document.getElementById('sellInpQty').value) || 0;
       const sellPx  = parseFloat(document.getElementById('sellInpPx').value)  || 0;
-      if (sellQty <= 0 || sellQty > activeSimRow.qty) { alert(currentUiLang==='en'?'Invalid quantity or exceeds funds.':'Cantidad inválida o supera fondos.'); return; }
-      if (sellPx  <= 0)                               { alert(currentUiLang==='en'?'Invalid sell price.':'Precio de venta inválido.'); return; }
+      if (sellQty <= 0 || sellQty > activeSimRow.qty) { alert(currentUiLang === 'en' ? 'Invalid quantity or exceeds funds.' : 'Cantidad inválida o supera fondos.'); return; }
+      if (sellPx  <= 0)                               { alert(currentUiLang === 'en' ? 'Invalid sell price.' : 'Precio de venta inválido.'); return; }
 
       saveStateToHistory();
       const avg = activeSimRow.inv / activeSimRow.qty;
       const pnl = (sellPx - avg) * sellQty;
-
       activeSimRow.qty -= sellQty;
       activeSimRow.inv -= sellQty * avg;
-
-      if (activeSimRow.qty < 0.000001) {
-        activeSimRow.qty = 0; activeSimRow.inv = 0;
-      }
+      if (activeSimRow.qty < 0.000001) { activeSimRow.qty = 0; activeSimRow.inv = 0; }
 
       TRADES.push({
-        id: Date.now(), date: new Date().toISOString(), type: 'Sell', symbol: activeSimRow.t,
-        assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
-        qty: sellQty, price: sellPx, amount: sellQty * sellPx, pnl: pnl,
+        id: Date.now(), date: new Date().toISOString(), type: 'Sell',
+        symbol: activeSimRow.t, assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
+        qty: sellQty, price: sellPx, amount: sellQty * sellPx, pnl,
         asset: activeSimRow.t, px: sellPx, inv: sellQty * avg
       });
 
       recalc(false);
       closeSim('sell');
-      const glText = pnl >= 0 ? (currentUiLang==='en'?'Profit':'Ganancia') : (currentUiLang==='en'?'Loss':'Pérdida');
-      showToast(`✅ ${currentUiLang==='en'?'Sell registered':'Venta registrada'}. ${glText}: $${f(Math.abs(pnl))} USD`);
+      const glText = pnl >= 0 ? (currentUiLang === 'en' ? 'Profit' : 'Ganancia') : (currentUiLang === 'en' ? 'Loss' : 'Pérdida');
+      showToast(`✅ ${currentUiLang === 'en' ? 'Sell registered' : 'Venta registrada'}. ${glText}: $${f(Math.abs(pnl))} USD`);
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 11. RENDERIZADO DE TABLAS (BILINGÜE Y BADGE 24H)
+    // 12. RENDERIZADO DE TABLAS (BILINGÜE + BADGE 24H)
     // ═══════════════════════════════════════════════════════════════
     function renderTable(data, tid) {
       const opp      = tid === 'cr' ? oppCrypto : oppStocks;
       const isCrypto = tid === 'cr';
 
-      const D = currentUiLang === 'en' ? {
-          thAsset: 'Asset', thCoin: 'Coin', thBroker: 'Broker', thQty: 'Qty.', thAvg: 'Avg Price',
-          thPx: 'Current Price', thVal: 'Value USD', thInv: 'Invested USD', thGl: '% P/L', thPnl: 'Profit', next: 'next'
-      } : {
-          thAsset: 'Activo', thCoin: 'Moneda', thBroker: 'Broker', thQty: 'Cant.', thAvg: 'Precio Prom',
-          thPx: 'Precio Actual', thVal: 'Valor USD', thInv: 'Invertido USD', thGl: '% G/L', thPnl: 'Profit', next: 'próximo'
-      };
+      // Cabeceras traducidas según idioma activo
+      const D = currentUiLang === 'en'
+        ? { thAsset:'Asset', thCoin:'Coin', thQty:'Qty.', thAvg:'Avg Price', thPx:'Current Price', thVal:'Value USD', thInv:'Invested USD', thGl:'% P/L', thPnl:'Profit', next:'next' }
+        : { thAsset:'Activo', thCoin:'Moneda', thQty:'Cant.', thAvg:'Precio Prom', thPx:'Precio Actual', thVal:'Valor USD', thInv:'Invertido USD', thGl:'% G/L', thPnl:'Profit', next:'próximo' };
 
       const stakingHeader = isCrypto ? getTh(tid, 'Stake',             'staking') : '';
       const walletHeader  = isCrypto ? getTh(tid, 'Wallet / Exchange', 'wallet')  : '';
@@ -1078,21 +1152,23 @@
         ${getTh(tid, isCrypto ? D.thCoin : D.thAsset, 't')}
         ${stakingHeader}
         ${walletHeader}
-        ${getTh(tid, D.thQty,         'qty')}
-        ${getTh(tid, D.thAvg,   'avg')}
-        ${getTh(tid, D.thPx, 'px')}
-        ${getTh(tid, D.thVal,     'cur')}
+        ${getTh(tid, D.thQty, 'qty')}
+        ${getTh(tid, D.thAvg, 'avg')}
+        ${getTh(tid, D.thPx,  'px')}
+        ${getTh(tid, D.thVal, 'cur')}
         ${getTh(tid, D.thInv, 'inv')}
-        ${getTh(tid, D.thGl,         'gl')}
-        ${getTh(tid, D.thPnl,        'pnl')}
+        ${getTh(tid, D.thGl,  'gl')}
+        ${getTh(tid, D.thPnl, 'pnl')}
         <th></th>
       </tr></thead>`;
 
       const tbody = data.map(row => {
         calc(row);
-        const isPend = row.p || !row.qty;
-        const isOpp  = !isPend && row.avg > 0 && row.px > 0 && ((row.avg - row.px) / row.avg * 100) >= opp;
+        const isPend   = row.p || !row.qty;
+        const isOpp    = !isPend && row.avg > 0 && row.px > 0 && ((row.avg - row.px) / row.avg * 100) >= opp;
+        const isStable = STABLECOINS.includes(String(row.t).toUpperCase());
 
+        // Celdas exclusivas de cripto
         const stakingTd = isCrypto
           ? `<td><input type="checkbox" class="chk-staking" ${row.staking ? 'checked' : ''} onchange="upd('${tid}',${row.id},'staking',this.checked)"></td>`
           : '';
@@ -1100,13 +1176,11 @@
           ? `<td><input class="ci wallet" value="${row.wallet||''}" placeholder="Binance, Ledger..." onblur="upd('${tid}',${row.id},'wallet',this.value)" onkeyup="if(event.key==='Enter')this.blur()"></td>`
           : '';
 
+        // Badge de variación de precio en 24h (▲/▼ %)
         let pxBadge = '';
-        const isStable = STABLECOINS.includes(String(row.t).toUpperCase());
         if (!isStable && row.pxChange !== undefined && row.pxChange !== null && !isPend && !isNaN(row.pxChange)) {
           const isPos = row.pxChange >= 0;
-          const colorCls = isPos ? 'g' : 'r';
-          const sign = isPos ? '▲' : '▼';
-          pxBadge = `<div style="font-size:0.65rem; font-weight:700; padding:1px 4px; border-radius:4px; margin-top:2px; background: ${isPos ? '#3fb95022' : '#f7816622'}" class="${colorCls}">${sign} ${Math.abs(row.pxChange).toFixed(2)}%</div>`;
+          pxBadge = `<div style="font-size:0.65rem;font-weight:700;padding:1px 4px;border-radius:4px;margin-top:2px;background:${isPos ? '#3fb95022' : '#f7816622'}" class="${isPos ? 'g' : 'r'}">${isPos ? '▲' : '▼'} ${Math.abs(row.pxChange).toFixed(2)}%</div>`;
         }
 
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
@@ -1120,24 +1194,30 @@
           </td>
           ${stakingTd}
           ${walletTd}
-          
-          <td class="computed" style="font-weight:600">${isPend ? '<span style="color:var(--sub)">—</span>' : row.qty}</td>
-          
-          <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)}</td>
-          
-          <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700; vertical-align: middle;">
-            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <td class="computed" style="font-weight:600">
+            ${isPend ? '<span style="color:var(--sub)">—</span>' : row.qty}
+          </td>
+          <td class="computed">
+            ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)}
+          </td>
+          <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700;vertical-align:middle">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
               <span>${row.px||0}</span>
               ${pxBadge}
             </div>
           </td>
-          
-          <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.cur)}</td>
-          
-          <td class="computed" style="color:var(--b)">${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.inv)}</td>
-          
-          <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fP(row.gl)}</td>
-          <td class="computed">${isPend ? '<span style="color:var(--sub)">—</span>' : fGain(row.pnl)}</td>
+          <td class="computed">
+            ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.cur)}
+          </td>
+          <td class="computed" style="color:var(--b)">
+            ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.inv)}
+          </td>
+          <td class="computed">
+            ${isPend ? '<span style="color:var(--sub)">—</span>' : fP(row.gl)}
+          </td>
+          <td class="computed">
+            ${isPend ? '<span style="color:var(--sub)">—</span>' : fGain(row.pnl)}
+          </td>
           <td class="action-btns">
             <button class="icon-btn" onmousedown="openSim('${tid}',${row.id})"  title="🛒">🛒</button>
             <button class="icon-btn" onmousedown="openSell('${tid}',${row.id})" title="💸">💸</button>
@@ -1146,18 +1226,16 @@
         </tr>`;
       }).join('');
 
-      const tbl     = document.getElementById('tbl-' + tid);
+      const tbl = document.getElementById('tbl-' + tid);
       tbl.innerHTML = thead + '<tbody>' + tbody + '</tbody>';
 
+      // Habilita drag & drop en la tabla
       const tbodyEl = tbl.querySelector('tbody');
       if (tbodyEl) {
         new Sortable(tbodyEl, {
-          handle:       '.drag-handle',
-          animation:    150,
-          ghostClass:   'sortable-ghost',
-          dragClass:    'sortable-drag',
-          forceFallback: true,
-          fallbackOnBody: true,
+          handle: '.drag-handle', animation: 150,
+          ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
+          forceFallback: true, fallbackOnBody: true,
           onEnd: evt => {
             if (evt.oldIndex === evt.newIndex) return;
             const arr = tid === 'sw' ? SW : tid === 'xt' ? XT : CR;
@@ -1170,28 +1248,27 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 12. CRUD DE FILAS (Crear, Leer, Actualizar, Eliminar)
+    // 13. CRUD DE FILAS (Crear, Actualizar, Eliminar)
     // ═══════════════════════════════════════════════════════════════
     function upd(tid, id, field, val) {
       const row = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
       if (!row) return;
       if      (field === 't')       row[field] = String(val).toUpperCase().trim();
       else if (field === 'wallet')  row[field] = String(val).trim();
-      else if (field === 'staking') row[field] = val;   
+      else if (field === 'staking') row[field] = val;  // booleano del checkbox
       else                          row[field] = rv(val);
       recalc();
     }
 
     function addRow(tid) {
       (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).push({
-        id: nid++, t: '', wallet: '', qty: 0,
-        inv: 0, px: 0, p: true, staking: false
+        id: nid++, t: '', wallet: '', qty: 0, inv: 0, px: 0, p: true, staking: false
       });
       recalc();
     }
 
     function delRow(tid, id) {
-      if (!confirm(currentUiLang==='en'?'Delete this asset?':'¿Eliminar este activo?')) return;
+      if (!confirm(currentUiLang === 'en' ? 'Delete this asset?' : '¿Eliminar este activo?')) return;
       if      (tid === 'sw') SW = SW.filter(x => x.id !== id);
       else if (tid === 'xt') XT = XT.filter(x => x.id !== id);
       else                   CR = CR.filter(x => x.id !== id);
@@ -1199,7 +1276,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 13. RECALC PRINCIPAL — Actualiza toda la UI
+    // 14. RECALC PRINCIPAL — Actualiza toda la UI de una vez
     // ═══════════════════════════════════════════════════════════════
     function recalc(pushToHistory = true) {
       renderTable(SW, 'sw');
@@ -1214,25 +1291,25 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 14. RENDERIZADO DE TARJETAS (CARDS) BILINGÜE
+    // 15. RENDERIZADO DE TARJETAS (CARDS) — BILINGÜE
     // ═══════════════════════════════════════════════════════════════
     function renderCards() {
       const rt      = rate();
-      const lastUpd = document.getElementById('lastSaved').textContent.includes('Nube') || document.getElementById('lastSaved').textContent.includes('Cloud') ? new Date().toLocaleTimeString('es-CO') : '—';
-      let activeAssets = [], tInv = 0, tCur = 0, tPnl = 0, tPct = 0, gC = 0;
-      
-      const D = currentUiLang === 'en' ? {
-          lblGlobalS: '💼 Stocks + Skandia Portfolio', lblGlobalC: '₿ Crypto Portfolio',
-          cInv: '📥 Invested Capital', cRet: '📈 Total Return', cTrm: '💱 Live Exchange Rate',
-          cTrmSub: '1 USD = ' + f(rt, 0) + ' COP', cTrmAct: 'Upd: ' + lastUpd,
-          cBest: '🏆 Best Asset', cWorst: '⚠️ Worst Asset', cRetSub: '% on investment'
-      } : {
-          lblGlobalS: '💼 Portafolio Acciones + Skandia', lblGlobalC: '₿ Portafolio Cripto',
-          cInv: '📥 Capital Invertido', cRet: '📈 Retorno Total', cTrm: '💱 TRM en Vivo',
-          cTrmSub: '1 USD = ' + f(rt, 0) + ' COP', cTrmAct: 'Act: ' + lastUpd,
-          cBest: '🏆 Mejor Activo', cWorst: '⚠️ Más Rezagado', cRetSub: '% sobre invertido'
-      };
+      const lastUpd = (document.getElementById('lastSaved').textContent.includes('Nube') || document.getElementById('lastSaved').textContent.includes('Cloud'))
+        ? new Date().toLocaleTimeString('es-CO') : '—';
 
+      // Etiquetas según idioma activo
+      const D = currentUiLang === 'en'
+        ? { lblS:'💼 Stocks + Skandia Portfolio', lblC:'₿ Crypto Portfolio', inv:'📥 Invested Capital',
+            ret:'📈 Total Return', retSub:'% on investment', trm:'💱 Live Exchange Rate',
+            trmSub:'1 USD = '+f(rt,0)+' COP', trmAct:'Upd: '+lastUpd,
+            best:'🏆 Best Asset', worst:'⚠️ Worst Asset', wallet:'Digital Wallet' }
+        : { lblS:'💼 Portafolio Acciones + Skandia', lblC:'₿ Portafolio Cripto', inv:'📥 Capital Invertido',
+            ret:'📈 Retorno Total', retSub:'% sobre invertido', trm:'💱 TRM en Vivo',
+            trmSub:'1 USD = '+f(rt,0)+' COP', trmAct:'Act: '+lastUpd,
+            best:'🏆 Mejor Activo', worst:'⚠️ Más Rezagado', wallet:'Billetera Digital' };
+
+      let activeAssets = [], tInv = 0, tCur = 0, tPnl = 0, tPct = 0, gC = 0;
       let lblGlobal = '', valInvStr = '', htmlSub = '';
 
       if (currentView === 'stocks') {
@@ -1240,10 +1317,9 @@
         tCur = activeAssets.reduce((s, x) => s + x.cur, 0);
         const bInv = activeAssets.reduce((s, x) => s + x.inv, 0);
         if (skInvVal <= 0) skInvVal = 14613200;
-        const skUSD  = skCurVal / rt;
-        const skIUSD = skInvVal / rt;
+        const skUSD  = skCurVal / rt, skIUSD = skInvVal / rt;
         tInv = bInv + skIUSD; gC = tCur + skUSD; tPnl = gC - tInv; tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
-        lblGlobal = D.lblGlobalS;
+        lblGlobal = D.lblS;
         valInvStr = '$' + f(tInv);
         htmlSub   = 'Brokers <span style="color:#e6edf3;font-weight:600">$' + f(tCur) + '</span> · Skandia <span style="color:#e6edf3;font-weight:600">$' + f(skUSD) + '</span>';
       } else {
@@ -1251,9 +1327,9 @@
         tCur = activeAssets.reduce((s, x) => s + x.cur, 0);
         tInv = activeAssets.reduce((s, x) => s + x.inv, 0);
         gC = tCur; tPnl = tCur - tInv; tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
-        lblGlobal = D.lblGlobalC;
+        lblGlobal = D.lblC;
         valInvStr = '$' + f(tInv);
-        htmlSub   = (currentUiLang==='en'?'Digital Wallet ':'Billetera Digital ') + '<span style="color:#e6edf3;font-weight:600">$' + f(tCur) + '</span>';
+        htmlSub   = D.wallet + ' <span style="color:#e6edf3;font-weight:600">$' + f(tCur) + '</span>';
       }
 
       const named = activeAssets.filter(x => x.t && !STABLECOINS.includes(String(x.t).toUpperCase()));
@@ -1263,38 +1339,44 @@
       const wCls  = worst && worst.gl >= 0 ? 'g' : 'r';
 
       document.getElementById('cards').innerHTML =
+        // Card 1 — Portafolio Global
         '<div class="card" style="border-color:#58a6ff33">' +
           '<div class="lbl">' + lblGlobal + '</div>' +
           '<div class="val b">$' + f(gC) + '</div>' +
           '<div class="s2" style="color:#8b949e;margin-top:3px">' + htmlSub + '</div>' +
           '<div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">' + fCOP(gC * rt) + '</div>' +
         '</div>' +
+        // Card 2 — Capital Invertido
         '<div class="card">' +
-          '<div class="lbl">' + D.cInv + '</div>' +
+          '<div class="lbl">' + D.inv + '</div>' +
           '<div class="val">' + valInvStr + '</div>' +
           '<div class="s2" style="color:#8b949e;margin-top:3px">' + fCOP(tInv * rt) + '</div>' +
         '</div>' +
+        // Card 3 — Retorno Total
         '<div class="card" style="border-color:' + (tPnl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
-          '<div class="lbl">' + D.cRet + '</div>' +
+          '<div class="lbl">' + D.ret + '</div>' +
           '<div class="val ' + (tPnl >= 0 ? 'g' : 'r') + '">' + (tPnl >= 0 ? '+' : '-') + ' $' + f(Math.abs(tPnl)) + '</div>' +
-          '<div class="s2 ' + (tPct >= 0 ? 'g' : 'r') + '" style="margin-top:3px">' + (tPct >= 0 ? '+' : '') + f(tPct, 1) + ' ' + D.cRetSub + '</div>' +
+          '<div class="s2 ' + (tPct >= 0 ? 'g' : 'r') + '" style="margin-top:3px">' + (tPct >= 0 ? '+' : '') + f(tPct, 1) + ' ' + D.retSub + '</div>' +
           '<div class="s2 ' + (tPnl >= 0 ? 'g' : 'r') + '" style="margin-top:2px;font-weight:600">' + (tPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(tPnl) * rt) + '</div>' +
         '</div>' +
+        // Card 4 — TRM
         '<div class="card" style="border-color:#ffa65733">' +
-          '<div class="lbl">' + D.cTrm + '</div>' +
+          '<div class="lbl">' + D.trm + '</div>' +
           '<div class="val" style="color:#ffa657">' + f(rt, 0) + ' <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div>' +
-          '<div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">' + D.cTrmSub + '</div>' +
-          '<div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">' + D.cTrmAct + '</div>' +
+          '<div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">' + D.trmSub + '</div>' +
+          '<div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">' + D.trmAct + '</div>' +
         '</div>' +
+        // Card 5 — Mejor Activo
         '<div class="card" style="border-color:' + (best && best.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
-          '<div class="lbl">' + D.cBest + '</div>' +
+          '<div class="lbl">' + D.best + '</div>' +
           '<div class="val ' + bCls + '">' + (best ? best.t : '—') + '</div>' +
           '<div class="s2 ' + bCls + '" style="margin-top:3px">' + (best ? (best.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(best.pnl)) : '') + '</div>' +
           '<div class="s2 ' + bCls + '" style="margin-top:2px">' + (best ? (best.gl >= 0 ? '+' : '') + f(best.gl, 1) + '%' : '') + '</div>' +
           '<div class="s2 hide-mob ' + bCls + '" style="margin-top:2px;font-size:.68rem">' + (best ? (best.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(best.pnl) * rt) : '') + '</div>' +
         '</div>' +
+        // Card 6 — Más Rezagado
         '<div class="card" style="border-color:' + (worst && worst.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
-          '<div class="lbl">' + D.cWorst + '</div>' +
+          '<div class="lbl">' + D.worst + '</div>' +
           '<div class="val ' + wCls + '">' + (worst ? worst.t : '—') + '</div>' +
           '<div class="s2 ' + wCls + '" style="margin-top:3px">' + (worst ? (worst.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(worst.pnl)) : '') + '</div>' +
           '<div class="s2 ' + wCls + '" style="margin-top:2px">' + (worst ? f(worst.gl, 1) + '%' : '') + '</div>' +
@@ -1303,23 +1385,31 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 15. RENDERIZADO DEL RESUMEN BILINGÜE
+    // 16. RENDERIZADO DEL RESUMEN CONSOLIDADO — BILINGÜE
+    //     ⚠️ FIX: lbl-summary se actualiza aquí con idioma + vista activa
     // ═══════════════════════════════════════════════════════════════
     function renderSummary() {
       const rt = rate();
-      const D = currentUiLang === 'en' ? {
-          inv: 'Invested', act: 'Current', sk: '🇨🇴 Skandia BITCOIN Portfolio ₿',
-          skCap: 'Invested Capital', skCur: 'Current Value', skRet: 'Skandia Return',
-          tInv: 'Total Invested', tEq: 'USD Equivalent', tCurCOP: 'Current Total COP', tCurUSD: 'Current Total USD',
-          crInv: '₿ Crypto Investment', tInvCr: 'Total Crypto Invested'
-      } : {
-          inv: 'Invertido', act: 'Actual', sk: '🇨🇴 Skandia Portafolio BITCOIN ₿',
-          skCap: 'Capital Invertido', skCur: 'Valor Actual', skRet: 'Rendimiento Skandia',
-          tInv: 'Total Invertido', tEq: 'Equivalente USD', tCurCOP: 'Total Actual COP', tCurUSD: 'Total Actual USD',
-          crInv: '₿ Inversión Cripto', tInvCr: 'Total Invertido Cripto'
-      };
+
+      // Etiquetas según idioma activo
+      const D = currentUiLang === 'en'
+        ? { inv:'Invested', act:'Current', sk:'🇨🇴 Skandia BITCOIN Portfolio ₿',
+            skCap:'Invested Capital', skCur:'Current Value', skRet:'Skandia Return',
+            tInv:'Total Invested', tEq:'USD Equivalent', tCurCOP:'Current Total COP', tCurUSD:'Current Total USD',
+            crInv:'₿ Crypto Investment', tInvCr:'Total Crypto Invested',
+            summaryS:'📋 Consolidated Stocks Summary', summaryC:'📋 Consolidated Crypto Summary' }
+        : { inv:'Invertido', act:'Actual', sk:'🇨🇴 Skandia Portafolio BITCOIN ₿',
+            skCap:'Capital Invertido', skCur:'Valor Actual', skRet:'Rendimiento Skandia',
+            tInv:'Total Invertido', tEq:'Equivalente USD', tCurCOP:'Total Actual COP', tCurUSD:'Total Actual USD',
+            crInv:'₿ Inversión Cripto', tInvCr:'Total Invertido Cripto',
+            summaryS:'📋 Resumen Consolidado de Acciones', summaryC:'📋 Resumen Consolidado Cripto' };
+
+      // ✅ FIX: Actualiza el título del resumen con idioma + pestaña activa
+      document.getElementById('lbl-summary').textContent =
+        currentView === 'stocks' ? D.summaryS : D.summaryC;
 
       if (currentView === 'stocks') {
+        // ── Acciones ──
         const sA = SW.map(calc).filter(x => x.qty > 0);
         const xA = XT.map(calc).filter(x => x.qty > 0);
         const sI = sA.reduce((s, x) => s + x.inv, 0),  sC = sA.reduce((s, x) => s + x.cur, 0);
@@ -1363,7 +1453,8 @@
                 <label style="font-size:.7rem;color:var(--sub)">${D.skCap}</label>
                 <div class="sk-edit-group">
                   <span class="sk-edit-badge">COP</span>
-                  <input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'inv')" onkeyup="if(event.key==='Enter')this.blur()">
+                  <input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}"
+                    onfocus="skFocus(this)" onblur="skBlur(this,'inv')" onkeyup="if(event.key==='Enter')this.blur()">
                 </div>
                 <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ $${f(skI_USD)} USD</div>
               </div>
@@ -1371,7 +1462,8 @@
                 <label style="font-size:.7rem;color:var(--sub)">${D.skCur}</label>
                 <div class="sk-edit-group">
                   <span class="sk-edit-badge">COP</span>
-                  <input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}" onfocus="skFocus(this)" onblur="skBlur(this,'cur')" onkeyup="if(event.key==='Enter')this.blur()">
+                  <input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}"
+                    onfocus="skFocus(this)" onblur="skBlur(this,'cur')" onkeyup="if(event.key==='Enter')this.blur()">
                 </div>
                 <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ ${fU(skC_USD)} USD</div>
               </div>
@@ -1409,6 +1501,7 @@
           </div>`;
 
       } else {
+        // ── Cripto ──
         const cA = CR.map(calc).filter(x => x.qty > 0);
         const cI = cA.reduce((s, x) => s + x.inv, 0),  cC = cA.reduce((s, x) => s + x.cur, 0);
 
@@ -1454,12 +1547,20 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 16. RENDERIZADO DE GRÁFICOS
+    // 17. RENDERIZADO DE GRÁFICOS (Donut + Barras)
+    //     ⚠️ FIX: lbl-bar se actualiza aquí con el idioma activo
     // ═══════════════════════════════════════════════════════════════
     function renderCharts() {
-      const activeData = currentView === 'stocks' ? [...SW.map(calc), ...XT.map(calc)] : [...CR.map(calc)];
-      const all    = activeData.filter(x => x.qty > 0 && x.t);
-      const labels = all.map(x => {
+      // ✅ FIX: Actualiza el título de la gráfica de barras con el idioma activo
+      document.getElementById('lbl-bar').textContent =
+        currentUiLang === 'en' ? 'Performance % P/L' : 'Rendimiento % G/L';
+
+      const activeData = currentView === 'stocks'
+        ? [...SW.map(calc), ...XT.map(calc)]
+        : [...CR.map(calc)];
+
+      const all       = activeData.filter(x => x.qty > 0 && x.t);
+      const labels    = all.map(x => {
         let n = String(x.t);
         if (['USDT','USDC'].includes(n.toUpperCase()) && x.wallet) n += ` (${x.wallet})`;
         return n;
@@ -1470,6 +1571,7 @@
       const labelsPct = labels.map((t, i) => t + ' (' + (total > 0 ? (vals[i]/total*100).toFixed(1) : 0) + '%)');
       const isMob     = window.innerWidth <= 768;
 
+      // ── Donut ──
       if (dChart) dChart.destroy();
       if (labels.length) {
         dChart = new Chart(document.getElementById('donut'), {
@@ -1479,10 +1581,13 @@
         });
       }
 
+      // ── Barras ──
       if (bChart) bChart.destroy();
       if (labels.length) {
         const barWrap = document.getElementById('bar-wrap');
         barWrap.style.height = isMob ? Math.max(280, labels.length * 40) + 'px' : '200px';
+
+        // Plugin: muestra % encima/debajo de cada barra
         const pctPlugin = {
           id: 'pct',
           afterDraw: chart => {
@@ -1490,12 +1595,17 @@
             chart.data.datasets.forEach((ds, i) => {
               const meta = chart.getDatasetMeta(i);
               if (!meta.hidden) meta.data.forEach((el, j) => {
-                ctx.fillStyle = ds.borderColor[j]; const v = ds.data[j]; const pctT = (v >= 0 ? '+' : '') + f(v, 1) + '%';
+                ctx.fillStyle = ds.borderColor[j];
+                const v    = ds.data[j];
+                const pctT = (v >= 0 ? '+' : '') + f(v, 1) + '%';
                 if (isMob && isH) {
-                  ctx.font = 'bold 11px sans-serif'; ctx.textBaseline = 'middle'; const zeroX = chart.scales.x.getPixelForValue(0); ctx.textAlign = v >= 0 ? 'right' : 'left';
+                  ctx.font = 'bold 11px sans-serif'; ctx.textBaseline = 'middle';
+                  const zeroX = chart.scales.x.getPixelForValue(0);
+                  ctx.textAlign = v >= 0 ? 'right' : 'left';
                   ctx.fillText(`${chart.data.labels[j]} (${pctT})`, zeroX + (v >= 0 ? -8 : 8), el.y);
                 } else {
-                  ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = v >= 0 ? 'bottom' : 'top';
+                  ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+                  ctx.textBaseline = v >= 0 ? 'bottom' : 'top';
                   ctx.fillText(pctT, el.x, el.y + (v >= 0 ? -6 : 6));
                 }
               });
@@ -1505,63 +1615,67 @@
 
         bChart = new Chart(document.getElementById('bar'), {
           type: 'bar',
-          data: { labels, datasets: [{ label: 'Rendimiento', data: gls, backgroundColor: gls.map(g => g >= 0 ? '#3fb95055' : '#f7816655'), borderColor: gls.map(g => g >= 0 ? '#3fb950' : '#f78166'), borderWidth: 1 }] },
+          data: { labels, datasets: [{ label: currentUiLang === 'en' ? 'Performance' : 'Rendimiento', data: gls, backgroundColor: gls.map(g => g >= 0 ? '#3fb95055' : '#f7816655'), borderColor: gls.map(g => g >= 0 ? '#3fb950' : '#f78166'), borderWidth: 1 }] },
           plugins: [pctPlugin],
           options: {
             responsive: true, maintainAspectRatio: false, indexAxis: isMob ? 'y' : 'x',
             layout: { padding: { top: isMob ? 0 : 25, bottom: isMob ? 0 : 25, left: isMob ? 120 : 0, right: isMob ? 120 : 0 } },
             plugins: { legend: { display: false } },
-            scales: { x: { display: !isMob, ticks: { color: '#e6edf3', font: { size: 10 } }, grid: { color: '#21262d' } }, y: { display: !isMob, ticks: { color: '#8b949e', callback: v => v + '%' }, grid: { color: '#21262d' } } }
+            scales: {
+              x: { display: !isMob, ticks: { color: '#e6edf3', font: { size: 10 } }, grid: { color: '#21262d' } },
+              y: { display: !isMob, ticks: { color: '#8b949e', callback: v => v + '%' }, grid: { color: '#21262d' } }
+            }
           }
         });
       }
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // 17. PRECIOS EN TIEMPO REAL
+    // 18. PRECIOS EN TIEMPO REAL
+    //     TRM:      awesomeapi (COP/USD)
+    //     Acciones: Finnhub (USA) + Yahoo Finance vía allorigins (XTB .UK)
+    //     Cripto:   Binance 24hr → fallback MEXC
     // ═══════════════════════════════════════════════════════════════
     async function fetchRealTimeData() {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
       if (!currentUser) return;
 
+      // ── TRM ──
       try {
         const res = await fetch('https://economia.awesomeapi.com.br/json/last/USD-COP');
         const d   = await res.json();
-        if (d.USDCOP && d.USDCOP.bid) document.getElementById('rateInput').value = parseFloat(d.USDCOP.bid).toFixed(2);
+        if (d.USDCOP && d.USDCOP.bid)
+          document.getElementById('rateInput').value = parseFloat(d.USDCOP.bid).toFixed(2);
       } catch (e) {}
 
+      // ── Acciones (Finnhub para USA, Yahoo Finance para .UK vía proxy) ──
       const fetchStockPrice = async r => {
         try {
           if (String(r.t).toUpperCase().includes('.UK')) {
-              // XTB EUROPE: Usamos el endpoint V8 de Yahoo que NO bloquea conexiones
-              const sym = String(r.t).toUpperCase().replace('.UK', '.L');
-              const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d')}`;
-              const res = await fetch(proxyUrl);
-              const data = await res.json();
-              
-              if (data && data.chart && data.chart.result && data.chart.result.length > 0) {
-                  const meta = data.chart.result[0].meta;
-                  r.px = meta.regularMarketPrice;
-                  // Calcula el porcentaje exacto de hoy comparando con el cierre de ayer
-                  r.pxChange = ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100;
-                  return; // Terminamos aquí para no consultar a Finnhub
-              }
+            // XTB Europe: Yahoo Finance v8 sin bloqueos via allorigins proxy
+            const sym      = String(r.t).toUpperCase().replace('.UK', '.L');
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d')}`;
+            const res      = await fetch(proxyUrl);
+            const data     = await res.json();
+            if (data && data.chart && data.chart.result && data.chart.result.length > 0) {
+              const meta = data.chart.result[0].meta;
+              r.px       = meta.regularMarketPrice;
+              r.pxChange = ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100;
+              return;
+            }
           }
-          
-          // SCHWAB USA: Sigue usando Finnhub con normalidad
-          const sym = r.t;
-          const res = await fetch('https://finnhub.io/api/v1/quote?symbol=' + sym + '&token=' + FINNHUB_API_KEY);
+          // Schwab USA: Finnhub
+          const res  = await fetch('https://finnhub.io/api/v1/quote?symbol=' + r.t + '&token=' + FINNHUB_API_KEY);
           const data = await res.json();
           if (data && data.c) {
             r.px = data.c;
             if (data.dp !== undefined && data.dp !== null) r.pxChange = data.dp;
             else if (data.pc && data.pc > 0) r.pxChange = ((data.c - data.pc) / data.pc) * 100;
           }
-        } catch (e) {
-          console.error("Error obteniendo precio para:", r.t, e);
-        }
+        } catch (e) { console.error('Error precio acción:', r.t, e); }
       };
 
+      // ── Cripto (Binance → fallback MEXC) ──
       const fetchCryptoPrice = async r => {
         const t = String(r.t).toUpperCase();
         if (STABLECOINS.includes(t)) { r.px = 1.00; r.pxChange = null; return; }
@@ -1583,40 +1697,49 @@
         }
       };
 
+      // ── Lanza todas las peticiones en paralelo ──
       try {
         await Promise.all([
-          ...SW.filter(r => r.t).map(fetchStockPrice), ...XT.filter(r => r.t).map(fetchStockPrice), ...CR.filter(r => r.t).map(fetchCryptoPrice)
+          ...SW.filter(r => r.t).map(fetchStockPrice),
+          ...XT.filter(r => r.t).map(fetchStockPrice),
+          ...CR.filter(r => r.t).map(fetchCryptoPrice)
         ]);
       } catch (e) {}
+
       recalc(false);
     }
+
+    // Refresco automático cada 60 segundos
     setInterval(fetchRealTimeData, 60000);
 
     // ═══════════════════════════════════════════════════════════════
-    // 18. GENERACIÓN DEL PDF BILINGÜE
+    // 19. GENERACIÓN DEL PDF BILINGÜE VÍA CLOUD FUNCTION
+    //     Llama al endpoint de Firebase Functions con el idioma elegido.
+    //     Usa mode:'no-cors' para evitar errores CORS desde el browser.
+    //     La respuesta no-cors no retorna body → se usa un timeout de 2.5s.
     // ═══════════════════════════════════════════════════════════════
     async function pedirReporte(lang) {
       const loadingScreen = document.getElementById('pdfLoading');
-      loadingScreen.style.display = 'flex'; 
+      loadingScreen.style.display = 'flex';
 
       try {
-        await fetch(`https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte?lang=${lang}`, {
-            method: 'GET',
-            mode: 'no-cors'
-        });
-        
+        await fetch(`${PDF_FUNCTION_URL}?lang=${lang}`, { method: 'GET', mode: 'no-cors' });
+
         setTimeout(() => {
-            loadingScreen.style.display = 'none';
-            const langTexto = lang === 'en' ? 'Inglés' : 'Español';
-            const msg = currentUiLang === 'en' ? `✅ Report in ${langTexto} is processing! Check your Telegram.` : `✅ ¡Reporte en ${langTexto} en proceso! Llegará a tu Telegram.`;
-            showToast(msg);
+          loadingScreen.style.display = 'none';
+          const langTexto = lang === 'en' ? 'Inglés' : 'Español';
+          const msg = currentUiLang === 'en'
+            ? `✅ Report in ${langTexto} is processing! Check your Telegram.`
+            : `✅ ¡Reporte en ${langTexto} en proceso! Llegará a tu Telegram.`;
+          showToast(msg);
         }, 2500);
 
       } catch (error) {
         loadingScreen.style.display = 'none';
-        showToast(currentUiLang === 'en' ? '❌ Network error. Try via Telegram with /reporte' : '❌ Ocurrió un error de red. Intenta desde Telegram con /reporte');
+        showToast(currentUiLang === 'en' ? '❌ Network error. Try via Telegram.' : '❌ Error de red. Intenta desde Telegram con /reporte');
       }
     }
+
   </script>
 </body>
 </html>
