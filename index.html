@@ -1183,6 +1183,18 @@
           pxBadge = `<div style="font-size:0.65rem;font-weight:700;padding:1px 4px;border-radius:4px;margin-top:2px;background:${isPos ? '#3fb95022' : '#f7816622'}" class="${isPos ? 'g' : 'r'}">${isPos ? '▲' : '▼'} ${Math.abs(row.pxChange).toFixed(2)}%</div>`;
         }
 
+        // 🔥 NUEVO: Lógica para cantidad editable si está en Staking 🔥
+        let qtyDisplay = '';
+        if (isPend) {
+            qtyDisplay = '<span style="color:var(--sub)">—</span>';
+        } else if (isCrypto && row.staking) {
+            // Si es cripto y el checkbox está activo, mostramos el input editable
+            qtyDisplay = `<input class="ci" style="width:75px; font-weight:bold; color:var(--b); border-color:var(--g);" value="${row.qty}" title="Editar cantidad en Staking" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()">`;
+        } else {
+            // Si no está en staking, se muestra como texto normal
+            qtyDisplay = row.qty;
+        }
+
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
           <td class="drag-handle" title="Mover">☰</td>
           <td>
@@ -1195,7 +1207,7 @@
           ${stakingTd}
           ${walletTd}
           <td class="computed" style="font-weight:600">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : row.qty}
+            ${qtyDisplay}
           </td>
           <td class="computed">
             ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)}
