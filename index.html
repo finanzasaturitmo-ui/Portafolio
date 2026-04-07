@@ -82,6 +82,23 @@
     .btn-lang      { background: #21262d; color: #fff; border: 1px solid var(--border); font-size: 1rem; padding: 4px 8px; border-radius: 5px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 5px rgba(0,0,0,0.3); font-weight: bold; }
     .btn-lang:hover{ background: #30363d; transform: scale(1.05); }
 
+    /* CSS para Menús Desplegables de Fechas */
+    .dropdown { position: relative; display: inline-block; }
+    .drop-content { 
+      display: none; position: absolute; right: 0; top: 110%; 
+      background: var(--card); border: 1px solid var(--border); 
+      border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.6); 
+      z-index: 10000; overflow: hidden;
+    }
+    .drop-content.show { display: block; animation: fadeIn 0.2s ease; }
+    .date-form { padding: 12px; display: flex; flex-direction: column; gap: 10px; width: 190px; }
+    .date-label { color: var(--sub); font-size: 0.75rem; font-weight: bold; margin-bottom: 3px; display: block; }
+    .date-input { width: 100%; background: #0d1117; border: 1px solid var(--border); color: #e6edf3; padding: 6px; border-radius: 4px; outline: none; font-size: 0.8rem; }
+    .date-input:focus { border-color: var(--b); }
+    .btn-gen-pdf { margin-top: 5px; padding: 8px; width: 100%; font-size: 0.8rem; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; color: white; transition: 0.2s; }
+    .btn-gen-es { background: #1f6feb; } .btn-gen-es:hover { background: #388bfd; }
+    .btn-gen-en { background: #2ea043; } .btn-gen-en:hover { background: #3fb950; }
+
     /* ═══════════════════════════════════════════
        5. CONTENEDOR PRINCIPAL Y TARJETAS (CARDS)
     ═══════════════════════════════════════════ */
@@ -349,8 +366,28 @@
         <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Conectando a la nube...</div>
       </div>
       <div class="hdr-right">
-        <button class="btn-pdf" onclick="pedirReporte('es')">📥 <span class="hide-mob" style="margin-right:3px">Descargar </span>Reporte (ES)</button>
-        <button class="btn-pdf" onclick="pedirReporte('en')" style="background:#2ea043;box-shadow:0 0 8px rgba(46,160,67,0.4)">📥 <span class="hide-mob" style="margin-right:3px">Descargar </span>Reporte (EN)</button>
+        <!-- Dropdown ES -->
+        <div class="dropdown">
+          <button class="btn-pdf" onclick="toggleDrop('es')">📥 <span class="hide-mob" style="margin-right:3px">Descargar </span>Reporte (ES) ▼</button>
+          <div id="drop-es" class="drop-content">
+            <div class="date-form">
+              <div><label class="date-label">Desde:</label><input type="date" id="start-es" class="date-input"></div>
+              <div><label class="date-label">Hasta:</label><input type="date" id="end-es" class="date-input"></div>
+              <button class="btn-gen-pdf btn-gen-es" onclick="pedirReporteRango('es')">Generar PDF</button>
+            </div>
+          </div>
+        </div>
+        <!-- Dropdown EN -->
+        <div class="dropdown">
+          <button class="btn-pdf" onclick="toggleDrop('en')" style="background:#2ea043;box-shadow:0 0 8px rgba(46,160,67,0.4)">📥 <span class="hide-mob" style="margin-right:3px">Descargar </span>Reporte (EN) ▼</button>
+          <div id="drop-en" class="drop-content">
+            <div class="date-form">
+              <div><label class="date-label">From:</label><input type="date" id="start-en" class="date-input"></div>
+              <div><label class="date-label">To:</label><input type="date" id="end-en" class="date-input"></div>
+              <button class="btn-gen-pdf btn-gen-en" onclick="pedirReporteRango('en')">Generate PDF</button>
+            </div>
+          </div>
+        </div>
         <button class="btn-lang" id="btn-toggle-lang" onclick="toggleLanguage()" title="Cambiar Idioma">🇺🇸 EN</button>
         <button class="btn-logout" id="btnLogout" onclick="cerrarSesion()">Cerrar Sesión</button>
       </div>
@@ -1730,19 +1767,46 @@
     //     Usa mode:'no-cors' para evitar errores CORS desde el browser.
     //     La respuesta no-cors no retorna body → se usa un timeout de 2.5s.
     // ═══════════════════════════════════════════════════════════════
-    async function pedirReporte(lang) {
+    // Mostrar/Ocultar los menús
+    function toggleDrop(lang) {
+      document.getElementById(lang === 'es' ? 'drop-es' : 'drop-en').classList.toggle('show');
+      document.getElementById(lang === 'es' ? 'drop-en' : 'drop-es').classList.remove('show');
+    }
+    // Cerrar si haces clic afuera
+    window.onclick = e => { 
+      if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show'));
+      }
+    };
+
+    // Nueva función que lee las fechas y llama a Firebase
+    async function pedirReporteRango(lang) {
+      const start = document.getElementById(`start-${lang}`).value;
+      const end = document.getElementById(`end-${lang}`).value;
+      
+      if(!start || !end) { 
+        showToast(currentUiLang === 'en' ? '⚠️ Select both dates' : '⚠️ Selecciona ambas fechas'); 
+        return; 
+      }
+      if(new Date(start) > new Date(end)) { 
+        showToast(currentUiLang === 'en' ? '⚠️ Start must be before End' : '⚠️ La fecha de inicio debe ser antes del fin'); 
+        return; 
+      }
+
+      document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show'));
+      
       const loadingScreen = document.getElementById('pdfLoading');
       loadingScreen.style.display = 'flex';
 
       try {
-        await fetch(`${PDF_FUNCTION_URL}?lang=${lang}`, { method: 'GET', mode: 'no-cors' });
+        await fetch(`${PDF_FUNCTION_URL}?lang=${lang}&start=${start}&end=${end}`, { method: 'GET', mode: 'no-cors' });
 
         setTimeout(() => {
           loadingScreen.style.display = 'none';
           const langTexto = lang === 'en' ? 'Inglés' : 'Español';
           const msg = currentUiLang === 'en'
-            ? `✅ Report in ${langTexto} is processing! Check your Telegram.`
-            : `✅ ¡Reporte en ${langTexto} en proceso! Llegará a tu Telegram.`;
+            ? `✅ Custom Report (${langTexto}) is processing! Check Telegram.`
+            : `✅ ¡Reporte personalizado (${langTexto}) en proceso! Llegará a Telegram.`;
           showToast(msg);
         }, 2500);
 
