@@ -1191,8 +1191,8 @@
             // Si es cripto y el checkbox está activo, mostramos el input editable
             qtyDisplay = `<input class="ci" style="width:75px; font-weight:bold; color:var(--b); border-color:var(--g);" value="${row.qty}" title="Editar cantidad en Staking" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()">`;
         } else {
-            // Si no está en staking, se muestra como texto normal
-            qtyDisplay = row.qty;
+            // ⚠️ FIX: Máximo 4 decimales limpios para acciones, decimales libres para cripto
+            qtyDisplay = isCrypto ? row.qty : parseFloat(Number(row.qty).toFixed(4));
         }
 
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
