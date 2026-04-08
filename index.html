@@ -91,13 +91,17 @@
       z-index: 10000; overflow: hidden;
     }
     .drop-content.show { display: block; animation: fadeIn 0.2s ease; }
-    .date-form { padding: 12px; display: flex; flex-direction: column; gap: 10px; width: 230px; }
+    /* Aumentamos el ancho a 260px y añadimos box-sizing para que no se desborden las fechas */
+    .date-form { padding: 12px; display: flex; flex-direction: column; gap: 10px; width: 260px; }
     .asset-list { max-height: 200px; overflow-y: auto; background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 15px; }
     .asset-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #e6edf3; font-size: 0.85rem; cursor: pointer; }
     .asset-item input[type="checkbox"] { accent-color: var(--b); transform: scale(1.2); cursor: pointer; }
     .date-label { color: var(--sub); font-size: 0.75rem; font-weight: bold; margin-bottom: 3px; display: block; }
-    .date-input { width: 100%; background: #0d1117; border: 1px solid var(--border); color: #e6edf3; padding: 6px; border-radius: 4px; outline: none; font-size: 0.8rem; }
-    .date-input:focus { border-color: var(--b); }
+    .date-input { box-sizing: border-box; width: 100%; background: #0d1117; border: 1px solid var(--border); color: #e6edf3; padding: 8px; border-radius: 4px; outline: none; font-size: 0.85rem; font-family: inherit; }
+    
+    /* Estilo de la barrita de búsqueda */
+    .search-asset { box-sizing: border-box; width: 100%; background: #0d1117; border: 1px solid var(--border); color: #e6edf3; padding: 8px; border-radius: 6px; outline: none; font-size: 0.85rem; margin-bottom: 10px; }
+    .search-asset:focus, .date-input:focus { border-color: var(--b); }
     .btn-gen-pdf { margin-top: 5px; padding: 8px; width: 100%; font-size: 0.8rem; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; color: white; transition: 0.2s; }
     .btn-gen-es { background: #1f6feb; } .btn-gen-es:hover { background: #388bfd; }
     .btn-gen-en { background: #2ea043; } .btn-gen-en:hover { background: #3fb950; }
@@ -598,6 +602,9 @@
       <h2><span id="assetModalTitle">📑 Seleccionar Activos</span></h2>
       <p style="color:var(--sub); font-size:0.8rem; margin-bottom:12px;" id="assetModalDesc">Elige los activos para tu reporte.</p>
       
+      <!-- BARRITA DE BÚSQUEDA -->
+      <input type="text" id="searchAssetInput" class="search-asset" onkeyup="filterAssets()">
+
       <div class="asset-item" style="border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:10px;">
         <input type="checkbox" id="chkAllAssets" checked onchange="toggleAllAssets(this.checked)">
         <label for="chkAllAssets" style="font-weight:bold; color:var(--b)" id="lblAllAssets">Seleccionar Todos</label>
@@ -1822,29 +1829,65 @@
       document.getElementById('btnGenAssetRep').style.background = lang === 'en' ? '#2ea043' : '#1f6feb';
       document.getElementById('btnGenAssetRep').style.borderColor = lang === 'en' ? '#3fb950' : '#388bfd';
 
-      const allAssets = [...SW, ...XT, ...CR].filter(a => a && a.t).map(a => String(a.t).toUpperCase());
-      const uniqueAssets = [...new Set(allAssets)].sort();
+      // Reseteamos la barra de búsqueda al abrir
+      const searchInput = document.getElementById('searchAssetInput');
+      searchInput.placeholder = lang === 'en' ? '🔍 Search asset...' : '🔍 Buscar activo...';
+      searchInput.value = '';
+
+      // Extracción de activos y Wallets
+      const assetMap = new Map();
+      [...SW, ...XT, ...CR].forEach(a => {
+          if (a && a.t) {
+              const t = String(a.t).toUpperCase();
+              let label = t;
+              // Añade la wallet visualmente solo a estables (USDT, USDC, EUSD)
+              if (['USDT', 'USDC', 'EUSD'].includes(t) && a.wallet) {
+                  label = `${t} (${a.wallet})`;
+              }
+              assetMap.set(label, t);
+          }
+      });
+      
+      const sortedLabels = Array.from(assetMap.keys()).sort();
       
       const container = document.getElementById('assetCheckboxes');
-      if (uniqueAssets.length === 0) {
+      if (sortedLabels.length === 0) {
         container.innerHTML = `<p style="color:var(--sub); font-size:0.8rem;">${lang === 'en' ? 'No assets found.' : 'No hay activos registrados.'}</p>`;
       } else {
-        container.innerHTML = uniqueAssets.map(t => `
-          <div class="asset-item">
-            <input type="checkbox" class="chk-asset-item" id="chk_${t}" value="${t}" checked>
-            <label for="chk_${t}">${t}</label>
+        container.innerHTML = sortedLabels.map((label, i) => {
+          const t = assetMap.get(label);
+          return `
+          <div class="asset-item modal-asset-row">
+            <input type="checkbox" class="chk-asset-item" id="chk_${i}" value="${t}" checked>
+            <label for="chk_${i}">${label}</label>
           </div>
-        `).join('');
+        `}).join('');
       }
 
       document.getElementById('chkAllAssets').checked = true;
       document.getElementById('assetModal').style.display = 'flex';
     }
 
+    // Función para filtrar mientras escribes
+    function filterAssets() {
+        const query = document.getElementById('searchAssetInput').value.toLowerCase();
+        const rows = document.querySelectorAll('.modal-asset-row');
+        rows.forEach(row => {
+            const label = row.querySelector('label').innerText.toLowerCase();
+            row.style.display = label.includes(query) ? 'flex' : 'none';
+        });
+    }
+
     function closeAssetModal() { document.getElementById('assetModal').style.display = 'none'; }
 
+    // Selecciona/Deselecciona SOLO los que están visibles en la búsqueda
     function toggleAllAssets(checked) {
-      document.querySelectorAll('.chk-asset-item').forEach(chk => chk.checked = checked);
+        const rows = document.querySelectorAll('.modal-asset-row');
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                row.querySelector('.chk-asset-item').checked = checked;
+            }
+        });
     }
 
     async function pedirReporteHistorial() {
