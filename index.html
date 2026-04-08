@@ -806,8 +806,9 @@
 
       <div class="asset-list" id="assetCheckboxes"></div>
 
-      <button class="modal-btn" style="background:#1f6feb;border-color:#388bfd" onclick="pedirReporteHistorial()" id="btnGenAssetRep">Generar Reporte PDF</button>
-      <button class="modal-btn" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeAssetModal()" id="btnCanAssetRep">Cancelar</button>
+      <button class="modal-btn" style="background:#1f6feb; border-color:#388bfd; margin-bottom:8px" onclick="pedirReporte('historial')" id="btnGenHistorial">Generar Historial (Solo Tablas)</button>
+      <button class="modal-btn" style="background:#21262d; border-color:var(--border);" onclick="pedirReporte('completo')" id="btnGenCompleto">Generar Reporte Completo (IA + Gráficas)</button>
+      <button class="modal-btn" style="background:transparent; border:1px solid var(--border); margin-top:8px" onclick="closeAssetModal()" id="btnCanAssetRep">Cancelar</button>
     </div>
   </div>
 
@@ -2081,12 +2082,14 @@
       document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show'));
 
       document.getElementById('assetModalTitle').innerText = lang === 'en' ? '📑 Select Assets'                                  : '📑 Seleccionar Activos';
-      document.getElementById('assetModalDesc').innerText  = lang === 'en' ? 'Choose the assets for your buy & sell history.'    : 'Elige los activos para tu reporte de compras y ventas.';
-      document.getElementById('lblAllAssets').innerText    = lang === 'en' ? 'Select All'                                        : 'Seleccionar Todos';
-      document.getElementById('btnGenAssetRep').innerText  = lang === 'en' ? 'Generate Report'                                   : 'Generar Reporte PDF';
-      document.getElementById('btnCanAssetRep').innerText  = lang === 'en' ? 'Cancel'                                            : 'Cancelar';
-      document.getElementById('btnGenAssetRep').style.background  = lang === 'en' ? '#2ea043' : '#1f6feb';
-      document.getElementById('btnGenAssetRep').style.borderColor = lang === 'en' ? '#3fb950' : '#388bfd';
+      document.getElementById('assetModalDesc').innerText  = lang === 'en' ? 'Choose assets and select report type.' : 'Elige los activos y el tipo de reporte.';
+      document.getElementById('lblAllAssets').innerText    = lang === 'en' ? 'Select All' : 'Seleccionar Todos';
+      document.getElementById('btnGenHistorial').innerText = lang === 'en' ? 'Generate History (Tables only)' : 'Generar Historial (Solo Tablas)';
+      document.getElementById('btnGenCompleto').innerText  = lang === 'en' ? 'Generate Full Report (AI + Charts)' : 'Generar Reporte Completo (IA + Gráficas)';
+      document.getElementById('btnCanAssetRep').innerText  = lang === 'en' ? 'Cancel' : 'Cancelar';
+      
+      document.getElementById('btnGenHistorial').style.background = lang === 'en' ? '#2ea043' : '#1f6feb';
+      document.getElementById('btnGenHistorial').style.borderColor = lang === 'en' ? '#3fb950' : '#388bfd';
 
       const searchInput = document.getElementById('searchAssetInput');
       searchInput.placeholder = lang === 'en' ? '🔍 Search asset...' : '🔍 Buscar activo...';
