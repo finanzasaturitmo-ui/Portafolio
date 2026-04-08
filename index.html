@@ -2085,8 +2085,13 @@
       document.getElementById('btnGenCompleto').innerText  = currentUiLang === 'en' ? 'Generate Full Report (AI + Charts)' : 'Generar Reporte Completo (IA + Gráficas)';
       document.getElementById('btnCanAssetRep').innerText  = currentUiLang === 'en' ? 'Cancel' : 'Cancelar';
       
+      // 1. Botón Historial (ES: Azul, EN: Verde)
       document.getElementById('btnGenHistorial').style.background = currentUiLang === 'en' ? '#2ea043' : '#1f6feb';
       document.getElementById('btnGenHistorial').style.borderColor = currentUiLang === 'en' ? '#3fb950' : '#388bfd';
+
+      // 2. Botón Reporte Completo (ES: Verde, EN: Azul) - Colores invertidos
+      document.getElementById('btnGenCompleto').style.background = currentUiLang === 'en' ? '#1f6feb' : '#2ea043';
+      document.getElementById('btnGenCompleto').style.borderColor = currentUiLang === 'en' ? '#388bfd' : '#3fb950';
 
       const searchInput = document.getElementById('searchAssetInput');
       searchInput.placeholder = currentUiLang === 'en' ? '🔍 Search asset...' : '🔍 Buscar activo...';
