@@ -559,48 +559,25 @@
       </div>
       <div class="hdr-right">
 
-        <!-- PDF Dropdown – Spanish -->
+        <!-- PDF Dropdown -->
         <div class="dropdown">
-          <button class="btn-pdf" onclick="toggleDrop('es')">
-            📥 <span class="hide-mob" style="margin-right:3px">Historial </span>Transacciones (ES) ▼
+          <button class="btn-pdf" onclick="toggleDrop()">
+            📥 <span class="hide-mob" style="margin-right:3px" id="lbl_btn_pdf_1">Descargar </span><span id="lbl_btn_pdf_2">Reporte ▼</span>
           </button>
-          <div id="drop-es" class="drop-content">
+          <div id="drop-pdf" class="drop-content">
             <div class="date-form">
               <div>
-                <label class="date-label">Desde:</label>
-                <input type="date" id="start-es" class="date-input"
-                  onchange="if(this.value) document.getElementById('end-es').focus()"
-                  onkeyup="if(event.key==='Enter') document.getElementById('end-es').focus()">
+                <label class="date-label" id="lbl_date_start">Desde:</label>
+                <input type="date" id="start-date" class="date-input"
+                  onchange="if(this.value) document.getElementById('end-date').focus()"
+                  onkeyup="if(event.key==='Enter') document.getElementById('end-date').focus()">
               </div>
               <div>
-                <label class="date-label">Hasta:</label>
-                <input type="date" id="end-es" class="date-input"
-                  onkeyup="if(event.key==='Enter') openAssetModal('es')">
+                <label class="date-label" id="lbl_date_end">Hasta:</label>
+                <input type="date" id="end-date" class="date-input"
+                  onkeyup="if(event.key==='Enter') openAssetModal()">
               </div>
-              <button class="btn-gen-pdf btn-gen-es" onclick="openAssetModal('es')">Elegir Activos ➔</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- PDF Dropdown – English -->
-        <div class="dropdown">
-          <button class="btn-pdf" onclick="toggleDrop('en')" style="background:#2ea043;box-shadow:0 0 8px rgba(46,160,67,0.4)">
-            📥 <span class="hide-mob" style="margin-right:3px">Transaction </span>History (EN) ▼
-          </button>
-          <div id="drop-en" class="drop-content">
-            <div class="date-form">
-              <div>
-                <label class="date-label">From:</label>
-                <input type="date" id="start-en" class="date-input"
-                  onchange="if(this.value) document.getElementById('end-en').focus()"
-                  onkeyup="if(event.key==='Enter') document.getElementById('end-en').focus()">
-              </div>
-              <div>
-                <label class="date-label">To:</label>
-                <input type="date" id="end-en" class="date-input"
-                  onkeyup="if(event.key==='Enter') openAssetModal('en')">
-              </div>
-              <button class="btn-gen-pdf btn-gen-en" onclick="openAssetModal('en')">Choose Assets ➔</button>
+              <button class="btn-gen-pdf btn-gen-es" id="btn_choose_assets" onclick="openAssetModal()">Elegir Activos ➔</button>
             </div>
           </div>
         </div>
@@ -799,9 +776,18 @@
 
       <input type="text" id="searchAssetInput" class="search-asset" onkeyup="filterAssets()">
 
-      <div class="asset-item" style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px">
-        <input type="checkbox" id="chkAllAssets" checked onchange="toggleAllAssets(this.checked)">
-        <label for="chkAllAssets" style="font-weight:bold;color:var(--blue)" id="lblAllAssets">Seleccionar Todos</label>
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 10px;">
+        <div class="asset-item" style="margin-bottom: 0;">
+          <input type="checkbox" id="chkAllAssets" checked onchange="toggleAllAssets(this.checked)">
+          <label for="chkAllAssets" style="font-weight:bold; color:var(--blue)" id="lblAllAssets">Seleccionar Todos</label>
+        </div>
+        <div class="asset-item" style="margin-bottom: 0; gap: 6px;">
+          <label style="color:var(--sub); font-size: 0.75rem; font-weight:bold;" id="lblRepLang">Idioma PDF:</label>
+          <select id="repLangSelect" style="background: var(--bg); border: 1px solid var(--border); color: var(--blue); padding: 4px 6px; border-radius: 4px; outline: none; cursor: pointer; font-weight: bold; font-size: 0.75rem;">
+            <option value="es">🇪🇸 ES</option>
+            <option value="en">🇺🇸 EN</option>
+          </select>
+        </div>
       </div>
 
       <div class="asset-list" id="assetCheckboxes"></div>
@@ -950,6 +936,14 @@
       document.getElementById('btn_cancel_sell').innerText      = T.btn_cancel;
       document.getElementById('lbl_loading_title').innerText    = T.loading_title;
       document.getElementById('lbl_loading_desc').innerText     = T.loading_desc;
+      
+      // Traducciones del nuevo Botón y Calendario Unificado
+      document.getElementById('lbl_btn_pdf_1').innerText = currentUiLang === 'en' ? 'Download ' : 'Descargar ';
+      document.getElementById('lbl_btn_pdf_2').innerText = currentUiLang === 'en' ? 'Report ▼' : 'Reporte ▼';
+      document.getElementById('lbl_date_start').innerText = currentUiLang === 'en' ? 'From:' : 'Desde:';
+      document.getElementById('lbl_date_end').innerText = currentUiLang === 'en' ? 'To:' : 'Hasta:';
+      document.getElementById('btn_choose_assets').innerText = currentUiLang === 'en' ? 'Choose Assets ➔' : 'Elegir Activos ➔';
+      document.getElementById('lblRepLang').innerText = currentUiLang === 'en' ? 'PDF Lang:' : 'Idioma PDF:';
     }
 
     /** Toggle UI language ES ↔ EN and re-render everything */
@@ -2057,9 +2051,8 @@
     // so a 2.5s timeout is used before showing the success toast.
     // ════════════════════════════════════════════════════════════════
 
-    function toggleDrop(lang) {
-      document.getElementById(lang === 'es' ? 'drop-es' : 'drop-en').classList.toggle('show');
-      document.getElementById(lang === 'es' ? 'drop-en' : 'drop-es').classList.remove('show');
+    function toggleDrop() {
+      document.getElementById('drop-pdf').classList.toggle('show');
     }
 
     // Close dropdowns on outside click
@@ -2069,30 +2062,34 @@
       }
     };
 
-    let repLang = 'es', repStart = '', repEnd = '';
+    let repStart = '', repEnd = '';
 
-    function openAssetModal(lang) {
-      const start = document.getElementById(`start-${lang}`).value;
-      const end   = document.getElementById(`end-${lang}`).value;
+    function openAssetModal() {
+      const start = document.getElementById('start-date').value;
+      const end   = document.getElementById('end-date').value;
 
       if (!start || !end)                     { showToast(currentUiLang === 'en' ? '⚠️ Select both dates'            : '⚠️ Selecciona ambas fechas'); return; }
       if (new Date(start) > new Date(end))    { showToast(currentUiLang === 'en' ? '⚠️ Start must be before End'    : '⚠️ Inicio debe ser antes del fin'); return; }
 
-      repLang = lang; repStart = start; repEnd = end;
+      repStart = start; repEnd = end;
       document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show'));
 
-      document.getElementById('assetModalTitle').innerText = lang === 'en' ? '📑 Select Assets'                                  : '📑 Seleccionar Activos';
-      document.getElementById('assetModalDesc').innerText  = lang === 'en' ? 'Choose assets and select report type.' : 'Elige los activos y el tipo de reporte.';
-      document.getElementById('lblAllAssets').innerText    = lang === 'en' ? 'Select All' : 'Seleccionar Todos';
-      document.getElementById('btnGenHistorial').innerText = lang === 'en' ? 'Generate History (Tables only)' : 'Generar Historial (Solo Tablas)';
-      document.getElementById('btnGenCompleto').innerText  = lang === 'en' ? 'Generate Full Report (AI + Charts)' : 'Generar Reporte Completo (IA + Gráficas)';
-      document.getElementById('btnCanAssetRep').innerText  = lang === 'en' ? 'Cancel' : 'Cancelar';
+      // Emparejar el selector de idioma del PDF con el idioma que estás usando en la página
+      document.getElementById('repLangSelect').value = currentUiLang;
+
+      // Textos bilingües del modal
+      document.getElementById('assetModalTitle').innerText = currentUiLang === 'en' ? '📑 Select Assets' : '📑 Seleccionar Activos';
+      document.getElementById('assetModalDesc').innerText  = currentUiLang === 'en' ? 'Choose assets and select report type.' : 'Elige los activos y el tipo de reporte.';
+      document.getElementById('lblAllAssets').innerText    = currentUiLang === 'en' ? 'Select All' : 'Seleccionar Todos';
+      document.getElementById('btnGenHistorial').innerText = currentUiLang === 'en' ? 'Generate History (Tables only)' : 'Generar Historial (Solo Tablas)';
+      document.getElementById('btnGenCompleto').innerText  = currentUiLang === 'en' ? 'Generate Full Report (AI + Charts)' : 'Generar Reporte Completo (IA + Gráficas)';
+      document.getElementById('btnCanAssetRep').innerText  = currentUiLang === 'en' ? 'Cancel' : 'Cancelar';
       
-      document.getElementById('btnGenHistorial').style.background = lang === 'en' ? '#2ea043' : '#1f6feb';
-      document.getElementById('btnGenHistorial').style.borderColor = lang === 'en' ? '#3fb950' : '#388bfd';
+      document.getElementById('btnGenHistorial').style.background = currentUiLang === 'en' ? '#2ea043' : '#1f6feb';
+      document.getElementById('btnGenHistorial').style.borderColor = currentUiLang === 'en' ? '#3fb950' : '#388bfd';
 
       const searchInput = document.getElementById('searchAssetInput');
-      searchInput.placeholder = lang === 'en' ? '🔍 Search asset...' : '🔍 Buscar activo...';
+      searchInput.placeholder = currentUiLang === 'en' ? '🔍 Search asset...' : '🔍 Buscar activo...';
       searchInput.value = '';
 
       // Build deduplicated asset map (stables include wallet label)
@@ -2108,7 +2105,7 @@
       const container    = document.getElementById('assetCheckboxes');
 
       container.innerHTML = sortedLabels.length === 0
-        ? `<p style="color:var(--sub);font-size:0.8rem">${lang === 'en' ? 'No assets found.' : 'No hay activos registrados.'}</p>`
+        ? `<p style="color:var(--sub);font-size:0.8rem">${currentUiLang === 'en' ? 'No assets found.' : 'No hay activos registrados.'}</p>`
         : sortedLabels.map((label, i) => `
             <div class="asset-item modal-asset-row">
               <input type="checkbox" class="chk-asset-item" id="chk_${i}" value="${assetMap.get(label)}" checked>
@@ -2147,20 +2144,21 @@
         return; 
       }
 
+      // Leemos el idioma exacto que el usuario seleccionó en el Modal
+      const selectedLang = document.getElementById('repLangSelect').value;
+
       closeAssetModal();
       const loadingScreen = document.getElementById('pdfLoading');
       loadingScreen.style.display = 'flex';
 
       try {
-        let url = `${PDF_FUNCTION_URL}?lang=${repLang}&start=${repStart}&end=${repEnd}`;
+        let url = `${PDF_FUNCTION_URL}?lang=${selectedLang}&start=${repStart}&end=${repEnd}`;
         
-        // Si el usuario presionó el botón de Historial, siempre enviamos la lista de activos
-        // (aunque sean todos). Esto fuerza al servidor a sacar el PDF corto.
+        // Si pide solo historial, enviamos los activos
         if (tipo === 'historial') {
             const assetsParam = encodeURIComponent(selected.join(','));
             url += `&assets=${assetsParam}`;
         }
-        // Si presionó 'completo', no enviamos 'assets', y el servidor genera el PDF grande.
 
         await fetch(url, { method: 'GET', mode: 'no-cors' });
 
