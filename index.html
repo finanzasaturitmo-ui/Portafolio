@@ -2139,9 +2139,8 @@
       });
     }
 
-   async function pedirReporteHistorial() {
+   async function pedirReporte(tipo) {
       const selected = Array.from(document.querySelectorAll('.chk-asset-item:checked')).map(c => c.value);
-      const totalAvailable = document.querySelectorAll('.chk-asset-item').length;
       
       if (selected.length === 0) { 
         showToast(currentUiLang === 'en' ? '⚠️ Select at least one asset' : '⚠️ Selecciona al menos un activo'); 
@@ -2153,26 +2152,25 @@
       loadingScreen.style.display = 'flex';
 
       try {
-        // Si selecciona absolutamente todos los activos, no enviamos el filtro.
-        // Esto le indica al servidor que genere el Reporte Completo del Portafolio.
         let url = `${PDF_FUNCTION_URL}?lang=${repLang}&start=${repStart}&end=${repEnd}`;
-        let isFullReport = true;
-
-        // Si desmarca al menos uno, enviamos la lista para generar solo el Historial de Transacciones.
-        if (selected.length < totalAvailable) {
+        
+        // Si el usuario presionó el botón de Historial, siempre enviamos la lista de activos
+        // (aunque sean todos). Esto fuerza al servidor a sacar el PDF corto.
+        if (tipo === 'historial') {
             const assetsParam = encodeURIComponent(selected.join(','));
             url += `&assets=${assetsParam}`;
-            isFullReport = false;
         }
+        // Si presionó 'completo', no enviamos 'assets', y el servidor genera el PDF grande.
 
         await fetch(url, { method: 'GET', mode: 'no-cors' });
 
         setTimeout(() => {
           loadingScreen.style.display = 'none';
-          const msgFull = currentUiLang === 'en' ? '✅ Full Portfolio Report is processing!' : '✅ ¡Reporte Completo en proceso!';
-          const msgHist = currentUiLang === 'en' ? '✅ Transaction History is processing!' : '✅ ¡Historial de Transacciones en proceso!';
+          const msg = tipo === 'completo' 
+             ? (currentUiLang === 'en' ? '✅ Full Report processing! Check Telegram.' : '✅ ¡Reporte Completo en proceso! Revisa Telegram.')
+             : (currentUiLang === 'en' ? '✅ History processing! Check Telegram.' : '✅ ¡Historial en proceso! Revisa Telegram.');
           
-          showToast((isFullReport ? msgFull : msgHist) + (currentUiLang === 'en' ? ' Check Telegram.' : ' Revisa Telegram.'));
+          showToast(msg);
         }, 2500);
       } catch (error) {
         loadingScreen.style.display = 'none';
