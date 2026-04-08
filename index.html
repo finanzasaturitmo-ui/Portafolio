@@ -92,7 +92,7 @@
     }
     .drop-content.show { display: block; animation: fadeIn 0.2s ease; }
     /* Aumentamos el ancho a 260px y añadimos box-sizing para que no se desborden las fechas */
-    .date-form { padding: 12px; display: flex; flex-direction: column; gap: 10px; width: 260px; }
+    .date-form { padding: 12px; display: flex; flex-direction: column; gap: 10px; width: 290px; max-width: 90vw; }
     .asset-list { max-height: 200px; overflow-y: auto; background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 15px; }
     .asset-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #e6edf3; font-size: 0.85rem; cursor: pointer; }
     .asset-item input[type="checkbox"] { accent-color: var(--b); transform: scale(1.2); cursor: pointer; }
@@ -378,7 +378,7 @@
           <button class="btn-pdf" onclick="toggleDrop('es')">📥 <span class="hide-mob" style="margin-right:3px">Historial </span>Compra y Venta (ES) ▼</button>
           <div id="drop-es" class="drop-content">
             <div class="date-form">
-              <div><label class="date-label">Desde:</label><input type="date" id="start-es" class="date-input"></div>
+              <div><label class="date-label">Desde:</label><input type="date" id="start-es" class="date-input" onchange="if(this.value) document.getElementById('end-es').focus()" onkeydown="if(event.key==='Enter'){ event.preventDefault(); document.getElementById('end-es').focus(); }"></div>
               <div><label class="date-label">Hasta:</label><input type="date" id="end-es" class="date-input"></div>
               <button class="btn-gen-pdf btn-gen-es" onclick="openAssetModal('es')">Elegir Activos ➔</button>
             </div>
@@ -389,7 +389,7 @@
           <button class="btn-pdf" onclick="toggleDrop('en')" style="background:#2ea043;box-shadow:0 0 8px rgba(46,160,67,0.4)">📥 <span class="hide-mob" style="margin-right:3px">History </span>Buy & Sell (EN) ▼</button>
           <div id="drop-en" class="drop-content">
             <div class="date-form">
-              <div><label class="date-label">From:</label><input type="date" id="start-en" class="date-input"></div>
+              <div><label class="date-label">From:</label><input type="date" id="start-en" class="date-input" onchange="if(this.value) document.getElementById('end-en').focus()" onkeydown="if(event.key==='Enter'){ event.preventDefault(); document.getElementById('end-en').focus(); }"></div>
               <div><label class="date-label">To:</label><input type="date" id="end-en" class="date-input"></div>
               <button class="btn-gen-pdf btn-gen-en" onclick="openAssetModal('en')">Choose Assets ➔</button>
             </div>
