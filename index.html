@@ -2,17 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mi Portafolio Pro | Sincronizado</title>
 
-  <!-- ═══════════════════════════════════════════
-       FAVICON
-  ═══════════════════════════════════════════ -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpolyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='20' fill='%2358a6ff' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E" />
 
-  <!-- ═══════════════════════════════════════════
-       LIBRERÍAS EXTERNAS
-  ═══════════════════════════════════════════ -->
+  <!-- External Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -20,321 +15,507 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
   <style>
-    /* ═══════════════════════════════════════════
-       1. RESET Y VARIABLES GLOBALES
-    ═══════════════════════════════════════════ */
+    /* ─── CSS Variables & Reset ─────────────────────────────────── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: "Segoe UI", sans-serif; background: #0d1117; color: #e6edf3; font-size: 13px; }
+
     :root {
-      --g:      #3fb950;
-      --r:      #f78166;
-      --b:      #58a6ff;
-      --border: #21262d;
-      --card:   #161b22;
-      --sub:    #8b949e;
-      --yellow: #f3ba2f;
+      --green:   #3fb950;
+      --red:     #f78166;
+      --blue:    #58a6ff;
+      --yellow:  #f3ba2f;
+      --border:  #21262d;
+      --card:    #161b22;
+      --sub:     #8b949e;
+      --bg:      #0d1117;
     }
 
-    /* ═══════════════════════════════════════════
-       2. PANTALLA DE LOGIN
-    ═══════════════════════════════════════════ */
-    #login-screen {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #0d1117; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      z-index: 9999; padding: 20px; text-align: center;
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: #e6edf3;
+      font-size: 13px;
     }
+
+    /* ─── Login Screen ──────────────────────────────────────────── */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      text-align: center;
+    }
+
     .btn-google {
-      background: #fff; color: #1f2328; border: none; padding: 12px 24px;
-      border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer;
-      margin-top: 25px; transition: 0.2s; display: flex; align-items: center; gap: 10px;
-      box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+      background: #fff;
+      color: #1f2328;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+      transition: 0.2s;
     }
     .btn-google:hover { background: #e6edf3; transform: scale(1.05); }
 
-    /* ═══════════════════════════════════════════
-       3. HEADER
-    ═══════════════════════════════════════════ */
+    /* ─── Header ────────────────────────────────────────────────── */
     .hdr {
-      background: linear-gradient(135deg, #1a2332, #0d1117);
-      padding: 12px 18px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 8px;
+      background: linear-gradient(135deg, #1a2332, var(--bg));
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
     }
-    .hdr h1    { font-size: 1.15rem; color: var(--b); font-weight: 700; }
+    .hdr h1    { font-size: 1.15rem; color: var(--blue); font-weight: 700; }
     .hdr-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-    .hdr input { background: transparent; border: none; color: var(--b); font-weight: 700; font-size: 0.88rem; width: 85px; outline: none; text-align: right; }
-    .opp-inp   { width: 35px !important; text-align: center !important; color: var(--g) !important; padding: 0 !important; }
+    .hdr input { background: transparent; border: none; color: var(--blue); font-weight: 700; font-size: 0.88rem; width: 85px; outline: none; text-align: right; }
 
-    /* ═══════════════════════════════════════════
-       4. BOTONES
-    ═══════════════════════════════════════════ */
-    .btn           { border: none; padding: 7px 14px; border-radius: 7px; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: 0.2s; }
-    .btn-undo-redo { background: #21262d; color: var(--sub); border: 1px solid var(--border); font-size: 0.68rem; padding: 5px 8px; border-radius: 5px; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    /* ─── Buttons ───────────────────────────────────────────────── */
+    .btn { border: none; padding: 7px 14px; border-radius: 7px; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: 0.2s; }
+
+    .btn-undo-redo {
+      background: #21262d;
+      color: var(--sub);
+      border: 1px solid var(--border);
+      font-size: 0.68rem;
+      padding: 5px 8px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
     .btn-undo-redo:hover:not(:disabled) { background: var(--border); color: #fff; }
     .btn-undo-redo:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-logout    { background: #f7816622; color: var(--r); border: 1px solid #f7816655; font-size: 0.68rem; padding: 5px 10px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
-    .btn-logout:hover { background: var(--r); color: #fff; }
-    .btn-add       { background: var(--g); color: #fff; border: none; font-size: 0.75rem; padding: 5px 12px; font-weight: 600; box-shadow: 0 0 5px rgba(63,185,80,0.3); }
-    .btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63,185,80,0.6); transform: scale(1.03); }
-    .btn-pdf       { background: #1f6feb; color: #fff; border: none; font-size: 0.68rem; padding: 5px 10px; border-radius: 5px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 0 8px rgba(31,111,235,0.4); cursor: pointer; }
-    .btn-pdf:hover { background: #388bfd; transform: scale(1.05); }
-    .btn-lang      { background: #21262d; color: #fff; border: 1px solid var(--border); font-size: 1rem; padding: 4px 8px; border-radius: 5px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 5px rgba(0,0,0,0.3); font-weight: bold; }
-    .btn-lang:hover{ background: #30363d; transform: scale(1.05); }
 
-    /* CSS para Menús Desplegables de Fechas */
+    .btn-logout {
+      background: #f7816622;
+      color: var(--red);
+      border: 1px solid #f7816655;
+      font-size: 0.68rem;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-logout:hover { background: var(--red); color: #fff; }
+
+    .btn-add {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      font-weight: 600;
+      box-shadow: 0 0 5px rgba(63, 185, 80, 0.3);
+    }
+    .btn-add:hover { background: #2ea043; box-shadow: 0 0 10px rgba(63, 185, 80, 0.6); transform: scale(1.03); }
+
+    .btn-pdf {
+      background: #1f6feb;
+      color: #fff;
+      border: none;
+      font-size: 0.68rem;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 0 8px rgba(31, 111, 235, 0.4);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-pdf:hover { background: #388bfd; transform: scale(1.05); }
+
+    .btn-lang {
+      background: #21262d;
+      color: #fff;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      transition: 0.2s;
+    }
+    .btn-lang:hover { background: #30363d; transform: scale(1.05); }
+
+    /* ─── PDF Date Dropdowns ────────────────────────────────────── */
     .dropdown { position: relative; display: inline-block; }
-    .drop-content { 
-      display: none; position: absolute; right: 0; top: 110%; 
-      background: var(--card); border: 1px solid var(--border); 
-      border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.6); 
-      z-index: 10000; overflow: hidden;
+
+    .drop-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 110%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+      z-index: 10000;
+      overflow: hidden;
     }
     .drop-content.show { display: block; animation: fadeIn 0.2s ease; }
-    
-    /* Responsive puro: Ancho basado en el contenido */
-    .date-form { padding: 16px; display: flex; flex-direction: column; gap: 12px; width: max-content; min-width: 250px; max-width: 95vw; box-sizing: border-box; }
-    .asset-list { max-height: 200px; overflow-y: auto; background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 15px; }
-    .asset-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #e6edf3; font-size: 0.85rem; cursor: pointer; }
-    .asset-item input[type="checkbox"] { accent-color: var(--b); transform: scale(1.2); cursor: pointer; }
+
+    .date-form { padding: 16px; display: flex; flex-direction: column; gap: 12px; width: max-content; min-width: 250px; max-width: 95vw; }
     .date-label { color: var(--sub); font-size: 0.75rem; font-weight: bold; margin-bottom: 4px; display: block; }
-    
-    /* Optimizados para Safari: Min-height y font-size a 1rem */
-    .date-input { box-sizing: border-box; width: 100%; min-height: 40px; background: #0d1117; border: 1px solid var(--border); color: #e6edf3; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 1rem; font-family: inherit; }
-    
-    /* Estilo de la barrita de búsqueda */
-    .search-asset { box-sizing: border-box; width: 100%; background: #0d1117; border: 1px solid var(--border); color: #e6edf3; padding: 8px; border-radius: 6px; outline: none; font-size: 0.85rem; margin-bottom: 10px; }
-    .search-asset:focus, .date-input:focus { border-color: var(--b); }
+
+    /* min-height + font-size 1rem fixes Safari tap targets */
+    .date-input {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 40px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: #e6edf3;
+      padding: 8px 10px;
+      border-radius: 6px;
+      outline: none;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    .date-input:focus { border-color: var(--blue); }
+
     .btn-gen-pdf { margin-top: 5px; padding: 8px; width: 100%; font-size: 0.8rem; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; color: white; transition: 0.2s; }
     .btn-gen-es { background: #1f6feb; } .btn-gen-es:hover { background: #388bfd; }
     .btn-gen-en { background: #2ea043; } .btn-gen-en:hover { background: #3fb950; }
 
-    /* ═══════════════════════════════════════════
-       5. CONTENEDOR PRINCIPAL Y TARJETAS (CARDS)
-    ═══════════════════════════════════════════ */
-    main   { padding: 14px 18px; max-width: 1300px; margin: 0 auto; }
+    /* ─── Asset Selection Modal – search & list ─────────────────── */
+    .search-asset {
+      box-sizing: border-box;
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: #e6edf3;
+      padding: 8px;
+      border-radius: 6px;
+      outline: none;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    .search-asset:focus { border-color: var(--blue); }
+
+    .asset-list { max-height: 200px; overflow-y: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 15px; }
+
+    .asset-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #e6edf3; font-size: 0.85rem; cursor: pointer; }
+    .asset-item input[type="checkbox"] { accent-color: var(--blue); transform: scale(1.2); cursor: pointer; }
+
+    /* ─── Layout: Main & Cards ──────────────────────────────────── */
+    main { padding: 14px 18px; max-width: 1300px; margin: 0 auto; }
+
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 10px; margin-bottom: 14px; }
-    .card  { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 12px; }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 12px; }
     .card .lbl { font-size: 0.68rem; color: var(--sub); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
     .card .val { font-size: 1.2rem; font-weight: 700; }
     .card .s2  { font-size: 0.72rem; color: var(--sub); margin-top: 2px; }
-    .g { color: var(--g) !important; }
-    .r { color: var(--r) !important; }
-    .b { color: var(--b); }
 
-    /* ═══════════════════════════════════════════
-       6. GRÁFICOS
-    ═══════════════════════════════════════════ */
-    .charts  { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-    .ch      { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 13px; }
+    /* Color helpers */
+    .g { color: var(--green) !important; }
+    .r { color: var(--red)   !important; }
+    .b { color: var(--blue); }
+
+    /* ─── Charts ────────────────────────────────────────────────── */
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+
+    .ch { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 13px; }
     .ch h3   { font-size: 0.72rem; color: var(--sub); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 9px; }
     .ch-wrap { height: 200px; position: relative; transition: height 0.3s; }
 
-    /* ═══════════════════════════════════════════
-       7. PESTAÑAS DE NAVEGACIÓN (ACCIONES / CRIPTO)
-    ═══════════════════════════════════════════ */
+    /* ─── Navigation Tabs ───────────────────────────────────────── */
     .view-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-    .view-tab  { background: #0d1117; border: 1px solid var(--border); color: var(--sub); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: 0.2s; }
-    .view-tab:hover  { background: #161b22; color: #e6edf3; }
-    .view-tab.active { background: #21262d; color: var(--b); border-color: var(--b); box-shadow: 0 0 10px rgba(88,166,255,0.15); }
+
+    .view-tab { background: var(--bg); border: 1px solid var(--border); color: var(--sub); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: 0.2s; }
+    .view-tab:hover  { background: var(--card); color: #e6edf3; }
+    .view-tab.active { background: #21262d; color: var(--blue); border-color: var(--blue); box-shadow: 0 0 10px rgba(88, 166, 255, 0.15); }
+
     .tab-content        { display: none; animation: fadeIn 0.3s ease; }
     .tab-content.active { display: block; }
+
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ═══════════════════════════════════════════
-       8. BOTÓN FLOTANTE MÓVIL (FAB)
-    ═══════════════════════════════════════════ */
+    /* ─── Mobile FAB (Floating Action Button) ───────────────────── */
     .fab-btn { display: none; }
 
-    /* ═══════════════════════════════════════════
-       9. TABLAS DE BROKERS
-    ═══════════════════════════════════════════ */
-    .broker     { background: var(--card); border: 1px solid var(--border); border-radius: 9px; margin-bottom: 12px; overflow: hidden; }
-    .bhdr       { padding: 9px 14px; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
-    .bhdr.sw    { color: #79c0ff;       background: linear-gradient(90deg, #1a3a5c22, transparent); }
-    .bhdr.xt    { color: #56d364;       background: linear-gradient(90deg, #1a5c3a22, transparent); }
-    .bhdr.cr    { color: var(--yellow); background: linear-gradient(90deg, #f3ba2f22, transparent); }
+    /* ─── Broker Tables ─────────────────────────────────────────── */
+    .broker { background: var(--card); border: 1px solid var(--border); border-radius: 9px; margin-bottom: 12px; overflow: hidden; }
+
+    .bhdr { padding: 9px 14px; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .bhdr.sw { color: #79c0ff;         background: linear-gradient(90deg, #1a3a5c22, transparent); }
+    .bhdr.xt { color: #56d364;         background: linear-gradient(90deg, #1a5c3a22, transparent); }
+    .bhdr.cr { color: var(--yellow);   background: linear-gradient(90deg, #f3ba2f22, transparent); }
+
     .bhdr-controls { display: flex; gap: 6px; align-items: center; }
-    .tbl-wrap   { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table       { width: 100%; border-collapse: collapse; text-align: center; }
-    th          { color: var(--sub); padding: 6px 8px; font-weight: 500; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--border); white-space: nowrap; text-align: center; cursor: pointer; transition: 0.2s; user-select: none; }
-    th:hover    { color: var(--b); }
-    td          { padding: 4px 5px; border-bottom: 1px solid #0d111766; white-space: nowrap; text-align: center; }
+
+    .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    table { width: 100%; border-collapse: collapse; text-align: center; }
+    th {
+      color: var(--sub);
+      padding: 6px 8px;
+      font-weight: 500;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: 0.2s;
+    }
+    th:hover { color: var(--blue); }
+    td { padding: 4px 5px; border-bottom: 1px solid #0d111766; white-space: nowrap; text-align: center; }
     tr:hover td { background: #1c212855; }
+
     .sort-icon        { font-size: 0.7rem; opacity: 0.3; margin-left: 4px; display: inline-block; transition: 0.2s; }
-    .sort-icon.active { opacity: 1; color: var(--b); }
+    .sort-icon.active { opacity: 1; color: var(--blue); }
 
-    /* ═══════════════════════════════════════════
-       10. INPUTS DE TABLA Y CHECKBOX DE STAKING
-    ═══════════════════════════════════════════ */
-    .ci          { background: #0d1117; border: 1px solid var(--border); color: #e6edf3; border-radius: 5px; padding: 4px 7px; width: 90px; font-size: 0.8rem; outline: none; transition: 0.15s; text-align: center; }
-    .ci.wallet   { width: 110px; color: var(--sub); font-size: 0.75rem; }
-    .ci:focus    { border-color: var(--b); background: #0d1c2e; }
-    .ci.ticker   { width: 85px; text-transform: uppercase; font-weight: 700; color: var(--b); text-align: center; }
+    /* ─── Table Inputs ──────────────────────────────────────────── */
+    .ci {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: #e6edf3;
+      border-radius: 5px;
+      padding: 4px 7px;
+      width: 90px;
+      font-size: 0.8rem;
+      outline: none;
+      text-align: center;
+      transition: 0.15s;
+    }
+    .ci.ticker  { width: 85px; text-transform: uppercase; font-weight: 700; color: var(--blue); }
+    .ci.wallet  { width: 110px; color: var(--sub); font-size: 0.75rem; }
+    .ci:focus   { border-color: var(--blue); background: #0d1c2e; }
     .pending .ci { color: var(--sub); }
-    .chk-staking { transform: scale(1.3); cursor: pointer; accent-color: var(--g); margin-top: 3px; }
 
-    /* ═══════════════════════════════════════════
-       11. BOTONES DE ACCIÓN EN FILAS
-    ═══════════════════════════════════════════ */
+    .chk-staking { transform: scale(1.3); cursor: pointer; accent-color: var(--green); margin-top: 3px; }
+
+    /* ─── Row Action Buttons ────────────────────────────────────── */
     .action-btns    { display: flex; gap: 4px; justify-content: center; align-items: center; }
-    .icon-btn       { background: transparent; border: none; cursor: pointer; padding: 2px 5px; font-size: 0.95rem; transition: 0.15s; opacity: 0.7; }
+    .icon-btn       { background: transparent; border: none; cursor: pointer; padding: 2px 5px; font-size: 0.95rem; opacity: 0.7; transition: 0.15s; }
     .icon-btn:hover { opacity: 1; transform: scale(1.1); }
     .btn-del        { color: #ff4444; opacity: 1; }
     .btn-del:hover  { color: #ff6666; }
 
-    /* ═══════════════════════════════════════════
-       12. DRAG & DROP (REORDENAR FILAS)
-    ═══════════════════════════════════════════ */
+    /* ─── Drag & Drop Handle ────────────────────────────────────── */
     .drag-handle        { cursor: grab; padding: 0 10px; color: var(--sub); font-size: 1rem; opacity: 0.5; transition: 0.2s; width: 30px; touch-action: none; }
-    .drag-handle:hover  { opacity: 1; color: var(--b); }
+    .drag-handle:hover  { opacity: 1; color: var(--blue); }
     .drag-handle:active { cursor: grabbing; }
-    .sortable-ghost     { opacity: 0.2; background-color: var(--b); }
-    .sortable-drag      { background-color: var(--card); box-shadow: 0 15px 25px rgba(0,0,0,0.8); opacity: 1 !important; }
+    .sortable-ghost { opacity: 0.2; background-color: var(--blue); }
+    .sortable-drag  { background-color: var(--card); box-shadow: 0 15px 25px rgba(0, 0, 0, 0.8); opacity: 1 !important; }
 
-    /* ═══════════════════════════════════════════
-       13. MINI INPUT DE OPORTUNIDAD DE COMPRA
-    ═══════════════════════════════════════════ */
-    .opp-mini       { display: flex; align-items: center; background: #161b22; border: 1px solid #21262d; padding: 3px 6px; border-radius: 5px; font-size: 0.7rem; color: #8b949e; margin-right: 4px; }
-    .opp-mini input { width: 30px; text-align: center; background: transparent; border: none; color: var(--g); font-weight: bold; outline: none; font-size: 0.75rem; -moz-appearance: textfield; }
+    /* ─── Buy Opportunity Mini-Input ────────────────────────────── */
+    .opp-mini { display: flex; align-items: center; background: var(--card); border: 1px solid #21262d; padding: 3px 6px; border-radius: 5px; font-size: 0.7rem; color: var(--sub); margin-right: 4px; }
+    .opp-mini input {
+      width: 30px;
+      text-align: center;
+      background: transparent;
+      border: none;
+      color: var(--green);
+      font-weight: bold;
+      outline: none;
+      font-size: 0.75rem;
+      -moz-appearance: textfield;
+    }
     .opp-mini input::-webkit-outer-spin-button,
     .opp-mini input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-    /* ═══════════════════════════════════════════
-       14. BADGES Y ESTILOS ESPECIALES
-    ═══════════════════════════════════════════ */
+    /* ─── Misc: Badges, Computed Cells, Opportunity Glow ────────── */
     .badge    { display: inline-block; background: #21262d; color: var(--sub); font-size: 0.62rem; padding: 1px 5px; border-radius: 9px; margin-left: 4px; vertical-align: middle; }
     .computed { font-size: 0.8rem; padding: 5px 8px; }
-    .opp-glow { color: #3fb950 !important; font-weight: 900 !important; text-shadow: 0 0 8px rgba(63,185,80,0.8); animation: pulse-green 1.2s infinite alternate; }
+
+    .opp-glow {
+      color: var(--green) !important;
+      font-weight: 900 !important;
+      text-shadow: 0 0 8px rgba(63, 185, 80, 0.8);
+      animation: pulse-green 1.2s infinite alternate;
+    }
     @keyframes pulse-green {
-      0%   { text-shadow: 0 0 5px rgba(63,185,80,0.5); }
-      100% { text-shadow: 0 0 15px rgba(63,185,80,1), 0 0 20px rgba(63,185,80,0.8); }
+      0%   { text-shadow: 0 0 5px rgba(63, 185, 80, 0.5); }
+      100% { text-shadow: 0 0 15px rgba(63, 185, 80, 1), 0 0 20px rgba(63, 185, 80, 0.8); }
     }
 
-    /* ═══════════════════════════════════════════
-       15. PANEL DE RESUMEN CONSOLIDADO
-    ═══════════════════════════════════════════ */
-    .bottom    { display: block; margin-bottom: 14px; }
-    .sum-box   { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+    /* ─── Consolidated Summary Panel ───────────────────────────── */
+    .bottom   { display: block; margin-bottom: 14px; }
+    .sum-box  { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
     .box-title { font-size: 0.85rem; color: #e6edf3; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-    .sum-grid  { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
-    .sum-card  { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+    .sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+    .sum-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
 
-    /* ═══════════════════════════════════════════
-       16. PANEL SKANDIA
-    ═══════════════════════════════════════════ */
-    .sk-panel       { background: #0d1117; border: 1px dashed #3fb95066; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
-    .sk-hdr         { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-    .sk-title-badge { background: var(--card); padding: 4px 8px; font-size: 0.68rem; color: #3fb950; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 4px; border: 1px solid var(--border); }
-    .sk-grid        { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .sk-edit-group  { position: relative; margin-top: 5px; }
-    .sk-edit-badge  { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--sub); font-weight: 700; background: #21262d; padding: 3px 6px; border-radius: 4px; pointer-events: none; }
-    .sk-edit-input  { width: 100%; background: #161b22; border: 1px solid #30363d; color: var(--b); font-weight: 700; text-align: right; padding: 8px 10px 8px 50px; border-radius: 6px; font-size: 0.95rem; outline: none; transition: 0.2s; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); }
+    /* ─── Skandia Panel ─────────────────────────────────────────── */
+    .sk-panel { background: var(--bg); border: 1px dashed #3fb95066; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
+    .sk-hdr   { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+    .sk-title-badge { background: var(--card); padding: 4px 8px; font-size: 0.68rem; color: var(--green); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 4px; border: 1px solid var(--border); }
+
+    .sk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .sk-edit-group { position: relative; margin-top: 5px; }
+    .sk-edit-badge { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--sub); font-weight: 700; background: #21262d; padding: 3px 6px; border-radius: 4px; pointer-events: none; }
+    .sk-edit-input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid #30363d;
+      color: var(--blue);
+      font-weight: 700;
+      text-align: right;
+      padding: 8px 10px 8px 50px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+      transition: 0.2s;
+    }
     .sk-edit-input:hover { border-color: #58a6ff66; }
-    .sk-edit-input:focus { border-color: #3fb950; box-shadow: 0 0 0 2px rgba(63,185,80,0.2); background: #0d1117; }
-    .totals-panel { background: linear-gradient(135deg, #161b22, #0d1117); border: 1px solid #58a6ff44; border-radius: 8px; padding: 16px; }
+    .sk-edit-input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(63, 185, 80, 0.2); background: var(--bg); }
 
-    /* ═══════════════════════════════════════════
-       17. MODALES — REGISTRO DE COMPRA Y VENTA
-    ═══════════════════════════════════════════ */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 100000; backdrop-filter: blur(4px); }
-    .modal         { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; width: 90%; max-width: 360px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
-    .modal h2      { font-size: 1.15rem; color: var(--b); margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .modal-row     { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
-    .modal-label   { color: var(--sub); font-size: 0.85rem; }
-    .modal-val     { font-size: 0.95rem; font-weight: 700; color: #e6edf3; }
-    .modal-input   { background: #0d1117; border: 1px solid var(--border); color: var(--b); font-weight: bold; padding: 8px 10px; border-radius: 6px; width: 110px; text-align: right; outline: none; font-size: 0.9rem; transition: 0.2s; }
-    .modal-input:focus { border-color: var(--b); box-shadow: 0 0 0 2px rgba(88,166,255,0.2); }
-    .modal-res     { background: #0d1117; padding: 14px; border-radius: 8px; margin-top: 18px; border: 1px dashed #58a6ff66; }
+    .totals-panel { background: linear-gradient(135deg, var(--card), var(--bg)); border: 1px solid #58a6ff44; border-radius: 8px; padding: 16px; }
+
+    /* ─── Buy / Sell Modals ─────────────────────────────────────── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 100000; backdrop-filter: blur(4px); }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; width: 90%; max-width: 360px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); }
+    .modal h2 { font-size: 1.15rem; color: var(--blue); margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+    .modal-row   { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
+    .modal-label { color: var(--sub); font-size: 0.85rem; }
+    .modal-val   { font-size: 0.95rem; font-weight: 700; color: #e6edf3; }
+
+    .modal-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--blue);
+      font-weight: bold;
+      padding: 8px 10px;
+      border-radius: 6px;
+      width: 110px;
+      text-align: right;
+      outline: none;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .modal-input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2); }
+
+    .modal-res { background: var(--bg); padding: 14px; border-radius: 8px; margin-top: 18px; border: 1px dashed #58a6ff66; }
     .modal-res-row { display: flex; justify-content: space-between; margin-bottom: 6px; align-items: center; }
-    .modal-btn     { width: 100%; background: #21262d; color: #e6edf3; border: 1px solid var(--border); padding: 10px; border-radius: 6px; margin-top: 15px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-    .modal-btn:hover { background: #30363d; border-color: #8b949e; }
 
-    /* ═══════════════════════════════════════════
-       18. TOAST Y SPINNER DE CARGA DEL PDF
-    ═══════════════════════════════════════════ */
+    .modal-btn { width: 100%; background: #21262d; color: #e6edf3; border: 1px solid var(--border); padding: 10px; border-radius: 6px; margin-top: 15px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+    .modal-btn:hover { background: #30363d; border-color: var(--sub); }
+
+    /* ─── Toast Notification ────────────────────────────────────── */
     .toast      { position: fixed; bottom: 18px; right: 18px; background: #1f6feb; color: #fff; padding: 9px 16px; border-radius: 7px; font-size: 0.78rem; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 99999; }
     .toast.show { opacity: 1; }
 
-    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 100000; backdrop-filter: blur(5px); }
-    .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--b); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    /* ─── PDF Generation Loading Overlay ────────────────────────── */
+    .loading-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 100000; backdrop-filter: blur(5px); }
+    .spinner { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--blue); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ═══════════════════════════════════════════
-       19. RESPONSIVE — TABLETAS Y CELULARES (≤ 768px)
-    ═══════════════════════════════════════════ */
+    /* ─── Responsive: Tablet & Mobile (≤ 768px) ─────────────────── */
     @media (max-width: 768px) {
       body { font-size: 11px; }
       main { padding: 10px; padding-bottom: 100px; }
 
-     /* Header */
       .hdr       { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px; }
       .hdr-right { width: 100%; justify-content: space-between; flex-wrap: wrap; position: relative; }
       .hide-mob  { display: none !important; }
-      
-      /* Corrección de pop-ups en móvil para que no salgan de pantalla */
-      .dropdown { position: static; }
-      .drop-content { left: 10px; right: 10px; width: auto; max-width: calc(100vw - 20px); }
-      .date-form { width: 100%; }
 
-      /* Tarjetas */
+      /* Dropdowns stay within screen bounds */
+      .dropdown    { position: static; }
+      .drop-content { left: 10px; right: 10px; width: auto; max-width: calc(100vw - 20px); }
+      .date-form   { width: 100%; }
+
       .cards     { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
       .card      { padding: 8px; }
       .card .lbl { font-size: 0.6rem; margin-bottom: 1px; }
       .card .val { font-size: 1rem; }
       .card .s2  { font-size: 0.65rem; }
 
-      /* Gráficos */
       .charts  { grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
       .ch-wrap { height: 280px !important; }
 
-      /* Botón flotante (FAB) */
+      /* FAB */
       .fab-btn {
-        display: flex; position: fixed; bottom: 20px; right: 20px;
-        width: 56px; height: 56px; border-radius: 50%;
-        background: rgba(22,27,34,0.85); backdrop-filter: blur(10px);
-        border: 2px solid var(--yellow); align-items: center; justify-content: center;
-        font-size: 1.6rem; z-index: 9999; cursor: pointer;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.6), 0 0 12px rgba(243,186,47,0.5);
+        display: flex;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: rgba(22, 27, 34, 0.85);
+        backdrop-filter: blur(10px);
+        border: 2px solid var(--yellow);
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        z-index: 9999;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(243, 186, 47, 0.5);
         transition: 0.3s;
       }
       .fab-btn:active { transform: scale(0.9); }
 
-      /* Menú de pestañas flotante */
+      /* Floating tabs menu */
       .view-tabs {
-        position: fixed; bottom: 85px; right: 20px; left: auto;
-        flex-direction: column; align-items: flex-end;
-        gap: 8px; margin: 0; padding: 0; background: transparent; border: none;
-        box-shadow: none; z-index: 9990; pointer-events: none;
-        opacity: 0; transform: translateY(20px); transition: 0.3s ease;
+        position: fixed;
+        bottom: 85px;
+        right: 20px;
+        left: auto;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        z-index: 9990;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: 0.3s ease;
       }
-      .view-tabs.open                 { opacity: 1; pointer-events: auto; transform: translateY(0); }
-      .view-tabs .view-tab.active     { display: none !important; }
-      .view-tab { background: rgba(22,27,34,0.95); backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-align: right; padding: 12px 20px; }
+      .view-tabs.open               { opacity: 1; pointer-events: auto; transform: translateY(0); }
+      .view-tabs .view-tab.active   { display: none !important; }
+      .view-tab { background: rgba(22, 27, 34, 0.95); backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); text-align: right; padding: 12px 20px; }
 
-      /* Cabeceras de brokers */
-      .bhdr          { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
-      .bhdr > span   { font-size: 1rem; text-align: center; }
-      .bhdr-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; width: 100%; }
+      .bhdr            { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
+      .bhdr > span     { font-size: 1rem; text-align: center; }
+      .bhdr-controls   { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; width: 100%; }
       .bhdr-controls .opp-mini      { margin: 0; justify-content: center; }
       .bhdr-controls .btn-undo-redo { justify-content: center; padding: 8px 0; }
       .bhdr-controls .btn-add       { grid-column: 1 / -1; margin-top: 5px; padding: 12px; font-size: 1rem; border-radius: 8px; }
 
-      /* Tablas */
       .tbl-wrap          { overflow-x: auto; -webkit-overflow-scrolling: touch; border-bottom: 1px solid var(--border); }
       table th, table td { font-size: 0.75rem; padding: 4px 3px; }
-      .ci                { padding: 3px 5px; width: 75px; font-size: 0.75rem; }
-      .ci.ticker         { width: 70px; }
-      .ci.wallet         { width: 90px; }
+      .ci        { padding: 3px 5px; width: 75px; font-size: 0.75rem; }
+      .ci.ticker { width: 70px; }
+      .ci.wallet { width: 90px; }
 
-      /* Panel resumen */
       .sum-box { padding: 12px; }
       .sk-grid { grid-template-columns: 1fr; gap: 12px; }
     }
 
-    /* ═══════════════════════════════════════════
-       20. RESPONSIVE — MÓVILES PEQUEÑOS (≤ 480px)
-    ═══════════════════════════════════════════ */
+    /* ─── Responsive: Small Mobile (≤ 480px) ───────────────────── */
     @media (max-width: 480px) {
       .cards { grid-template-columns: 1fr; }
     }
@@ -342,17 +523,15 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       PANTALLA DE LOGIN
-  ═══════════════════════════════════════════════════════════════ -->
+  <!-- ─── Login Screen ──────────────────────────────────────────── -->
   <div id="login-screen">
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width="80" height="80" style="margin-bottom:20px">
-      <rect width='32' height='32' rx='7' fill='#161b22'/>
-      <polyline points='5,26 12,18 18,22 27,8' fill='none' stroke='#3fb950' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>
-      <path d='M21,8 L27,8 L27,14' fill='none' stroke='#3fb950' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>
-      <text x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='19' fill='#58a6ff' text-anchor='middle'>$</text>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="80" height="80" style="margin-bottom:20px">
+      <rect width="32" height="32" rx="7" fill="#161b22"/>
+      <polyline points="5,26 12,18 18,22 27,8" fill="none" stroke="#3fb950" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M21,8 L27,8 L27,14" fill="none" stroke="#3fb950" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="16" y="23" font-family="Segoe UI, sans-serif" font-weight="900" font-size="19" fill="#58a6ff" text-anchor="middle">$</text>
     </svg>
-    <h1 style="font-size:2.2rem;color:var(--b);margin-bottom:10px">Mi Portafolio Pro</h1>
+    <h1 style="font-size:2.2rem;color:var(--blue);margin-bottom:10px">Mi Portafolio Pro</h1>
     <p style="color:var(--sub);max-width:300px">Bóveda personal sincronizada en la nube segura de Google Firebase.</p>
     <button class="btn-google" onclick="iniciarSesion()">
       <svg width="20" height="20" viewBox="0 0 48 48">
@@ -366,12 +545,10 @@
     <p style="color:#444;font-size:0.7rem;margin-top:50px">Solo acceso autorizado.</p>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       APLICACIÓN PRINCIPAL (visible tras login)
-  ═══════════════════════════════════════════════════════════════ -->
+  <!-- ─── Main Application (visible after login) ────────────────── -->
   <div id="app-content" style="display:none">
 
-    <!-- TRM oculto — leído internamente por JS para cálculos COP -->
+    <!-- Hidden TRM input – read internally by JS for COP calculations -->
     <input id="rateInput" value="4180" type="hidden">
 
     <!-- HEADER -->
@@ -381,28 +558,53 @@
         <div style="font-size:.68rem;color:var(--sub)" id="lastSaved">Conectando a la nube...</div>
       </div>
       <div class="hdr-right">
-        <!-- Dropdown ES -->
+
+        <!-- PDF Dropdown – Spanish -->
         <div class="dropdown">
-          <button class="btn-pdf" onclick="toggleDrop('es')">📥 <span class="hide-mob" style="margin-right:3px">Historial </span>Compra y Venta (ES) ▼</button>
+          <button class="btn-pdf" onclick="toggleDrop('es')">
+            📥 <span class="hide-mob" style="margin-right:3px">Historial </span>Compra y Venta (ES) ▼
+          </button>
           <div id="drop-es" class="drop-content">
             <div class="date-form">
-              <div><label class="date-label">Desde:</label><input type="date" id="start-es" class="date-input" onchange="if(this.value) document.getElementById('end-es').focus()" onkeyup="if(event.key==='Enter') document.getElementById('end-es').focus();"></div>
-              <div><label class="date-label">Hasta:</label><input type="date" id="end-es" class="date-input" onkeyup="if(event.key==='Enter') openAssetModal('es');"></div>
+              <div>
+                <label class="date-label">Desde:</label>
+                <input type="date" id="start-es" class="date-input"
+                  onchange="if(this.value) document.getElementById('end-es').focus()"
+                  onkeyup="if(event.key==='Enter') document.getElementById('end-es').focus()">
+              </div>
+              <div>
+                <label class="date-label">Hasta:</label>
+                <input type="date" id="end-es" class="date-input"
+                  onkeyup="if(event.key==='Enter') openAssetModal('es')">
+              </div>
               <button class="btn-gen-pdf btn-gen-es" onclick="openAssetModal('es')">Elegir Activos ➔</button>
             </div>
           </div>
         </div>
-        <!-- Dropdown EN -->
+
+        <!-- PDF Dropdown – English -->
         <div class="dropdown">
-          <button class="btn-pdf" onclick="toggleDrop('en')" style="background:#2ea043;box-shadow:0 0 8px rgba(46,160,67,0.4)">📥 <span class="hide-mob" style="margin-right:3px">History </span>Buy & Sell (EN) ▼</button>
+          <button class="btn-pdf" onclick="toggleDrop('en')" style="background:#2ea043;box-shadow:0 0 8px rgba(46,160,67,0.4)">
+            📥 <span class="hide-mob" style="margin-right:3px">History </span>Buy & Sell (EN) ▼
+          </button>
           <div id="drop-en" class="drop-content">
             <div class="date-form">
-              <div><label class="date-label">From:</label><input type="date" id="start-en" class="date-input" onchange="if(this.value) document.getElementById('end-en').focus()" onkeyup="if(event.key==='Enter') document.getElementById('end-en').focus();"></div>
-              <div><label class="date-label">To:</label><input type="date" id="end-en" class="date-input" onkeyup="if(event.key==='Enter') openAssetModal('en');"></div>
+              <div>
+                <label class="date-label">From:</label>
+                <input type="date" id="start-en" class="date-input"
+                  onchange="if(this.value) document.getElementById('end-en').focus()"
+                  onkeyup="if(event.key==='Enter') document.getElementById('end-en').focus()">
+              </div>
+              <div>
+                <label class="date-label">To:</label>
+                <input type="date" id="end-en" class="date-input"
+                  onkeyup="if(event.key==='Enter') openAssetModal('en')">
+              </div>
               <button class="btn-gen-pdf btn-gen-en" onclick="openAssetModal('en')">Choose Assets ➔</button>
             </div>
           </div>
         </div>
+
         <button class="btn-lang" id="btn-toggle-lang" onclick="toggleLanguage()" title="Cambiar Idioma">🇺🇸 EN</button>
         <button class="btn-logout" id="btnLogout" onclick="cerrarSesion()">Cerrar Sesión</button>
       </div>
@@ -410,37 +612,33 @@
 
     <main>
 
-      <!-- TARJETAS DE RESUMEN (generadas por renderCards) -->
+      <!-- Summary cards (rendered by renderCards) -->
       <div class="cards" id="cards"></div>
 
-      <!-- GRÁFICOS (generados por renderCharts) -->
+      <!-- Charts (rendered by renderCharts) -->
       <div class="charts">
         <div class="ch">
           <h3 id="lbl-donut">Distribución del Portafolio</h3>
           <div class="ch-wrap"><canvas id="donut"></canvas></div>
         </div>
         <div class="ch">
-          <!-- ⚠️ FIX: lbl-bar ahora se actualiza en renderCharts() con el idioma activo -->
           <h3 id="lbl-bar">Rendimiento % G/L</h3>
           <div class="ch-wrap" id="bar-wrap"><canvas id="bar"></canvas></div>
         </div>
       </div>
 
-      <!-- PESTAÑAS DE NAVEGACIÓN (PC) -->
+      <!-- Navigation tabs (desktop) -->
       <div class="view-tabs" id="view-tabs">
         <button id="btn-tab-stocks" class="view-tab active" onclick="switchTab('stocks')">📈 Portfolio Acciones</button>
         <button id="btn-tab-crypto" class="view-tab"        onclick="switchTab('crypto')">₿ Portfolio Cripto</button>
       </div>
 
-      <!-- BOTÓN FLOTANTE (solo visible en móvil) -->
+      <!-- FAB (mobile only) -->
       <button class="fab-btn" id="fab-btn" onclick="toggleFab()">💰</button>
 
-      <!-- ─────────────────────────────────────────
-           TAB: ACCIONES (Schwab + XTB)
-      ───────────────────────────────────────── -->
+      <!-- TAB: Stocks (Schwab + XTB) -->
       <div id="content-stocks" class="tab-content active">
 
-        <!-- Broker: Schwab USA -->
         <div class="broker">
           <div class="bhdr sw">
             <span>🇺🇸 Schwab USA</span>
@@ -459,7 +657,6 @@
           <div class="tbl-wrap"><table id="tbl-sw"></table></div>
         </div>
 
-        <!-- Broker: XTB Europe -->
         <div class="broker">
           <div class="bhdr xt">
             <span>🇪🇺 XTB Europe</span>
@@ -480,12 +677,9 @@
 
       </div><!-- /content-stocks -->
 
-      <!-- ─────────────────────────────────────────
-           TAB: CRIPTOMONEDAS
-      ───────────────────────────────────────── -->
+      <!-- TAB: Crypto -->
       <div id="content-crypto" class="tab-content">
 
-        <!-- Billetera Cripto -->
         <div class="broker">
           <div class="bhdr cr">
             <span>₿🚀🪙 Criptomonedas</span>
@@ -506,10 +700,9 @@
 
       </div><!-- /content-crypto -->
 
-      <!-- PANEL DE RESUMEN CONSOLIDADO (generado por renderSummary) -->
+      <!-- Consolidated Summary (rendered by renderSummary) -->
       <div class="bottom">
         <div class="sum-box">
-          <!-- ⚠️ FIX: lbl-summary ahora se actualiza en renderSummary() con idioma + vista activa -->
           <div class="box-title" id="lbl-summary">📋 Resumen Consolidado de Acciones</div>
           <div id="sum-content"></div>
         </div>
@@ -518,9 +711,7 @@
     </main>
   </div><!-- /app-content -->
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       MODAL — REGISTRAR COMPRA
-  ═══════════════════════════════════════════════════════════════ -->
+  <!-- ─── Modal: Register Buy ───────────────────────────────────── -->
   <div class="modal-overlay" id="buyModal" onclick="if(event.target===this) closeSim('buy')">
     <div class="modal">
       <h2><span id="simTitleBuyText">🛒 Registrar Compra</span>: <span style="color:#e6edf3;margin-left:5px" id="simTitleBuyAsset"></span></h2>
@@ -534,9 +725,9 @@
           oninput="calcSim('buy','px')" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
-        <span class="modal-label" style="color:var(--b)" id="lbl_buy_inv">Inversión (USD):</span>
+        <span class="modal-label" style="color:var(--blue)" id="lbl_buy_inv">Inversión (USD):</span>
         <input type="number" id="simInpInv" class="modal-input" placeholder="100" min="0" step="0.01"
-          oninput="calcSim('buy','inv')" style="border-color:var(--b)" onkeyup="if(event.key==='Enter')this.blur()">
+          oninput="calcSim('buy','inv')" style="border-color:var(--blue)" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
         <span class="modal-label" id="lbl_buy_qty">Cantidad a sumar:</span>
@@ -551,18 +742,16 @@
         </div>
         <div class="modal-res-row" style="margin-top:8px">
           <span class="modal-label" id="lbl_buy_new_inv">Nueva Inv. Total:</span>
-          <span id="simOutInv" style="font-weight:700;color:var(--b)">$0.00</span>
+          <span id="simOutInv" style="font-weight:700;color:var(--blue)">$0.00</span>
         </div>
       </div>
 
-      <button class="modal-btn" id="btn_conf_buy"    style="background:var(--g);border-color:#2ea043" onclick="confirmBuy()">Confirmar Compra</button>
-      <button class="modal-btn" id="btn_cancel_buy"  style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('buy')">Cancelar</button>
+      <button class="modal-btn" id="btn_conf_buy"   style="background:var(--green);border-color:#2ea043" onclick="confirmBuy()">Confirmar Compra</button>
+      <button class="modal-btn" id="btn_cancel_buy" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('buy')">Cancelar</button>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       MODAL — REGISTRAR VENTA
-  ═══════════════════════════════════════════════════════════════ -->
+  <!-- ─── Modal: Register Sell ──────────────────────────────────── -->
   <div class="modal-overlay" id="sellModal" onclick="if(event.target===this) closeSim('sell')">
     <div class="modal">
       <h2><span id="simTitleSellText">💸 Registrar Venta</span>: <span style="color:#e6edf3;margin-left:5px" id="simTitleSellAsset"></span></h2>
@@ -576,9 +765,9 @@
           oninput="calcSim('sell','px')" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
-        <span class="modal-label" style="color:var(--r)" id="lbl_sell_inv">Valor a retirar (USD):</span>
+        <span class="modal-label" style="color:var(--red)" id="lbl_sell_inv">Valor a retirar (USD):</span>
         <input type="number" id="sellInpInv" class="modal-input" placeholder="100" min="0" step="0.01"
-          oninput="calcSim('sell','inv')" style="border-color:var(--r)" onkeyup="if(event.key==='Enter')this.blur()">
+          oninput="calcSim('sell','inv')" style="border-color:var(--red)" onkeyup="if(event.key==='Enter')this.blur()">
       </div>
       <div class="modal-row">
         <span class="modal-label" id="lbl_sell_qty">Cantidad a restar:</span>
@@ -597,49 +786,48 @@
         </div>
       </div>
 
-      <button class="modal-btn" id="btn_conf_sell"   style="background:var(--g);border-color:#2ea043" onclick="confirmSell()">Confirmar Venta</button>
+      <button class="modal-btn" id="btn_conf_sell"   style="background:var(--green);border-color:#2ea043" onclick="confirmSell()">Confirmar Venta</button>
       <button class="modal-btn" id="btn_cancel_sell" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeSim('sell')">Cancelar</button>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       MODAL — SELECCIONAR ACTIVOS PARA EL HISTORIAL
-  ═══════════════════════════════════════════════════════════════ -->
+  <!-- ─── Modal: Asset Selector (for PDF report) ───────────────── -->
   <div class="modal-overlay" id="assetModal" onclick="if(event.target===this) closeAssetModal()">
     <div class="modal">
       <h2><span id="assetModalTitle">📑 Seleccionar Activos</span></h2>
-      <p style="color:var(--sub); font-size:0.8rem; margin-bottom:12px;" id="assetModalDesc">Elige los activos para tu reporte.</p>
-      
-      <!-- BARRITA DE BÚSQUEDA -->
+      <p style="color:var(--sub);font-size:0.8rem;margin-bottom:12px" id="assetModalDesc">Elige los activos para tu reporte.</p>
+
       <input type="text" id="searchAssetInput" class="search-asset" onkeyup="filterAssets()">
 
-      <div class="asset-item" style="border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:10px;">
+      <div class="asset-item" style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px">
         <input type="checkbox" id="chkAllAssets" checked onchange="toggleAllAssets(this.checked)">
-        <label for="chkAllAssets" style="font-weight:bold; color:var(--b)" id="lblAllAssets">Seleccionar Todos</label>
+        <label for="chkAllAssets" style="font-weight:bold;color:var(--blue)" id="lblAllAssets">Seleccionar Todos</label>
       </div>
 
       <div class="asset-list" id="assetCheckboxes"></div>
 
-      <button class="modal-btn" style="background:#1f6feb; border-color:#388bfd;" onclick="pedirReporteHistorial()" id="btnGenAssetRep">Generar Reporte PDF</button>
-      <button class="modal-btn" style="background:transparent; border:1px solid var(--border); margin-top:8px" onclick="closeAssetModal()" id="btnCanAssetRep">Cancelar</button>
+      <button class="modal-btn" style="background:#1f6feb;border-color:#388bfd" onclick="pedirReporteHistorial()" id="btnGenAssetRep">Generar Reporte PDF</button>
+      <button class="modal-btn" style="background:transparent;border:1px solid var(--border);margin-top:8px" onclick="closeAssetModal()" id="btnCanAssetRep">Cancelar</button>
     </div>
   </div>
-  <!-- TOAST (notificaciones temporales) -->
+
+  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- SPINNER — visible mientras se genera el PDF -->
+  <!-- PDF loading spinner -->
   <div id="pdfLoading" class="loading-overlay">
     <div class="spinner"></div>
-    <h3 id="lbl_loading_title" style="color:var(--b);font-size:1.2rem;margin-bottom:10px">Generando Reporte...</h3>
+    <h3 id="lbl_loading_title" style="color:var(--blue);font-size:1.2rem;margin-bottom:10px">Generando Reporte...</h3>
     <p id="lbl_loading_desc" style="color:var(--sub);text-align:center;max-width:300px">
       La Inteligencia Artificial está analizando tus activos y redactando tus insights.
     </p>
   </div>
 
   <script>
-    // ═══════════════════════════════════════════════════════════════
-    // 1. CONFIGURACIÓN — LLAVES, FIREBASE Y CONSTANTES
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // CONFIGURATION
+    // ════════════════════════════════════════════════════════════════
+
     const FINNHUB_API_KEY  = 'd72igc9r01qlfd9ncqr0d72igc9r01qlfd9ncqrg';
     const PDF_FUNCTION_URL = 'https://us-central1-mi-portafolio-cristhian.cloudfunctions.net/probarReporte';
 
@@ -657,134 +845,131 @@
     const auth = firebase.auth();
     const db   = firebase.database();
 
-    // ═══════════════════════════════════════════════════════════════
-    // 2. VARIABLES GLOBALES
-    // ═══════════════════════════════════════════════════════════════
-    let currentUser    = null;
-    let currentView    = 'stocks';    // pestaña activa: 'stocks' | 'crypto'
-    let currentUiLang  = 'es';        // idioma activo: 'es' | 'en'
-    let SW = [], XT = [], CR = [];    // posiciones Schwab, XTB y Cripto
-    let TRADES = [];                  // historial de transacciones (compras/ventas)
-    let nid = 1;                      // contador de IDs únicos para filas nuevas
-    let skInvVal = 14613200;          // Skandia: capital invertido (COP)
-    let skCurVal = 12627217;          // Skandia: valor actual (COP)
-    let oppStocks = 10;               // umbral de oportunidad acciones (%)
-    let oppCrypto = 20;               // umbral de oportunidad cripto (%)
+    // ════════════════════════════════════════════════════════════════
+    // GLOBAL STATE
+    // ════════════════════════════════════════════════════════════════
+
+    let currentUser   = null;
+    let currentView   = 'stocks';   // 'stocks' | 'crypto'
+    let currentUiLang = 'es';       // 'es' | 'en'
+
+    let SW = [], XT = [], CR = [];  // Schwab, XTB, Crypto positions
+    let TRADES = [];                // Trade history (buys & sells)
+    let nid = 1;                    // Auto-increment row ID
+
+    let skInvVal = 14613200;        // Skandia: invested capital (COP)
+    let skCurVal = 12627217;        // Skandia: current value (COP)
+    let oppStocks = 10;             // Buy-opportunity threshold for stocks (%)
+    let oppCrypto = 20;             // Buy-opportunity threshold for crypto (%)
+
     let dChart = null, bChart = null, saveTimeout = null;
+
     let sortState = {
       sw: { col: null, dir: 1 },
       xt: { col: null, dir: 1 },
       cr: { col: null, dir: 1 }
     };
 
-    const COLS        = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc','#f3ba2f','#8c52ff'];
-    const STABLECOINS = ['USDT','USDC','EUSD'];
+    const CHART_COLORS = ['#58a6ff','#3fb950','#f78166','#d2a8ff','#ffa657','#79c0ff','#56d364','#ff7b72','#bc8cff','#ffb347','#63d3fb','#a8dadc','#f3ba2f','#8c52ff'];
+    const STABLECOINS  = ['USDT', 'USDC', 'EUSD'];
 
-    // ═══════════════════════════════════════════════════════════════
-    // 3. SISTEMA BILINGÜE — DICCIONARIO Y FUNCIONES DE TRADUCCIÓN
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // TRANSLATIONS (bilingual dictionary)
+    // ════════════════════════════════════════════════════════════════
+
     const TRANSLATIONS = {
       es: {
         app_title:        '📊 Mi Portafolio Pro',       btn_logout:       'Cerrar Sesión',
         tab_stocks:       '📈 Portfolio Acciones',       tab_crypto:       '₿ Portfolio Cripto',
         undo:             'Deshacer',                    redo:             'Rehacer',
         add_asset:        '+ Agregar activo',            add_crypto:       '+ Agregar Cripto',
-        // Modal Compra
         sim_buy_title:    '🛒 Registrar Compra',         sim_buy_cur_qty:  'Activos actuales:',
         sim_buy_cur_avg:  'Precio Prom. actual:',        sim_buy_px:       'Precio de compra ($):',
-        sim_buy_inv:      'Inversión (USD):',             sim_buy_qty:      'Cantidad a sumar:',
-        sim_buy_new_avg:  'Nuevo Promedio:',              sim_buy_new_inv:  'Nueva Inv. Total:',
-        btn_conf_buy:     'Confirmar Compra',             btn_cancel:       'Cancelar',
-        // Modal Venta
+        sim_buy_inv:      'Inversión (USD):',            sim_buy_qty:      'Cantidad a sumar:',
+        sim_buy_new_avg:  'Nuevo Promedio:',             sim_buy_new_inv:  'Nueva Inv. Total:',
+        btn_conf_buy:     'Confirmar Compra',            btn_cancel:       'Cancelar',
         sim_sell_title:   '💸 Registrar Venta',          sim_sell_cur_qty: 'Activos Disponibles:',
         sim_sell_cur_avg: 'Precio Prom. Original:',      sim_sell_px:      'Precio de venta ($):',
-        sim_sell_inv:     'Valor a retirar (USD):',       sim_sell_qty:     'Cantidad a restar:',
+        sim_sell_inv:     'Valor a retirar (USD):',      sim_sell_qty:     'Cantidad a restar:',
         sim_sell_pnl:     'Profit/Pérdida de la Venta:', sim_sell_rem:     'Activos restantes:',
         btn_conf_sell:    'Confirmar Venta',
-        // Loading
         loading_title:    'Generando Reporte...',
         loading_desc:     'La Inteligencia Artificial está analizando tus activos y redactando tus insights.'
       },
       en: {
-        app_title:        '📊 My Portfolio Pro',         btn_logout:       'Logout',
-        tab_stocks:       '📈 Stocks Portfolio',          tab_crypto:       '₿ Crypto Portfolio',
-        undo:             'Undo',                         redo:             'Redo',
-        add_asset:        '+ Add asset',                  add_crypto:       '+ Add Crypto',
-        // Buy Modal
-        sim_buy_title:    '🛒 Register Buy',              sim_buy_cur_qty:  'Current assets:',
-        sim_buy_cur_avg:  'Current Avg Price:',           sim_buy_px:       'Buy Price ($):',
-        sim_buy_inv:      'Investment (USD):',             sim_buy_qty:      'Quantity to add:',
-        sim_buy_new_avg:  'New Avg Price:',               sim_buy_new_inv:  'New Total Inv.:',
-        btn_conf_buy:     'Confirm Buy',                   btn_cancel:       'Cancel',
-        // Sell Modal
-        sim_sell_title:   '💸 Register Sell',             sim_sell_cur_qty: 'Available assets:',
-        sim_sell_cur_avg: 'Original Avg Price:',          sim_sell_px:      'Sell Price ($):',
-        sim_sell_inv:     'Value to withdraw (USD):',      sim_sell_qty:     'Quantity to subtract:',
-        sim_sell_pnl:     'Trade Profit/Loss:',           sim_sell_rem:     'Remaining assets:',
+        app_title:        '📊 My Portfolio Pro',        btn_logout:       'Logout',
+        tab_stocks:       '📈 Stocks Portfolio',         tab_crypto:       '₿ Crypto Portfolio',
+        undo:             'Undo',                        redo:             'Redo',
+        add_asset:        '+ Add asset',                 add_crypto:       '+ Add Crypto',
+        sim_buy_title:    '🛒 Register Buy',             sim_buy_cur_qty:  'Current assets:',
+        sim_buy_cur_avg:  'Current Avg Price:',          sim_buy_px:       'Buy Price ($):',
+        sim_buy_inv:      'Investment (USD):',           sim_buy_qty:      'Quantity to add:',
+        sim_buy_new_avg:  'New Avg Price:',              sim_buy_new_inv:  'New Total Inv.:',
+        btn_conf_buy:     'Confirm Buy',                 btn_cancel:       'Cancel',
+        sim_sell_title:   '💸 Register Sell',            sim_sell_cur_qty: 'Available assets:',
+        sim_sell_cur_avg: 'Original Avg Price:',         sim_sell_px:      'Sell Price ($):',
+        sim_sell_inv:     'Value to withdraw (USD):',    sim_sell_qty:     'Quantity to subtract:',
+        sim_sell_pnl:     'Trade Profit/Loss:',          sim_sell_rem:     'Remaining assets:',
         btn_conf_sell:    'Confirm Sell',
-        // Loading
         loading_title:    'Generating Report...',
         loading_desc:     'Artificial Intelligence is analyzing your assets and drafting your insights.'
       }
     };
 
-    /** Aplica el diccionario activo a todos los elementos de la UI con id fijo */
+    /** Apply the active language dictionary to all fixed-ID elements */
     function translateUI() {
       const T = TRANSLATIONS[currentUiLang];
-      document.getElementById('app-title').innerText        = T.app_title;
-      document.getElementById('btnLogout').innerText         = T.btn_logout;
-      document.getElementById('btn-tab-stocks').innerHTML    = T.tab_stocks;
-      document.getElementById('btn-tab-crypto').innerHTML    = T.tab_crypto;
-      document.querySelectorAll('.lbl-undo').forEach(e => e.innerText = T.undo);
-      document.querySelectorAll('.lbl-redo').forEach(e => e.innerText = T.redo);
-      document.querySelectorAll('.btn-add-stock').forEach(e => e.innerText  = T.add_asset);
+      document.getElementById('app-title').innerText           = T.app_title;
+      document.getElementById('btnLogout').innerText            = T.btn_logout;
+      document.getElementById('btn-tab-stocks').innerHTML       = T.tab_stocks;
+      document.getElementById('btn-tab-crypto').innerHTML       = T.tab_crypto;
+      document.querySelectorAll('.lbl-undo').forEach(e  => e.innerText = T.undo);
+      document.querySelectorAll('.lbl-redo').forEach(e  => e.innerText = T.redo);
+      document.querySelectorAll('.btn-add-stock').forEach(e  => e.innerText = T.add_asset);
       document.querySelectorAll('.btn-add-crypto').forEach(e => e.innerText = T.add_crypto);
-      // Modal Compra
-      document.getElementById('simTitleBuyText').innerText   = T.sim_buy_title;
-      document.getElementById('lbl_buy_cur_qty').innerText   = T.sim_buy_cur_qty;
-      document.getElementById('lbl_buy_cur_avg').innerText   = T.sim_buy_cur_avg;
-      document.getElementById('lbl_buy_px').innerText        = T.sim_buy_px;
-      document.getElementById('lbl_buy_inv').innerText       = T.sim_buy_inv;
-      document.getElementById('lbl_buy_qty').innerText       = T.sim_buy_qty;
-      document.getElementById('lbl_buy_new_avg').innerText   = T.sim_buy_new_avg;
-      document.getElementById('lbl_buy_new_inv').innerText   = T.sim_buy_new_inv;
-      document.getElementById('btn_conf_buy').innerText      = T.btn_conf_buy;
-      document.getElementById('btn_cancel_buy').innerText    = T.btn_cancel;
-      // Modal Venta
-      document.getElementById('simTitleSellText').innerText  = T.sim_sell_title;
-      document.getElementById('lbl_sell_cur_qty').innerText  = T.sim_sell_cur_qty;
-      document.getElementById('lbl_sell_cur_avg').innerText  = T.sim_sell_cur_avg;
-      document.getElementById('lbl_sell_px').innerText       = T.sim_sell_px;
-      document.getElementById('lbl_sell_inv').innerText      = T.sim_sell_inv;
-      document.getElementById('lbl_sell_qty').innerText      = T.sim_sell_qty;
-      document.getElementById('lbl_sell_pnl').innerText      = T.sim_sell_pnl;
-      document.getElementById('lbl_sell_rem').innerText      = T.sim_sell_rem;
-      document.getElementById('btn_conf_sell').innerText     = T.btn_conf_sell;
-      document.getElementById('btn_cancel_sell').innerText   = T.btn_cancel;
-      // Spinner PDF
-      document.getElementById('lbl_loading_title').innerText = T.loading_title;
-      document.getElementById('lbl_loading_desc').innerText  = T.loading_desc;
+      document.getElementById('simTitleBuyText').innerText      = T.sim_buy_title;
+      document.getElementById('lbl_buy_cur_qty').innerText      = T.sim_buy_cur_qty;
+      document.getElementById('lbl_buy_cur_avg').innerText      = T.sim_buy_cur_avg;
+      document.getElementById('lbl_buy_px').innerText           = T.sim_buy_px;
+      document.getElementById('lbl_buy_inv').innerText          = T.sim_buy_inv;
+      document.getElementById('lbl_buy_qty').innerText          = T.sim_buy_qty;
+      document.getElementById('lbl_buy_new_avg').innerText      = T.sim_buy_new_avg;
+      document.getElementById('lbl_buy_new_inv').innerText      = T.sim_buy_new_inv;
+      document.getElementById('btn_conf_buy').innerText         = T.btn_conf_buy;
+      document.getElementById('btn_cancel_buy').innerText       = T.btn_cancel;
+      document.getElementById('simTitleSellText').innerText     = T.sim_sell_title;
+      document.getElementById('lbl_sell_cur_qty').innerText     = T.sim_sell_cur_qty;
+      document.getElementById('lbl_sell_cur_avg').innerText     = T.sim_sell_cur_avg;
+      document.getElementById('lbl_sell_px').innerText          = T.sim_sell_px;
+      document.getElementById('lbl_sell_inv').innerText         = T.sim_sell_inv;
+      document.getElementById('lbl_sell_qty').innerText         = T.sim_sell_qty;
+      document.getElementById('lbl_sell_pnl').innerText         = T.sim_sell_pnl;
+      document.getElementById('lbl_sell_rem').innerText         = T.sim_sell_rem;
+      document.getElementById('btn_conf_sell').innerText        = T.btn_conf_sell;
+      document.getElementById('btn_cancel_sell').innerText      = T.btn_cancel;
+      document.getElementById('lbl_loading_title').innerText    = T.loading_title;
+      document.getElementById('lbl_loading_desc').innerText     = T.loading_desc;
     }
 
-    /** Cambia el idioma de la UI entre ES ↔ EN y re-renderiza todo */
+    /** Toggle UI language ES ↔ EN and re-render everything */
     function toggleLanguage() {
       currentUiLang = currentUiLang === 'es' ? 'en' : 'es';
-      // Muestra la bandera del idioma al que se puede cambiar
       document.getElementById('btn-toggle-lang').innerHTML = currentUiLang === 'es' ? '🇺🇸 EN' : '🇨🇴 ES';
       translateUI();
       recalc(false);
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 4. UTILIDADES DE FORMATO
-    // ═══════════════════════════════════════════════════════════════
-    const f     = (n, d=2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO', { minimumFractionDigits:d, maximumFractionDigits:d }).format(n);
-    const fCOP  = n        => new Intl.NumberFormat('es-CO', { minimumFractionDigits:0, maximumFractionDigits:0 }).format(n) + ' COP';
-    const fU    = (n, d=2) => (n < 0 ? '-' : '') + '$' + f(Math.abs(n), d);
-    const fGain = (n, d=2) => `<span class="${n >= 0 ? 'g' : 'r'}">${n >= 0 ? '+' : '-'}$${f(Math.abs(n), d)}</span>`;
-    const fP    = n        => `<span class="${n >= 0 ? 'g' : 'r'}">${n >= 0 ? '+' : ''}${f(n, 2)}%</span>`;
-    const rv    = s        => parseFloat(String(s).replace(/[^0-9.\-]/g, '')) || 0;
-    const rate  = ()       => rv(document.getElementById('rateInput').value) || 4180;
+    // ════════════════════════════════════════════════════════════════
+    // FORMATTING UTILITIES
+    // ════════════════════════════════════════════════════════════════
+
+    const f     = (n, d = 2) => isNaN(n) ? '—' : new Intl.NumberFormat('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
+    const fCOP  = n          => new Intl.NumberFormat('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n) + ' COP';
+    const fU    = (n, d = 2) => (n < 0 ? '-' : '') + '$' + f(Math.abs(n), d);
+    const fGain = (n, d = 2) => `<span class="${n >= 0 ? 'g' : 'r'}">${n >= 0 ? '+' : '-'}$${f(Math.abs(n), d)}</span>`;
+    const fP    = n          => `<span class="${n >= 0 ? 'g' : 'r'}">${n >= 0 ? '+' : ''}${f(n, 2)}%</span>`;
+    const rv    = s          => parseFloat(String(s).replace(/[^0-9.\-]/g, '')) || 0;
+    const rate  = ()         => rv(document.getElementById('rateInput').value) || 4180;
 
     function showToast(message) {
       const t = document.getElementById('toast');
@@ -793,9 +978,10 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 5. AUTENTICACIÓN FIREBASE
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // AUTHENTICATION
+    // ════════════════════════════════════════════════════════════════
+
     auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = user;
@@ -816,9 +1002,10 @@
 
     function cerrarSesion() { auth.signOut(); }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 6. CARGA Y GUARDADO EN FIREBASE
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // FIREBASE: LOAD & SAVE
+    // ════════════════════════════════════════════════════════════════
+
     function loadFromFirebase() {
       if (!currentUser) return;
       document.getElementById('lastSaved').textContent = currentUiLang === 'en' ? 'Syncing...' : 'Sincronizando...';
@@ -828,12 +1015,12 @@
           if (snap.exists()) {
             const d = snap.val();
 
-            // Filtro anti-fantasmas + normalización de tipos
             SW     = (d.SW || []).filter(Boolean);
             XT     = (d.XT || []).filter(Boolean);
             CR     = (d.CR || []).filter(Boolean);
             TRADES = d.transactions || d.trades || [];
 
+            // Normalize field types
             const cleanRow = row => {
               if (typeof row.qty === 'string') row.qty = rv(row.qty);
               if (typeof row.inv === 'string') row.inv = rv(row.inv);
@@ -842,49 +1029,53 @@
             };
             SW.forEach(cleanRow);
             XT.forEach(cleanRow);
-            CR.forEach(c => {
-              cleanRow(c);
-              if (c.wallet  === undefined) c.wallet  = '';
-              if (c.staking === undefined) c.staking = false;
+            CR.forEach(r => {
+              cleanRow(r);
+              if (r.wallet  === undefined) r.wallet  = '';
+              if (r.staking === undefined) r.staking = false;
             });
 
-            const all = [...SW, ...XT, ...CR];
-            if (all.length) nid = Math.max(...all.map(r => r.id)) + 1;
+            const allRows = [...SW, ...XT, ...CR];
+            if (allRows.length) nid = Math.max(...allRows.map(r => r.id)) + 1;
 
             if (d.rate) document.getElementById('rateInput').value = d.rate;
 
-            // Actualiza TRM al cargar (awesomeapi)
+            // Fetch live exchange rate
             fetch('https://economia.awesomeapi.com.br/json/last/USD-COP')
               .then(r => r.json())
               .then(data => {
-                if (data && data.USDCOP)
+                if (data?.USDCOP)
                   document.getElementById('rateInput').value = parseFloat(data.USDCOP.bid).toFixed(2);
-              }).catch(() => {});
+              })
+              .catch(() => {});
 
             if (d.skInv) skInvVal = parseFloat(d.skInv);
             if (d.skCur) skCurVal = parseFloat(d.skCur);
 
-            // Compatibilidad con versión anterior (un solo campo 'opp')
+            // Backward compatibility: single 'opp' field → oppStocks / oppCrypto
             oppStocks = d.oppStocks !== undefined ? parseFloat(d.oppStocks) : (d.opp ? parseFloat(d.opp) : 10);
             oppCrypto = d.oppCrypto !== undefined ? parseFloat(d.oppCrypto) : (d.opp ? parseFloat(d.opp) : 20);
             document.querySelectorAll('.opp-stocks').forEach(el => el.value = oppStocks);
             document.querySelectorAll('.opp-crypto').forEach(el => el.value = oppCrypto);
 
-            if (d.ts) document.getElementById('lastSaved').textContent = (currentUiLang === 'en' ? 'Cloud OK: ' : 'Nube OK: ') + new Date(d.ts).toLocaleTimeString('es-CO');
+            if (d.ts) {
+              document.getElementById('lastSaved').textContent =
+                (currentUiLang === 'en' ? 'Cloud OK: ' : 'Nube OK: ') + new Date(d.ts).toLocaleTimeString('es-CO');
+            }
 
           } else {
-            // Datos de ejemplo para usuarios nuevos
+            // Default demo data for new users
             SW = [
-              { id:1,  t:'BABA',    qty:19,      inv:1460.91, px:129.87, p:false, staking:false },
-              { id:2,  t:'BRK-B',   qty:7.5562,  inv:2974.72, px:476.19, p:false, staking:false }
+              { id: 1,  t: 'BABA',    qty: 19,      inv: 1460.91, px: 129.87, p: false, staking: false },
+              { id: 2,  t: 'BRK-B',   qty: 7.5562,  inv: 2974.72, px: 476.19, p: false, staking: false }
             ];
             XT = [
-              { id:11, t:'EIMI.UK', qty:28.2244, inv:1125.02, px:46.19,  p:false, staking:false }
+              { id: 11, t: 'EIMI.UK', qty: 28.2244, inv: 1125.02, px: 46.19,  p: false, staking: false }
             ];
             CR = [
-              { id:41, t:'ETH',  wallet:'Binance', qty:0, inv:0, px:0, p:true, staking:false },
-              { id:42, t:'BTC',  wallet:'Ledger',  qty:0, inv:0, px:0, p:true, staking:false },
-              { id:43, t:'USDT', wallet:'Binance', qty:0, inv:0, px:1, p:true, staking:false }
+              { id: 41, t: 'ETH',  wallet: 'Binance', qty: 0, inv: 0, px: 0, p: true, staking: false },
+              { id: 42, t: 'BTC',  wallet: 'Ledger',  qty: 0, inv: 0, px: 0, p: true, staking: false },
+              { id: 43, t: 'USDT', wallet: 'Binance', qty: 0, inv: 0, px: 1, p: true, staking: false }
             ];
             TRADES = [];
             nid    = 50;
@@ -894,30 +1085,33 @@
           translateUI();
           recalc(true);
 
-        } catch (err) { console.error('Error al procesar datos:', err); }
-      }).catch(e => { console.error(e); showToast(currentUiLang === 'en' ? '❌ Cloud sync error' : '❌ Error al descargar de la nube'); });
+        } catch (err) { console.error('Error loading data:', err); }
+      }).catch(e => {
+        console.error(e);
+        showToast(currentUiLang === 'en' ? '❌ Cloud sync error' : '❌ Error al descargar de la nube');
+      });
     }
 
     function saveDataToFirebase() {
       if (!currentUser) return;
       db.ref('users/' + currentUser.uid).set({
         SW, XT, CR,
-        transactions: TRADES,  // historial de compras/ventas
+        transactions: TRADES,
         rate:      document.getElementById('rateInput').value,
         oppStocks, oppCrypto,
         skInv:     skInvVal,
         skCur:     skCurVal,
         ts:        new Date().toISOString()
       }).then(() => {
-        document.getElementById('lastSaved').textContent = (currentUiLang === 'en' ? 'Cloud synced: ' : 'Nube sincronizada: ') + new Date().toLocaleTimeString('es-CO');
+        document.getElementById('lastSaved').textContent =
+          (currentUiLang === 'en' ? 'Cloud synced: ' : 'Nube sincronizada: ') + new Date().toLocaleTimeString('es-CO');
       });
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 7. NAVEGACIÓN ENTRE PESTAÑAS
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // TAB NAVIGATION
+    // ════════════════════════════════════════════════════════════════
 
-    /** Abre/cierra el menú flotante de pestañas (solo móvil) */
     function toggleFab() {
       document.getElementById('view-tabs').classList.toggle('open');
     }
@@ -925,22 +1119,21 @@
     function switchTab(tabId) {
       currentView = tabId;
 
-      document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.view-tab').forEach(t    => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('btn-tab-' + tabId).classList.add('active');
       document.getElementById('content-' + tabId).classList.add('active');
 
-      // Actualiza etiquetas del gráfico donut según idioma y pestaña
       document.getElementById('lbl-donut').textContent = tabId === 'stocks'
         ? (currentUiLang === 'en' ? 'Stocks Distribution' : 'Distribución de Acciones')
         : (currentUiLang === 'en' ? 'Crypto Distribution' : 'Distribución Cripto');
 
       document.getElementById('view-tabs').classList.remove('open');
 
-      // Color del FAB según destino
+      // Update FAB color to reflect active tab
       const fab = document.getElementById('fab-btn');
       if (fab) {
-        fab.style.borderColor = tabId === 'stocks' ? 'var(--yellow)' : 'var(--g)';
+        fab.style.borderColor = tabId === 'stocks' ? 'var(--yellow)' : 'var(--green)';
         fab.style.boxShadow   = tabId === 'stocks'
           ? '0 8px 20px rgba(0,0,0,0.6), 0 0 12px rgba(243,186,47,0.5)'
           : '0 8px 20px rgba(0,0,0,0.6), 0 0 12px rgba(63,185,80,0.5)';
@@ -949,38 +1142,47 @@
       recalc(false);
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 8. HISTORIAL — DESHACER / REHACER
-    // ═══════════════════════════════════════════════════════════════
-    let historyArr = [], historyIndex = -1;
+    // ════════════════════════════════════════════════════════════════
+    // UNDO / REDO
+    // ════════════════════════════════════════════════════════════════
+
+    let historyArr   = [];
+    let historyIndex = -1;
 
     function saveStateToHistory() {
-      const s = JSON.stringify({
+      const snapshot = JSON.stringify({
         SW, XT, CR, TRADES,
         rate:      document.getElementById('rateInput').value,
         oppStocks, oppCrypto,
         skInv:     skInvVal,
         skCur:     skCurVal
       });
-      if (historyIndex >= 0 && historyArr[historyIndex] === s) return;
-      if (historyIndex < historyArr.length - 1) historyArr = historyArr.slice(0, historyIndex + 1);
-      historyArr.push(s);
-      if (historyArr.length > 11) historyArr.shift();
+
+      // Skip if state hasn't changed
+      if (historyIndex >= 0 && historyArr[historyIndex] === snapshot) return;
+
+      // Truncate forward history on new action
+      if (historyIndex < historyArr.length - 1) {
+        historyArr = historyArr.slice(0, historyIndex + 1);
+      }
+
+      historyArr.push(snapshot);
+      if (historyArr.length > 11) historyArr.shift(); // max 10 steps
       historyIndex = historyArr.length - 1;
       updateUndoRedoButtons();
     }
 
     function updateUndoRedoButtons() {
-      const uCnt = historyIndex > 0 ? historyIndex : 0;
-      const rCnt = historyArr.length - 1 - historyIndex > 0 ? historyArr.length - 1 - historyIndex : 0;
-      document.querySelectorAll('.undo-cnt').forEach(el => el.textContent = uCnt);
-      document.querySelectorAll('.redo-cnt').forEach(el => el.textContent = rCnt);
+      const undoCount = historyIndex > 0 ? historyIndex : 0;
+      const redoCount = historyArr.length - 1 - historyIndex > 0 ? historyArr.length - 1 - historyIndex : 0;
+      document.querySelectorAll('.undo-cnt').forEach(el => el.textContent = undoCount);
+      document.querySelectorAll('.redo-cnt').forEach(el => el.textContent = redoCount);
       document.querySelectorAll('.btn-undo-action').forEach(btn => btn.disabled = historyIndex <= 0);
       document.querySelectorAll('.btn-redo-action').forEach(btn => btn.disabled = historyIndex >= historyArr.length - 1);
     }
 
-    function applyState(s) {
-      const p = JSON.parse(s);
+    function applyState(snapshot) {
+      const p = JSON.parse(snapshot);
       SW = p.SW; XT = p.XT; CR = p.CR || []; TRADES = p.TRADES || [];
       document.getElementById('rateInput').value = p.rate;
       oppStocks = p.oppStocks || 10;
@@ -993,26 +1195,37 @@
     }
 
     function undo() {
-      if (historyIndex > 0)                   { historyIndex--; applyState(historyArr[historyIndex]); showToast(currentUiLang === 'en' ? '↩️ Undone' : '↩️ Deshecho'); updateUndoRedoButtons(); }
-    }
-    function redo() {
-      if (historyIndex < historyArr.length-1) { historyIndex++; applyState(historyArr[historyIndex]); showToast(currentUiLang === 'en' ? '↪️ Redone' : '↪️ Rehecho'); updateUndoRedoButtons(); }
+      if (historyIndex > 0) {
+        historyIndex--;
+        applyState(historyArr[historyIndex]);
+        showToast(currentUiLang === 'en' ? '↩️ Undone' : '↩️ Deshecho');
+        updateUndoRedoButtons();
+      }
     }
 
-    // Atajos de teclado Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y
+    function redo() {
+      if (historyIndex < historyArr.length - 1) {
+        historyIndex++;
+        applyState(historyArr[historyIndex]);
+        showToast(currentUiLang === 'en' ? '↪️ Redone' : '↪️ Rehecho');
+        updateUndoRedoButtons();
+      }
+    }
+
+    // Keyboard shortcuts: Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y
     document.addEventListener('keydown', e => {
-      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+      if (document.activeElement?.tagName === 'INPUT') return;
       if (e.ctrlKey || e.metaKey) {
         if (e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
         if (e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
       }
     });
 
-    // ═══════════════════════════════════════════════════════════════
-    // 9. CÁLCULOS POR FILA
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // ROW CALCULATIONS
+    // ════════════════════════════════════════════════════════════════
 
-    // ── Skandia (inputs COP) ──
+    /** Skandia COP inputs: save history on focus, parse raw value on blur */
     function skFocus(el) {
       saveStateToHistory();
       el.value = el.id === 'skInv' ? skInvVal : skCurVal;
@@ -1023,64 +1236,79 @@
       recalc();
     }
 
-    /** Actualiza el umbral de oportunidad de compra (%) para acciones o cripto */
+    /** Update buy-opportunity threshold for stocks or crypto */
     function updateOpp(tab, val) {
       saveStateToHistory();
       const v = rv(val);
-      if (tab === 'stocks') { oppStocks = v; document.querySelectorAll('.opp-stocks').forEach(el => el.value = v); }
-      else                  { oppCrypto = v; document.querySelectorAll('.opp-crypto').forEach(el => el.value = v); }
+      if (tab === 'stocks') {
+        oppStocks = v;
+        document.querySelectorAll('.opp-stocks').forEach(el => el.value = v);
+      } else {
+        oppCrypto = v;
+        document.querySelectorAll('.opp-crypto').forEach(el => el.value = v);
+      }
       recalc();
     }
 
-    /** Calcula avg, cur, gl, pnl de una fila. Las stablecoins siempre valen $1.00 */
+    /**
+     * Calculate derived fields for a single row:
+     * avg, cur (current value), gl (% gain/loss), pnl (dollar gain/loss).
+     * Stablecoins are always priced at $1.00.
+     */
     function calc(row) {
       if (!row.qty) row.qty = 0;
       if (!row.inv) row.inv = 0;
       if (STABLECOINS.includes(String(row.t).toUpperCase())) { row.px = 1.00; row.pxChange = null; }
-      const cur  = row.qty * (row.px || 0);
-      const avg  = row.qty > 0 ? row.inv / row.qty : 0;
-      row.avg    = avg;
-      row.cur    = cur;
-      row.gl     = row.inv > 0 ? (cur - row.inv) / row.inv * 100 : 0;
-      row.pnl    = cur - row.inv;
+      row.avg = row.qty > 0 ? row.inv / row.qty : 0;
+      row.cur = row.qty * (row.px || 0);
+      row.gl  = row.inv > 0 ? (row.cur - row.inv) / row.inv * 100 : 0;
+      row.pnl = row.cur - row.inv;
       return row;
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 10. ORDENAMIENTO DE COLUMNAS
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // TABLE SORTING
+    // ════════════════════════════════════════════════════════════════
+
     function sortTable(tid, field) {
       const arr = tid === 'sw' ? SW : tid === 'xt' ? XT : CR;
       arr.forEach(calc);
+
       if (sortState[tid].col === field) sortState[tid].dir *= -1;
       else { sortState[tid].col = field; sortState[tid].dir = -1; }
+
       const dir = sortState[tid].dir;
       arr.sort((a, b) => {
         let vA = a[field], vB = b[field];
-        if (field === 't' || field === 'wallet') { vA = String(vA||''); vB = String(vB||''); return vA.localeCompare(vB) * dir; }
+        if (field === 't' || field === 'wallet') {
+          return String(vA || '').localeCompare(String(vB || '')) * dir;
+        }
         if (field === 'staking') return ((vA ? 1 : 0) - (vB ? 1 : 0)) * dir;
-        return ((parseFloat(vA)||0) - (parseFloat(vB)||0)) * dir;
+        return ((parseFloat(vA) || 0) - (parseFloat(vB) || 0)) * dir;
       });
+
       recalc();
     }
 
-    /** Genera el HTML de una cabecera con icono de ordenamiento bilingüe */
+    /** Render a sortable <th> with directional arrow icon */
     function getTh(tid, label, field) {
       const sorted  = sortState[tid].col === field;
       const icon    = sorted ? (sortState[tid].dir === 1 ? '▲' : '▼') : '⇕';
       const tooltip = currentUiLang === 'en' ? 'Sort by' : 'Ordenar por';
-      return `<th onclick="sortTable('${tid}','${field}')" title="${tooltip} ${label}">${label} <span class="sort-icon ${sorted?'active':''}">${icon}</span></th>`;
+      return `<th onclick="sortTable('${tid}','${field}')" title="${tooltip} ${label}">${label} <span class="sort-icon ${sorted ? 'active' : ''}">${icon}</span></th>`;
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 11. MODALES — REGISTRO DE COMPRA Y VENTA
-    // ═══════════════════════════════════════════════════════════════
-    let activeSimRow = null, activeSimTid = null;
+    // ════════════════════════════════════════════════════════════════
+    // BUY / SELL MODALS
+    // ════════════════════════════════════════════════════════════════
+
+    let activeSimRow = null;
+    let activeSimTid = null;
 
     function openSim(tid, id) {
       activeSimTid = tid;
       activeSimRow = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
-      if (!activeSimRow || !activeSimRow.t) { showToast(currentUiLang === 'en' ? 'Assign a name first.' : 'Primero asigna un nombre.'); return; }
+      if (!activeSimRow?.t) { showToast(currentUiLang === 'en' ? 'Assign a name first.' : 'Primero asigna un nombre.'); return; }
       calc(activeSimRow);
 
       document.getElementById('simTitleBuyAsset').innerText = activeSimRow.t;
@@ -1098,7 +1326,10 @@
     function openSell(tid, id) {
       activeSimTid = tid;
       activeSimRow = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
-      if (!activeSimRow || !activeSimRow.qty || activeSimRow.qty <= 0) { alert(currentUiLang === 'en' ? 'No valid balance to sell.' : 'No tienes saldo válido para vender.'); return; }
+      if (!activeSimRow?.qty || activeSimRow.qty <= 0) {
+        alert(currentUiLang === 'en' ? 'No valid balance to sell.' : 'No tienes saldo válido para vender.');
+        return;
+      }
       calc(activeSimRow);
 
       document.getElementById('simTitleSellAsset').innerText = activeSimRow.t;
@@ -1116,56 +1347,65 @@
 
     function closeSim(type) {
       document.getElementById(type === 'buy' ? 'buyModal' : 'sellModal').style.display = 'none';
-      activeSimRow = null; activeSimTid = null;
+      activeSimRow = null;
+      activeSimTid = null;
     }
 
+    /**
+     * Live-calculate buy/sell modal preview.
+     * source: 'px' | 'inv' | 'qty'  – which field triggered the update
+     */
     function calcSim(type, source = 'px') {
       if (!activeSimRow) return;
-      const pfx  = type === 'buy' ? 'sim' : 'sell';
-      const elPx  = document.getElementById(pfx + 'InpPx');
-      const elInv = document.getElementById(pfx + 'InpInv');
-      const elQty = document.getElementById(pfx + 'InpQty');
+      const pfx = type === 'buy' ? 'sim' : 'sell';
 
-      let px  = parseFloat(elPx.value)  || 0;
-      let inv = parseFloat(elInv.value) || 0;
-      let qty = parseFloat(elQty.value) || 0;
+      let px  = parseFloat(document.getElementById(pfx + 'InpPx').value)  || 0;
+      let inv = parseFloat(document.getElementById(pfx + 'InpInv').value) || 0;
+      let qty = parseFloat(document.getElementById(pfx + 'InpQty').value) || 0;
 
-      if (source === 'inv') { qty = px > 0 ? inv/px : 0; elQty.value = qty > 0 ? parseFloat(qty.toFixed(6)) : ''; }
-      else                  { inv = qty*px; elInv.value = inv > 0 ? parseFloat(inv.toFixed(2)) : ''; }
+      if (source === 'inv') {
+        qty = px > 0 ? inv / px : 0;
+        document.getElementById(pfx + 'InpQty').value = qty > 0 ? parseFloat(qty.toFixed(6)) : '';
+      } else {
+        inv = qty * px;
+        document.getElementById(pfx + 'InpInv').value = inv > 0 ? parseFloat(inv.toFixed(2)) : '';
+      }
 
       if (type === 'buy') {
-        const newQty = (activeSimRow.qty||0) + qty;
-        const newInv = (activeSimRow.inv||0) + inv;
-        const newAvg = newQty > 0 ? newInv/newQty : 0;
+        const newQty = (activeSimRow.qty || 0) + qty;
+        const newInv = (activeSimRow.inv || 0) + inv;
+        const newAvg = newQty > 0 ? newInv / newQty : 0;
         const avgEl  = document.getElementById('simOutAvg');
         avgEl.textContent = '$' + f(newAvg);
-        avgEl.style.color = newAvg < activeSimRow.avg ? 'var(--g)' : newAvg > activeSimRow.avg ? 'var(--r)' : '#e6edf3';
+        avgEl.style.color = newAvg < activeSimRow.avg ? 'var(--green)' : newAvg > activeSimRow.avg ? 'var(--red)' : '#e6edf3';
         document.getElementById('simOutInv').textContent = '$' + f(newInv);
       } else {
         const pnl   = (px - activeSimRow.avg) * qty;
         const rem   = activeSimRow.qty - qty;
         const pnlEl = document.getElementById('sellOutPnl');
         pnlEl.textContent = (pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(pnl));
-        pnlEl.style.color = pnl >= 0 ? 'var(--g)' : 'var(--r)';
+        pnlEl.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
         const qtyEl = document.getElementById('sellOutQty');
         qtyEl.textContent = rem < 0 ? (currentUiLang === 'en' ? '⚠️ Invalid' : '⚠️ Inválido') : f(rem, 6);
-        qtyEl.style.color = rem < 0 ? 'var(--r)' : 'var(--sub)';
+        qtyEl.style.color = rem < 0 ? 'var(--red)' : 'var(--sub)';
       }
     }
 
-    /** Confirma la compra: actualiza posición y agrega trade al historial */
+    /** Confirm buy: update position and push trade to history */
     function confirmBuy() {
       if (!activeSimRow) return;
       const buyQty = parseFloat(document.getElementById('simInpQty').value) || 0;
       const buyPx  = parseFloat(document.getElementById('simInpPx').value)  || 0;
+      const isStable = STABLECOINS.includes(String(activeSimRow.t).toUpperCase());
+
       if (buyQty <= 0) { alert(currentUiLang === 'en' ? 'Invalid Quantity.' : 'Cantidad inválida.'); return; }
-      if (buyPx  <= 0 && !STABLECOINS.includes(String(activeSimRow.t).toUpperCase())) { alert(currentUiLang === 'en' ? 'Invalid Price.' : 'Precio de compra inválido.'); return; }
+      if (buyPx  <= 0 && !isStable) { alert(currentUiLang === 'en' ? 'Invalid Price.' : 'Precio de compra inválido.'); return; }
 
       saveStateToHistory();
-      const buyInv         = buyQty * buyPx;
-      activeSimRow.qty     = (activeSimRow.qty || 0) + buyQty;
-      activeSimRow.inv     = (activeSimRow.inv || 0) + buyInv;
-      activeSimRow.p       = false;
+      const buyInv     = buyQty * buyPx;
+      activeSimRow.qty = (activeSimRow.qty || 0) + buyQty;
+      activeSimRow.inv = (activeSimRow.inv || 0) + buyInv;
+      activeSimRow.p   = false;
 
       TRADES.push({
         id: Date.now(), date: new Date().toISOString(), type: 'Buy',
@@ -1178,17 +1418,21 @@
       showToast((currentUiLang === 'en' ? '✅ Buy registered: ' : '✅ Compra registrada: ') + activeSimRow.t);
     }
 
-    /** Confirma la venta: actualiza posición, calcula P&L y agrega trade al historial */
+    /** Confirm sell: update position, calculate P&L, push trade to history */
     function confirmSell() {
       if (!activeSimRow) return;
       const sellQty = parseFloat(document.getElementById('sellInpQty').value) || 0;
       const sellPx  = parseFloat(document.getElementById('sellInpPx').value)  || 0;
-      if (sellQty <= 0 || sellQty > activeSimRow.qty) { alert(currentUiLang === 'en' ? 'Invalid quantity or exceeds funds.' : 'Cantidad inválida o supera fondos.'); return; }
-      if (sellPx  <= 0)                               { alert(currentUiLang === 'en' ? 'Invalid sell price.' : 'Precio de venta inválido.'); return; }
+
+      if (sellQty <= 0 || sellQty > activeSimRow.qty) {
+        alert(currentUiLang === 'en' ? 'Invalid quantity or exceeds funds.' : 'Cantidad inválida o supera fondos.');
+        return;
+      }
+      if (sellPx <= 0) { alert(currentUiLang === 'en' ? 'Invalid sell price.' : 'Precio de venta inválido.'); return; }
 
       saveStateToHistory();
-      const avg = activeSimRow.inv / activeSimRow.qty;
-      const pnl = (sellPx - avg) * sellQty;
+      const avg  = activeSimRow.inv / activeSimRow.qty;
+      const pnl  = (sellPx - avg) * sellQty;
       activeSimRow.qty -= sellQty;
       activeSimRow.inv -= sellQty * avg;
       if (activeSimRow.qty < 0.000001) { activeSimRow.qty = 0; activeSimRow.inv = 0; }
@@ -1202,30 +1446,27 @@
 
       recalc(false);
       closeSim('sell');
-      const glText = pnl >= 0 ? (currentUiLang === 'en' ? 'Profit' : 'Ganancia') : (currentUiLang === 'en' ? 'Loss' : 'Pérdida');
-      showToast(`✅ ${currentUiLang === 'en' ? 'Sell registered' : 'Venta registrada'}. ${glText}: $${f(Math.abs(pnl))} USD`);
+      const glLabel = pnl >= 0 ? (currentUiLang === 'en' ? 'Profit' : 'Ganancia') : (currentUiLang === 'en' ? 'Loss' : 'Pérdida');
+      showToast(`✅ ${currentUiLang === 'en' ? 'Sell registered' : 'Venta registrada'}. ${glLabel}: $${f(Math.abs(pnl))} USD`);
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 12. RENDERIZADO DE TABLAS (BILINGÜE + BADGE 24H)
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // TABLE RENDERING (bilingual, with 24h price badge)
+    // ════════════════════════════════════════════════════════════════
+
     function renderTable(data, tid) {
       const opp      = tid === 'cr' ? oppCrypto : oppStocks;
       const isCrypto = tid === 'cr';
 
-      // Cabeceras traducidas según idioma activo
       const D = currentUiLang === 'en'
-        ? { thAsset:'Asset', thCoin:'Coin', thQty:'Qty.', thAvg:'Avg Price', thPx:'Current Price', thVal:'Value USD', thInv:'Invested USD', thGl:'% P/L', thPnl:'Profit', next:'next' }
-        : { thAsset:'Activo', thCoin:'Moneda', thQty:'Cant.', thAvg:'Precio Prom', thPx:'Precio Actual', thVal:'Valor USD', thInv:'Invertido USD', thGl:'% G/L', thPnl:'Profit', next:'próximo' };
-
-      const stakingHeader = isCrypto ? getTh(tid, 'Stake',             'staking') : '';
-      const walletHeader  = isCrypto ? getTh(tid, 'Wallet / Exchange', 'wallet')  : '';
+        ? { thAsset: 'Asset', thCoin: 'Coin', thQty: 'Qty.', thAvg: 'Avg Price', thPx: 'Current Price', thVal: 'Value USD', thInv: 'Invested USD', thGl: '% P/L', thPnl: 'Profit', next: 'next' }
+        : { thAsset: 'Activo', thCoin: 'Moneda', thQty: 'Cant.', thAvg: 'Precio Prom', thPx: 'Precio Actual', thVal: 'Valor USD', thInv: 'Invertido USD', thGl: '% G/L', thPnl: 'Profit', next: 'próximo' };
 
       const thead = `<thead><tr>
         <th></th>
         ${getTh(tid, isCrypto ? D.thCoin : D.thAsset, 't')}
-        ${stakingHeader}
-        ${walletHeader}
+        ${isCrypto ? getTh(tid, 'Stake',             'staking') : ''}
+        ${isCrypto ? getTh(tid, 'Wallet / Exchange', 'wallet')  : ''}
         ${getTh(tid, D.thQty, 'qty')}
         ${getTh(tid, D.thAvg, 'avg')}
         ${getTh(tid, D.thPx,  'px')}
@@ -1239,71 +1480,51 @@
       const tbody = data.map(row => {
         calc(row);
         const isPend   = row.p || !row.qty;
-        const isOpp    = !isPend && row.avg > 0 && row.px > 0 && ((row.avg - row.px) / row.avg * 100) >= opp;
         const isStable = STABLECOINS.includes(String(row.t).toUpperCase());
+        const isOpp    = !isPend && row.avg > 0 && row.px > 0 && ((row.avg - row.px) / row.avg * 100) >= opp;
 
-        // Celdas exclusivas de cripto
-        const stakingTd = isCrypto
-          ? `<td><input type="checkbox" class="chk-staking" ${row.staking ? 'checked' : ''} onchange="upd('${tid}',${row.id},'staking',this.checked)"></td>`
-          : '';
-        const walletTd = isCrypto
-          ? `<td><input class="ci wallet" value="${row.wallet||''}" placeholder="Binance, Ledger..." onblur="upd('${tid}',${row.id},'wallet',this.value)" onkeyup="if(event.key==='Enter')this.blur()"></td>`
-          : '';
-
-        // Badge de variación de precio en 24h (▲/▼ %)
+        // 24h price change badge
         let pxBadge = '';
         if (!isStable && row.pxChange !== undefined && row.pxChange !== null && !isPend && !isNaN(row.pxChange)) {
           const isPos = row.pxChange >= 0;
           pxBadge = `<div style="font-size:0.65rem;font-weight:700;padding:1px 4px;border-radius:4px;margin-top:2px;background:${isPos ? '#3fb95022' : '#f7816622'}" class="${isPos ? 'g' : 'r'}">${isPos ? '▲' : '▼'} ${Math.abs(row.pxChange).toFixed(2)}%</div>`;
         }
 
-        // 🔥 NUEVO: Lógica para cantidad editable si está en Staking 🔥
-        let qtyDisplay = '';
+        // Quantity cell: editable if staking, formatted otherwise
+        let qtyCell = '';
         if (isPend) {
-            qtyDisplay = '<span style="color:var(--sub)">—</span>';
+          qtyCell = '<span style="color:var(--sub)">—</span>';
         } else if (isCrypto && row.staking) {
-            // Si es cripto y el checkbox está activo, mostramos el input editable
-            qtyDisplay = `<input class="ci" style="width:75px; font-weight:bold; color:var(--b); border-color:var(--g);" value="${row.qty}" title="Editar cantidad en Staking" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()">`;
+          qtyCell = `<input class="ci" style="width:75px;font-weight:bold;color:var(--blue);border-color:var(--green)" value="${row.qty}" title="Editar cantidad en Staking" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()">`;
         } else {
-            // ⚠️ FIX: Máximo 4 decimales limpios para acciones, decimales libres para cripto
-            qtyDisplay = isCrypto ? row.qty : parseFloat(Number(row.qty).toFixed(4));
+          qtyCell = isCrypto ? row.qty : parseFloat(Number(row.qty).toFixed(4));
         }
+
+        const placeholder = isCrypto ? 'BTC, ETH...' : 'TICKER';
+        const dash = '<span style="color:var(--sub)">—</span>';
 
         return `<tr class="${isPend ? 'pending' : ''}" data-id="${row.id}">
           <td class="drag-handle" title="Mover">☰</td>
           <td>
-            <input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t||''}"
-              placeholder="${isCrypto ? 'BTC, ETH...' : 'TICKER'}"
+            <input class="ci ticker ${isOpp ? 'opp-glow' : ''}" value="${row.t || ''}" placeholder="${placeholder}"
               onblur="upd('${tid}',${row.id},'t',this.value)"
               onkeyup="if(event.key==='Enter')this.blur()">
             ${isPend ? `<span class="badge">${D.next}</span>` : ''}
           </td>
-          ${stakingTd}
-          ${walletTd}
-          <td class="computed" style="font-weight:600">
-            ${qtyDisplay}
-          </td>
-          <td class="computed">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.avg, isCrypto ? 4 : 2)}
-          </td>
+          ${isCrypto ? `<td><input type="checkbox" class="chk-staking" ${row.staking ? 'checked' : ''} onchange="upd('${tid}',${row.id},'staking',this.checked)"></td>` : ''}
+          ${isCrypto ? `<td><input class="ci wallet" value="${row.wallet || ''}" placeholder="Binance, Ledger..." onblur="upd('${tid}',${row.id},'wallet',this.value)" onkeyup="if(event.key==='Enter')this.blur()"></td>` : ''}
+          <td class="computed" style="font-weight:600">${qtyCell}</td>
+          <td class="computed">${isPend ? dash : fU(row.avg, isCrypto ? 4 : 2)}</td>
           <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700;vertical-align:middle">
             <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
-              <span>${row.px||0}</span>
+              <span>${row.px || 0}</span>
               ${pxBadge}
             </div>
           </td>
-          <td class="computed">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.cur)}
-          </td>
-          <td class="computed" style="color:var(--b)">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fU(row.inv)}
-          </td>
-          <td class="computed">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fP(row.gl)}
-          </td>
-          <td class="computed">
-            ${isPend ? '<span style="color:var(--sub)">—</span>' : fGain(row.pnl)}
-          </td>
+          <td class="computed">${isPend ? dash : fU(row.cur)}</td>
+          <td class="computed" style="color:var(--blue)">${isPend ? dash : fU(row.inv)}</td>
+          <td class="computed">${isPend ? dash : fP(row.gl)}</td>
+          <td class="computed">${isPend ? dash : fGain(row.pnl)}</td>
           <td class="action-btns">
             <button class="icon-btn" onmousedown="openSim('${tid}',${row.id})"  title="🛒">🛒</button>
             <button class="icon-btn" onmousedown="openSell('${tid}',${row.id})" title="💸">💸</button>
@@ -1315,13 +1536,16 @@
       const tbl = document.getElementById('tbl-' + tid);
       tbl.innerHTML = thead + '<tbody>' + tbody + '</tbody>';
 
-      // Habilita drag & drop en la tabla
+      // Enable drag-and-drop row reordering
       const tbodyEl = tbl.querySelector('tbody');
       if (tbodyEl) {
         new Sortable(tbodyEl, {
-          handle: '.drag-handle', animation: 150,
-          ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
-          forceFallback: true, fallbackOnBody: true,
+          handle: '.drag-handle',
+          animation: 150,
+          ghostClass: 'sortable-ghost',
+          dragClass: 'sortable-drag',
+          forceFallback: true,
+          fallbackOnBody: true,
           onEnd: evt => {
             if (evt.oldIndex === evt.newIndex) return;
             const arr = tid === 'sw' ? SW : tid === 'xt' ? XT : CR;
@@ -1333,15 +1557,16 @@
       }
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 13. CRUD DE FILAS (Crear, Actualizar, Eliminar)
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // ROW CRUD
+    // ════════════════════════════════════════════════════════════════
+
     function upd(tid, id, field, val) {
       const row = (tid === 'sw' ? SW : tid === 'xt' ? XT : CR).find(x => x.id === id);
       if (!row) return;
       if      (field === 't')       row[field] = String(val).toUpperCase().trim();
       else if (field === 'wallet')  row[field] = String(val).trim();
-      else if (field === 'staking') row[field] = val;  // booleano del checkbox
+      else if (field === 'staking') row[field] = val;
       else                          row[field] = rv(val);
       recalc();
     }
@@ -1361,9 +1586,10 @@
       recalc();
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 14. RECALC PRINCIPAL — Actualiza toda la UI de una vez
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // MASTER RECALC – rebuilds the entire UI in one pass
+    // ════════════════════════════════════════════════════════════════
+
     function recalc(pushToHistory = true) {
       renderTable(SW, 'sw');
       renderTable(XT, 'xt');
@@ -1371,51 +1597,55 @@
       renderCards();
       renderSummary();
       renderCharts();
-      if (pushToHistory) saveStateToHistory(); else updateUndoRedoButtons();
+      if (pushToHistory) saveStateToHistory();
+      else updateUndoRedoButtons();
       clearTimeout(saveTimeout);
       saveTimeout = setTimeout(saveDataToFirebase, 1500);
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 15. RENDERIZADO DE TARJETAS (CARDS) — BILINGÜE
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // SUMMARY CARDS (bilingual)
+    // ════════════════════════════════════════════════════════════════
+
     function renderCards() {
-      const rt      = rate();
-      const lastUpd = (document.getElementById('lastSaved').textContent.includes('Nube') || document.getElementById('lastSaved').textContent.includes('Cloud'))
-        ? new Date().toLocaleTimeString('es-CO') : '—';
+      const rt  = rate();
+      const now = new Date().toLocaleTimeString('es-CO');
 
-      // Etiquetas según idioma activo
       const D = currentUiLang === 'en'
-        ? { lblS:'💼 Stocks + Skandia Portfolio', lblC:'₿ Crypto Portfolio', inv:'📥 Invested Capital',
-            ret:'📈 Total Return', retSub:'% on investment', trm:'💱 Live Exchange Rate',
-            trmSub:'1 USD = '+f(rt,0)+' COP', trmAct:'Upd: '+lastUpd,
-            best:'🏆 Best Asset', worst:'⚠️ Worst Asset', wallet:'Digital Wallet' }
-        : { lblS:'💼 Portafolio Acciones + Skandia', lblC:'₿ Portafolio Cripto', inv:'📥 Capital Invertido',
-            ret:'📈 Retorno Total', retSub:'% sobre invertido', trm:'💱 TRM en Vivo',
-            trmSub:'1 USD = '+f(rt,0)+' COP', trmAct:'Act: '+lastUpd,
-            best:'🏆 Mejor Activo', worst:'⚠️ Más Rezagado', wallet:'Billetera Digital' };
+        ? { lblS: '💼 Stocks + Skandia Portfolio', lblC: '₿ Crypto Portfolio',
+            inv: '📥 Invested Capital', ret: '📈 Total Return', retSub: '% on investment',
+            trm: '💱 Live Exchange Rate', trmSub: '1 USD = ' + f(rt, 0) + ' COP', trmAct: 'Upd: ' + now,
+            best: '🏆 Best Asset', worst: '⚠️ Worst Asset', wallet: 'Digital Wallet' }
+        : { lblS: '💼 Portafolio Acciones + Skandia', lblC: '₿ Portafolio Cripto',
+            inv: '📥 Capital Invertido', ret: '📈 Retorno Total', retSub: '% sobre invertido',
+            trm: '💱 TRM en Vivo', trmSub: '1 USD = ' + f(rt, 0) + ' COP', trmAct: 'Act: ' + now,
+            best: '🏆 Mejor Activo', worst: '⚠️ Más Rezagado', wallet: 'Billetera Digital' };
 
-      let activeAssets = [], tInv = 0, tCur = 0, tPnl = 0, tPct = 0, gC = 0;
-      let lblGlobal = '', valInvStr = '', htmlSub = '';
+      let activeAssets, tInv, tCur, tPnl, tPct, lblGlobal, valInvStr, htmlSub;
 
       if (currentView === 'stocks') {
         activeAssets = [...SW.map(calc), ...XT.map(calc)].filter(x => x.qty > 0);
         tCur = activeAssets.reduce((s, x) => s + x.cur, 0);
-        const bInv = activeAssets.reduce((s, x) => s + x.inv, 0);
+        const bInv   = activeAssets.reduce((s, x) => s + x.inv, 0);
         if (skInvVal <= 0) skInvVal = 14613200;
-        const skUSD  = skCurVal / rt, skIUSD = skInvVal / rt;
-        tInv = bInv + skIUSD; gC = tCur + skUSD; tPnl = gC - tInv; tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
+        const skUSD  = skCurVal / rt;
+        const skIUSD = skInvVal / rt;
+        tInv     = bInv + skIUSD;
+        tCur    += skUSD;
+        tPnl     = tCur - tInv;
+        tPct     = tInv > 0 ? (tPnl / tInv) * 100 : 0;
         lblGlobal = D.lblS;
         valInvStr = '$' + f(tInv);
-        htmlSub   = 'Brokers <span style="color:#e6edf3;font-weight:600">$' + f(tCur) + '</span> · Skandia <span style="color:#e6edf3;font-weight:600">$' + f(skUSD) + '</span>';
+        htmlSub   = `Brokers <span style="color:#e6edf3;font-weight:600">$${f(tCur - skUSD)}</span> · Skandia <span style="color:#e6edf3;font-weight:600">$${f(skUSD)}</span>`;
       } else {
         activeAssets = CR.map(calc).filter(x => x.qty > 0);
-        tCur = activeAssets.reduce((s, x) => s + x.cur, 0);
-        tInv = activeAssets.reduce((s, x) => s + x.inv, 0);
-        gC = tCur; tPnl = tCur - tInv; tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
+        tCur     = activeAssets.reduce((s, x) => s + x.cur, 0);
+        tInv     = activeAssets.reduce((s, x) => s + x.inv, 0);
+        tPnl     = tCur - tInv;
+        tPct     = tInv > 0 ? (tPnl / tInv) * 100 : 0;
         lblGlobal = D.lblC;
         valInvStr = '$' + f(tInv);
-        htmlSub   = D.wallet + ' <span style="color:#e6edf3;font-weight:600">$' + f(tCur) + '</span>';
+        htmlSub   = `${D.wallet} <span style="color:#e6edf3;font-weight:600">$${f(tCur)}</span>`;
       }
 
       const named = activeAssets.filter(x => x.t && !STABLECOINS.includes(String(x.t).toUpperCase()));
@@ -1423,79 +1653,70 @@
       const worst = named.length ? [...named].sort((a, b) => a.gl - b.gl)[0] : null;
       const bCls  = best  && best.gl  >= 0 ? 'g' : 'r';
       const wCls  = worst && worst.gl >= 0 ? 'g' : 'r';
+      const glSign = (n, v) => `${n >= 0 ? '+' : '-'}$${f(Math.abs(n), v)}`;
 
-      document.getElementById('cards').innerHTML =
-        // Card 1 — Portafolio Global
-        '<div class="card" style="border-color:#58a6ff33">' +
-          '<div class="lbl">' + lblGlobal + '</div>' +
-          '<div class="val b">$' + f(gC) + '</div>' +
-          '<div class="s2" style="color:#8b949e;margin-top:3px">' + htmlSub + '</div>' +
-          '<div class="s2" style="color:#3fb950;margin-top:2px;font-weight:600">' + fCOP(gC * rt) + '</div>' +
-        '</div>' +
-        // Card 2 — Capital Invertido
-        '<div class="card">' +
-          '<div class="lbl">' + D.inv + '</div>' +
-          '<div class="val">' + valInvStr + '</div>' +
-          '<div class="s2" style="color:#8b949e;margin-top:3px">' + fCOP(tInv * rt) + '</div>' +
-        '</div>' +
-        // Card 3 — Retorno Total
-        '<div class="card" style="border-color:' + (tPnl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
-          '<div class="lbl">' + D.ret + '</div>' +
-          '<div class="val ' + (tPnl >= 0 ? 'g' : 'r') + '">' + (tPnl >= 0 ? '+' : '-') + ' $' + f(Math.abs(tPnl)) + '</div>' +
-          '<div class="s2 ' + (tPct >= 0 ? 'g' : 'r') + '" style="margin-top:3px">' + (tPct >= 0 ? '+' : '') + f(tPct, 1) + ' ' + D.retSub + '</div>' +
-          '<div class="s2 ' + (tPnl >= 0 ? 'g' : 'r') + '" style="margin-top:2px;font-weight:600">' + (tPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(tPnl) * rt) + '</div>' +
-        '</div>' +
-        // Card 4 — TRM
-        '<div class="card" style="border-color:#ffa65733">' +
-          '<div class="lbl">' + D.trm + '</div>' +
-          '<div class="val" style="color:#ffa657">' + f(rt, 0) + ' <span style="font-size:.72rem;font-weight:400;color:#8b949e">COP</span></div>' +
-          '<div class="s2 hide-mob" style="color:#8b949e;margin-top:3px">' + D.trmSub + '</div>' +
-          '<div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">' + D.trmAct + '</div>' +
-        '</div>' +
-        // Card 5 — Mejor Activo
-        '<div class="card" style="border-color:' + (best && best.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
-          '<div class="lbl">' + D.best + '</div>' +
-          '<div class="val ' + bCls + '">' + (best ? best.t : '—') + '</div>' +
-          '<div class="s2 ' + bCls + '" style="margin-top:3px">' + (best ? (best.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(best.pnl)) : '') + '</div>' +
-          '<div class="s2 ' + bCls + '" style="margin-top:2px">' + (best ? (best.gl >= 0 ? '+' : '') + f(best.gl, 1) + '%' : '') + '</div>' +
-          '<div class="s2 hide-mob ' + bCls + '" style="margin-top:2px;font-size:.68rem">' + (best ? (best.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(best.pnl) * rt) : '') + '</div>' +
-        '</div>' +
-        // Card 6 — Más Rezagado
-        '<div class="card" style="border-color:' + (worst && worst.gl >= 0 ? '#3fb95033' : '#f7816633') + '">' +
-          '<div class="lbl">' + D.worst + '</div>' +
-          '<div class="val ' + wCls + '">' + (worst ? worst.t : '—') + '</div>' +
-          '<div class="s2 ' + wCls + '" style="margin-top:3px">' + (worst ? (worst.pnl >= 0 ? '+' : '-') + '$' + f(Math.abs(worst.pnl)) : '') + '</div>' +
-          '<div class="s2 ' + wCls + '" style="margin-top:2px">' + (worst ? f(worst.gl, 1) + '%' : '') + '</div>' +
-          '<div class="s2 hide-mob ' + wCls + '" style="margin-top:2px;font-size:.68rem">' + (worst ? (worst.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(worst.pnl) * rt) : '') + '</div>' +
-        '</div>';
+      document.getElementById('cards').innerHTML = `
+        <div class="card" style="border-color:#58a6ff33">
+          <div class="lbl">${lblGlobal}</div>
+          <div class="val b">$${f(tCur)}</div>
+          <div class="s2" style="color:var(--sub);margin-top:3px">${htmlSub}</div>
+          <div class="s2" style="color:var(--green);margin-top:2px;font-weight:600">${fCOP(tCur * rt)}</div>
+        </div>
+        <div class="card">
+          <div class="lbl">${D.inv}</div>
+          <div class="val">${valInvStr}</div>
+          <div class="s2" style="color:var(--sub);margin-top:3px">${fCOP(tInv * rt)}</div>
+        </div>
+        <div class="card" style="border-color:${tPnl >= 0 ? '#3fb95033' : '#f7816633'}">
+          <div class="lbl">${D.ret}</div>
+          <div class="val ${tPnl >= 0 ? 'g' : 'r'}">${glSign(tPnl, 2)}</div>
+          <div class="s2 ${tPct >= 0 ? 'g' : 'r'}" style="margin-top:3px">${tPct >= 0 ? '+' : ''}${f(tPct, 1)} ${D.retSub}</div>
+          <div class="s2 ${tPnl >= 0 ? 'g' : 'r'}" style="margin-top:2px;font-weight:600">${tPnl >= 0 ? '+' : '-'} ${fCOP(Math.abs(tPnl) * rt)}</div>
+        </div>
+        <div class="card" style="border-color:#ffa65733">
+          <div class="lbl">${D.trm}</div>
+          <div class="val" style="color:#ffa657">${f(rt, 0)} <span style="font-size:.72rem;font-weight:400;color:var(--sub)">COP</span></div>
+          <div class="s2 hide-mob" style="color:var(--sub);margin-top:3px">${D.trmSub}</div>
+          <div class="s2 hide-mob" style="color:#555;margin-top:2px;font-size:.62rem">${D.trmAct}</div>
+        </div>
+        <div class="card" style="border-color:${best && best.gl >= 0 ? '#3fb95033' : '#f7816633'}">
+          <div class="lbl">${D.best}</div>
+          <div class="val ${bCls}">${best ? best.t : '—'}</div>
+          <div class="s2 ${bCls}" style="margin-top:3px">${best ? glSign(best.pnl, 2) : ''}</div>
+          <div class="s2 ${bCls}" style="margin-top:2px">${best ? (best.gl >= 0 ? '+' : '') + f(best.gl, 1) + '%' : ''}</div>
+          <div class="s2 hide-mob ${bCls}" style="margin-top:2px;font-size:.68rem">${best ? (best.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(best.pnl) * rt) : ''}</div>
+        </div>
+        <div class="card" style="border-color:${worst && worst.gl >= 0 ? '#3fb95033' : '#f7816633'}">
+          <div class="lbl">${D.worst}</div>
+          <div class="val ${wCls}">${worst ? worst.t : '—'}</div>
+          <div class="s2 ${wCls}" style="margin-top:3px">${worst ? glSign(worst.pnl, 2) : ''}</div>
+          <div class="s2 ${wCls}" style="margin-top:2px">${worst ? f(worst.gl, 1) + '%' : ''}</div>
+          <div class="s2 hide-mob ${wCls}" style="margin-top:2px;font-size:.68rem">${worst ? (worst.pnl >= 0 ? '+' : '-') + fCOP(Math.abs(worst.pnl) * rt) : ''}</div>
+        </div>`;
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 16. RENDERIZADO DEL RESUMEN CONSOLIDADO — BILINGÜE
-    //     ⚠️ FIX: lbl-summary se actualiza aquí con idioma + vista activa
-    // ═══════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════
+    // CONSOLIDATED SUMMARY PANEL (bilingual)
+    // ════════════════════════════════════════════════════════════════
+
     function renderSummary() {
       const rt = rate();
 
-      // Etiquetas según idioma activo
       const D = currentUiLang === 'en'
-        ? { inv:'Invested', act:'Current', sk:'🇨🇴 Skandia BITCOIN Portfolio ₿',
-            skCap:'Invested Capital', skCur:'Current Value', skRet:'Skandia Return',
-            tInv:'Total Invested', tEq:'USD Equivalent', tCurCOP:'Current Total COP', tCurUSD:'Current Total USD',
-            crInv:'₿ Crypto Investment', tInvCr:'Total Crypto Invested',
-            summaryS:'📋 Consolidated Stocks Summary', summaryC:'📋 Consolidated Crypto Summary' }
-        : { inv:'Invertido', act:'Actual', sk:'🇨🇴 Skandia Portafolio BITCOIN ₿',
-            skCap:'Capital Invertido', skCur:'Valor Actual', skRet:'Rendimiento Skandia',
-            tInv:'Total Invertido', tEq:'Equivalente USD', tCurCOP:'Total Actual COP', tCurUSD:'Total Actual USD',
-            crInv:'₿ Inversión Cripto', tInvCr:'Total Invertido Cripto',
-            summaryS:'📋 Resumen Consolidado de Acciones', summaryC:'📋 Resumen Consolidado Cripto' };
+        ? { inv: 'Invested', act: 'Current', sk: '🇨🇴 Skandia BITCOIN Portfolio ₿',
+            skCap: 'Invested Capital', skCur: 'Current Value', skRet: 'Skandia Return',
+            tInv: 'Total Invested', tEq: 'USD Equivalent', tCurCOP: 'Current Total COP', tCurUSD: 'Current Total USD',
+            crInv: '₿ Crypto Investment', tInvCr: 'Total Crypto Invested',
+            summaryS: '📋 Consolidated Stocks Summary', summaryC: '📋 Consolidated Crypto Summary' }
+        : { inv: 'Invertido', act: 'Actual', sk: '🇨🇴 Skandia Portafolio BITCOIN ₿',
+            skCap: 'Capital Invertido', skCur: 'Valor Actual', skRet: 'Rendimiento Skandia',
+            tInv: 'Total Invertido', tEq: 'Equivalente USD', tCurCOP: 'Total Actual COP', tCurUSD: 'Total Actual USD',
+            crInv: '₿ Inversión Cripto', tInvCr: 'Total Invertido Cripto',
+            summaryS: '📋 Resumen Consolidado de Acciones', summaryC: '📋 Resumen Consolidado Cripto' };
 
-      // ✅ FIX: Actualiza el título del resumen con idioma + pestaña activa
-      document.getElementById('lbl-summary').textContent =
-        currentView === 'stocks' ? D.summaryS : D.summaryC;
+      document.getElementById('lbl-summary').textContent = currentView === 'stocks' ? D.summaryS : D.summaryC;
 
       if (currentView === 'stocks') {
-        // ── Acciones ──
         const sA = SW.map(calc).filter(x => x.qty > 0);
         const xA = XT.map(calc).filter(x => x.qty > 0);
         const sI = sA.reduce((s, x) => s + x.inv, 0),  sC = sA.reduce((s, x) => s + x.cur, 0);
@@ -1503,8 +1724,11 @@
         if (skInvVal <= 0) skInvVal = 14613200;
         const skI_USD = skInvVal / rt,  skC_USD = skCurVal / rt;
         const tI_USD  = sI + xI + skI_USD,  tC_USD = sC + xC + skC_USD;
-        const tI_COP  = (sI + xI) * rt + skInvVal,  tC_COP = (sC + xC) * rt + skCurVal;
-        const skPnl   = skCurVal - skInvVal,  skRet = skInvVal > 0 ? (skPnl / skInvVal) * 100 : 0;
+        const tI_COP  = (sI + xI) * rt + skInvVal;
+        const tC_COP  = (sC + xC) * rt + skCurVal;
+        const skPnl   = skCurVal - skInvVal;
+        const skRet   = skInvVal > 0 ? (skPnl / skInvVal) * 100 : 0;
+        const copFmt  = n => new Intl.NumberFormat('es-CO').format(n);
 
         document.getElementById('sum-content').innerHTML = `
           <div class="sum-grid">
@@ -1539,7 +1763,7 @@
                 <label style="font-size:.7rem;color:var(--sub)">${D.skCap}</label>
                 <div class="sk-edit-group">
                   <span class="sk-edit-badge">COP</span>
-                  <input class="sk-edit-input" id="skInv" value="${new Intl.NumberFormat('es-CO').format(skInvVal)}"
+                  <input class="sk-edit-input" id="skInv" value="${copFmt(skInvVal)}"
                     onfocus="skFocus(this)" onblur="skBlur(this,'inv')" onkeyup="if(event.key==='Enter')this.blur()">
                 </div>
                 <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ $${f(skI_USD)} USD</div>
@@ -1548,7 +1772,7 @@
                 <label style="font-size:.7rem;color:var(--sub)">${D.skCur}</label>
                 <div class="sk-edit-group">
                   <span class="sk-edit-badge">COP</span>
-                  <input class="sk-edit-input" id="skCur" value="${new Intl.NumberFormat('es-CO').format(skCurVal)}"
+                  <input class="sk-edit-input" id="skCur" value="${copFmt(skCurVal)}"
                     onfocus="skFocus(this)" onblur="skBlur(this,'cur')" onkeyup="if(event.key==='Enter')this.blur()">
                 </div>
                 <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ ${fU(skC_USD)} USD</div>
@@ -1576,20 +1800,20 @@
             <div style="border-top:1px solid var(--border);margin:12px 0"></div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div>
-                <div style="font-size:.8rem;color:#3fb950;font-weight:700;margin-bottom:2px">${D.tCurCOP}</div>
-                <div style="font-size:1.5rem;font-weight:800;color:#3fb950;letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(tC_COP)}</div>
+                <div style="font-size:.8rem;color:var(--green);font-weight:700;margin-bottom:2px">${D.tCurCOP}</div>
+                <div style="font-size:1.5rem;font-weight:800;color:var(--green);letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(tC_COP)}</div>
               </div>
               <div style="text-align:right">
-                <div style="font-size:.75rem;color:var(--b);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div>
-                <div style="font-size:1.2rem;font-weight:800;color:var(--b)">$${f(tC_USD)}</div>
+                <div style="font-size:.75rem;color:var(--blue);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div>
+                <div style="font-size:1.2rem;font-weight:800;color:var(--blue)">$${f(tC_USD)}</div>
               </div>
             </div>
           </div>`;
 
       } else {
-        // ── Cripto ──
-        const cA = CR.map(calc).filter(x => x.qty > 0);
-        const cI = cA.reduce((s, x) => s + x.inv, 0),  cC = cA.reduce((s, x) => s + x.cur, 0);
+        const cA  = CR.map(calc).filter(x => x.qty > 0);
+        const cI  = cA.reduce((s, x) => s + x.inv, 0);
+        const cC  = cA.reduce((s, x) => s + x.cur, 0);
 
         document.getElementById('sum-content').innerHTML = `
           <div class="sum-grid">
@@ -1620,91 +1844,117 @@
             <div style="border-top:1px solid var(--border);margin:12px 0"></div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div>
-                <div style="font-size:.8rem;color:#3fb950;font-weight:700;margin-bottom:2px">${D.tCurCOP}</div>
-                <div style="font-size:1.5rem;font-weight:800;color:#3fb950;letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(cC * rt)}</div>
+                <div style="font-size:.8rem;color:var(--green);font-weight:700;margin-bottom:2px">${D.tCurCOP}</div>
+                <div style="font-size:1.5rem;font-weight:800;color:var(--green);letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(cC * rt)}</div>
               </div>
               <div style="text-align:right">
-                <div style="font-size:.75rem;color:var(--b);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div>
-                <div style="font-size:1.2rem;font-weight:800;color:var(--b)">$${f(cC)}</div>
+                <div style="font-size:.75rem;color:var(--blue);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div>
+                <div style="font-size:1.2rem;font-weight:800;color:var(--blue)">$${f(cC)}</div>
               </div>
             </div>
           </div>`;
       }
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 17. RENDERIZADO DE GRÁFICOS (Donut + Barras)
-    //     ⚠️ FIX: lbl-bar se actualiza aquí con el idioma activo
-    // ═══════════════════════════════════════════════════════════════
-    function renderCharts() {
-      // ✅ FIX: Actualiza el título de la gráfica de barras con el idioma activo
-      document.getElementById('lbl-bar').textContent =
-        currentUiLang === 'en' ? 'Performance % P/L' : 'Rendimiento % G/L';
+    // ════════════════════════════════════════════════════════════════
+    // CHARTS (Donut + Bar)
+    // ════════════════════════════════════════════════════════════════
 
-      const activeData = currentView === 'stocks'
+    function renderCharts() {
+      document.getElementById('lbl-bar').textContent = currentUiLang === 'en' ? 'Performance % P/L' : 'Rendimiento % G/L';
+
+      const rawData = currentView === 'stocks'
         ? [...SW.map(calc), ...XT.map(calc)]
         : [...CR.map(calc)];
 
-      const all       = activeData.filter(x => x.qty > 0 && x.t);
-      const labels    = all.map(x => {
-        let n = String(x.t);
-        if (['USDT','USDC'].includes(n.toUpperCase()) && x.wallet) n += ` (${x.wallet})`;
-        return n;
+      const all    = rawData.filter(x => x.qty > 0 && x.t);
+      const labels = all.map(x => {
+        let name = String(x.t);
+        if (['USDT', 'USDC'].includes(name.toUpperCase()) && x.wallet) name += ` (${x.wallet})`;
+        return name;
       });
-      const vals      = all.map(x => x.cur);
-      const gls       = all.map(x => x.gl);
-      const total     = vals.reduce((a, b) => a + b, 0);
-      const labelsPct = labels.map((t, i) => t + ' (' + (total > 0 ? (vals[i]/total*100).toFixed(1) : 0) + '%)');
-      const isMob     = window.innerWidth <= 768;
+      const values = all.map(x => x.cur);
+      const gls    = all.map(x => x.gl);
+      const total  = values.reduce((a, b) => a + b, 0);
+      const isMob  = window.innerWidth <= 768;
 
-      // ── Donut ──
+      const labelsPct = labels.map((t, i) =>
+        `${t} (${total > 0 ? (values[i] / total * 100).toFixed(1) : 0}%)`
+      );
+
+      // Donut chart
       if (dChart) dChart.destroy();
       if (labels.length) {
         dChart = new Chart(document.getElementById('donut'), {
           type: 'doughnut',
-          data: { labels: labelsPct, datasets: [{ data: vals, backgroundColor: COLS.slice(0, labels.length), borderWidth: 2, borderColor: '#161b22' }] },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: isMob ? 'bottom' : 'right', labels: { color: '#e6edf3', font: { size: 11 }, boxWidth: 10, padding: 8 } } } }
+          data: {
+            labels: labelsPct,
+            datasets: [{ data: values, backgroundColor: CHART_COLORS.slice(0, labels.length), borderWidth: 2, borderColor: '#161b22' }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: isMob ? 'bottom' : 'right', labels: { color: '#e6edf3', font: { size: 11 }, boxWidth: 10, padding: 8 } }
+            }
+          }
         });
       }
 
-      // ── Barras ──
+      // Bar chart
       if (bChart) bChart.destroy();
       if (labels.length) {
         const barWrap = document.getElementById('bar-wrap');
         barWrap.style.height = isMob ? Math.max(280, labels.length * 40) + 'px' : '200px';
 
-        // Plugin: muestra % encima/debajo de cada barra
+        // Plugin: show % label above/beside each bar
         const pctPlugin = {
           id: 'pct',
           afterDraw: chart => {
-            const ctx = chart.ctx, isH = chart.options.indexAxis === 'y';
+            const ctx  = chart.ctx;
+            const isH  = chart.options.indexAxis === 'y';
             chart.data.datasets.forEach((ds, i) => {
               const meta = chart.getDatasetMeta(i);
-              if (!meta.hidden) meta.data.forEach((el, j) => {
-                ctx.fillStyle = ds.borderColor[j];
-                const v    = ds.data[j];
-                const pctT = (v >= 0 ? '+' : '') + f(v, 1) + '%';
-                if (isMob && isH) {
-                  ctx.font = 'bold 11px sans-serif'; ctx.textBaseline = 'middle';
-                  const zeroX = chart.scales.x.getPixelForValue(0);
-                  ctx.textAlign = v >= 0 ? 'right' : 'left';
-                  ctx.fillText(`${chart.data.labels[j]} (${pctT})`, zeroX + (v >= 0 ? -8 : 8), el.y);
-                } else {
-                  ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
-                  ctx.textBaseline = v >= 0 ? 'bottom' : 'top';
-                  ctx.fillText(pctT, el.x, el.y + (v >= 0 ? -6 : 6));
-                }
-              });
+              if (!meta.hidden) {
+                meta.data.forEach((el, j) => {
+                  ctx.fillStyle = ds.borderColor[j];
+                  const v    = ds.data[j];
+                  const text = (v >= 0 ? '+' : '') + f(v, 1) + '%';
+                  if (isMob && isH) {
+                    ctx.font = 'bold 11px sans-serif';
+                    ctx.textBaseline = 'middle';
+                    const zeroX = chart.scales.x.getPixelForValue(0);
+                    ctx.textAlign = v >= 0 ? 'right' : 'left';
+                    ctx.fillText(`${chart.data.labels[j]} (${text})`, zeroX + (v >= 0 ? -8 : 8), el.y);
+                  } else {
+                    ctx.font = 'bold 10px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = v >= 0 ? 'bottom' : 'top';
+                    ctx.fillText(text, el.x, el.y + (v >= 0 ? -6 : 6));
+                  }
+                });
+              }
             });
           }
         };
 
         bChart = new Chart(document.getElementById('bar'), {
           type: 'bar',
-          data: { labels, datasets: [{ label: currentUiLang === 'en' ? 'Performance' : 'Rendimiento', data: gls, backgroundColor: gls.map(g => g >= 0 ? '#3fb95055' : '#f7816655'), borderColor: gls.map(g => g >= 0 ? '#3fb950' : '#f78166'), borderWidth: 1 }] },
+          data: {
+            labels,
+            datasets: [{
+              label: currentUiLang === 'en' ? 'Performance' : 'Rendimiento',
+              data: gls,
+              backgroundColor: gls.map(g => g >= 0 ? '#3fb95055' : '#f7816655'),
+              borderColor:     gls.map(g => g >= 0 ? '#3fb950'   : '#f78166'),
+              borderWidth: 1
+            }]
+          },
           plugins: [pctPlugin],
           options: {
-            responsive: true, maintainAspectRatio: false, indexAxis: isMob ? 'y' : 'x',
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: isMob ? 'y' : 'x',
             layout: { padding: { top: isMob ? 0 : 25, bottom: isMob ? 0 : 25, left: isMob ? 120 : 0, right: isMob ? 120 : 0 } },
             plugins: { legend: { display: false } },
             scales: {
@@ -1716,74 +1966,76 @@
       }
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // 18. PRECIOS EN TIEMPO REAL
-    //     TRM:      awesomeapi (COP/USD)
-    //     Acciones: Finnhub (USA) + Yahoo Finance vía allorigins (XTB .UK)
-    //     Cripto:   Binance 24hr → fallback MEXC
-    // ═══════════════════════════════════════════════════════════════
-    async function fetchRealTimeData() {
-      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-      if (!currentUser) return;
+    // ════════════════════════════════════════════════════════════════
+    // REAL-TIME PRICE FETCHING
+    // Sources:
+    //   TRM:    awesomeapi (COP/USD)
+    //   Stocks: Finnhub (USA) | Yahoo Finance via allorigins proxy (.UK)
+    //   Crypto: Binance 24hr → fallback MEXC
+    // ════════════════════════════════════════════════════════════════
 
-      // ── TRM ──
+    async function fetchRealTimeData() {
+      if (document.activeElement?.tagName === 'INPUT' || !currentUser) return;
+
+      // Live exchange rate (COP/USD)
       try {
-        const res = await fetch('https://economia.awesomeapi.com.br/json/last/USD-COP');
-        const d   = await res.json();
-        if (d.USDCOP && d.USDCOP.bid)
-          document.getElementById('rateInput').value = parseFloat(d.USDCOP.bid).toFixed(2);
+        const res  = await fetch('https://economia.awesomeapi.com.br/json/last/USD-COP');
+        const data = await res.json();
+        if (data?.USDCOP?.bid)
+          document.getElementById('rateInput').value = parseFloat(data.USDCOP.bid).toFixed(2);
       } catch (e) {}
 
-      // ── Acciones (Finnhub para USA, Yahoo Finance para .UK vía proxy) ──
-      const fetchStockPrice = async r => {
+      // Stock price (Finnhub for US tickers, Yahoo Finance proxy for .UK)
+      const fetchStockPrice = async row => {
         try {
-          if (String(r.t).toUpperCase().includes('.UK')) {
-            // XTB Europe: Yahoo Finance v8 sin bloqueos via allorigins proxy
-            const sym      = String(r.t).toUpperCase().replace('.UK', '.L');
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d')}`;
+          if (String(row.t).toUpperCase().includes('.UK')) {
+            const sym      = String(row.t).toUpperCase().replace('.UK', '.L');
+            const url      = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d`;
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
             const res      = await fetch(proxyUrl);
             const data     = await res.json();
-            if (data && data.chart && data.chart.result && data.chart.result.length > 0) {
-              const meta = data.chart.result[0].meta;
-              r.px       = meta.regularMarketPrice;
-              r.pxChange = ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100;
-              return;
+            const meta     = data?.chart?.result?.[0]?.meta;
+            if (meta) {
+              row.px       = meta.regularMarketPrice;
+              row.pxChange = (meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose * 100;
             }
+            return;
           }
-          // Schwab USA: Finnhub
-          const res  = await fetch('https://finnhub.io/api/v1/quote?symbol=' + r.t + '&token=' + FINNHUB_API_KEY);
+          // Finnhub (US)
+          const res  = await fetch(`https://finnhub.io/api/v1/quote?symbol=${row.t}&token=${FINNHUB_API_KEY}`);
           const data = await res.json();
-          if (data && data.c) {
-            r.px = data.c;
-            if (data.dp !== undefined && data.dp !== null) r.pxChange = data.dp;
-            else if (data.pc && data.pc > 0) r.pxChange = ((data.c - data.pc) / data.pc) * 100;
+          if (data?.c) {
+            row.px       = data.c;
+            row.pxChange = data.dp !== undefined && data.dp !== null
+              ? data.dp
+              : (data.pc > 0 ? (data.c - data.pc) / data.pc * 100 : undefined);
           }
-        } catch (e) { console.error('Error precio acción:', r.t, e); }
+        } catch (e) { console.error('Stock price error:', row.t, e); }
       };
 
-      // ── Cripto (Binance → fallback MEXC) ──
-      const fetchCryptoPrice = async r => {
-        const t = String(r.t).toUpperCase();
-        if (STABLECOINS.includes(t)) { r.px = 1.00; r.pxChange = null; return; }
+      // Crypto price (Binance → fallback MEXC)
+      const fetchCryptoPrice = async row => {
+        const ticker = String(row.t).toUpperCase();
+        if (STABLECOINS.includes(ticker)) { row.px = 1.00; row.pxChange = null; return; }
         try {
-          const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=' + t + 'USDT');
+          const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${ticker}USDT`);
           if (res.ok) {
-            const d = await res.json();
-            if (d.lastPrice) { r.px = parseFloat(d.lastPrice); r.pxChange = parseFloat(d.priceChangePercent); return; }
+            const data = await res.json();
+            if (data.lastPrice) { row.px = parseFloat(data.lastPrice); row.pxChange = parseFloat(data.priceChangePercent); return; }
           }
-          throw new Error('Not found in Binance');
+          throw new Error('Not on Binance');
         } catch {
           try {
-            const res = await fetch('https://api.mexc.com/api/v3/ticker/24hr?symbol=' + t + 'USDT');
+            const res = await fetch(`https://api.mexc.com/api/v3/ticker/24hr?symbol=${ticker}USDT`);
             if (res.ok) {
-              const d = await res.json();
-              if (d.lastPrice) { r.px = parseFloat(d.lastPrice); r.pxChange = parseFloat(d.priceChangePercent) * 100; }
+              const data = await res.json();
+              if (data.lastPrice) { row.px = parseFloat(data.lastPrice); row.pxChange = parseFloat(data.priceChangePercent) * 100; }
             }
           } catch (e) {}
         }
       };
 
-      // ── Lanza todas las peticiones en paralelo ──
+      // Fetch all prices in parallel
       try {
         await Promise.all([
           ...SW.filter(r => r.t).map(fetchStockPrice),
@@ -1795,22 +2047,22 @@
       recalc(false);
     }
 
-    // Refresco automático cada 60 segundos
-    setInterval(fetchRealTimeData, 60000);
+    // Auto-refresh every 60 seconds
+    setInterval(fetchRealTimeData, 60_000);
 
-    // ═══════════════════════════════════════════════════════════════
-    // 19. GENERACIÓN DEL PDF BILINGÜE VÍA CLOUD FUNCTION
-    //     Llama al endpoint de Firebase Functions con el idioma elegido.
-    //     Usa mode:'no-cors' para evitar errores CORS desde el browser.
-    //     La respuesta no-cors no retorna body → se usa un timeout de 2.5s.
-    // ═══════════════════════════════════════════════════════════════
-    // Mostrar/Ocultar los menús
+    // ════════════════════════════════════════════════════════════════
+    // PDF REPORT GENERATION (via Firebase Cloud Function)
+    // Uses mode:'no-cors' to avoid CORS errors; response body is empty,
+    // so a 2.5s timeout is used before showing the success toast.
+    // ════════════════════════════════════════════════════════════════
+
     function toggleDrop(lang) {
       document.getElementById(lang === 'es' ? 'drop-es' : 'drop-en').classList.toggle('show');
       document.getElementById(lang === 'es' ? 'drop-en' : 'drop-es').classList.remove('show');
     }
-    // Cerrar si haces clic afuera
-    window.onclick = e => { 
+
+    // Close dropdowns on outside click
+    window.onclick = e => {
       if (!e.target.closest('.dropdown')) {
         document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show'));
       }
@@ -1820,82 +2072,68 @@
 
     function openAssetModal(lang) {
       const start = document.getElementById(`start-${lang}`).value;
-      const end = document.getElementById(`end-${lang}`).value;
-      
-      if(!start || !end) { showToast(currentUiLang === 'en' ? '⚠️ Select both dates' : '⚠️ Selecciona ambas fechas'); return; }
-      if(new Date(start) > new Date(end)) { showToast(currentUiLang === 'en' ? '⚠️ Start must be before End' : '⚠️ Inicio debe ser antes del fin'); return; }
+      const end   = document.getElementById(`end-${lang}`).value;
+
+      if (!start || !end)                     { showToast(currentUiLang === 'en' ? '⚠️ Select both dates'            : '⚠️ Selecciona ambas fechas'); return; }
+      if (new Date(start) > new Date(end))    { showToast(currentUiLang === 'en' ? '⚠️ Start must be before End'    : '⚠️ Inicio debe ser antes del fin'); return; }
 
       repLang = lang; repStart = start; repEnd = end;
       document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show'));
 
-      document.getElementById('assetModalTitle').innerText = lang === 'en' ? '📑 Select Assets' : '📑 Seleccionar Activos';
-      document.getElementById('assetModalDesc').innerText  = lang === 'en' ? 'Choose the assets for your buy & sell history.' : 'Elige los activos para tu reporte de compras y ventas.';
-      document.getElementById('lblAllAssets').innerText    = lang === 'en' ? 'Select All' : 'Seleccionar Todos';
-      document.getElementById('btnGenAssetRep').innerText  = lang === 'en' ? 'Generate Report' : 'Generar Reporte PDF';
-      document.getElementById('btnCanAssetRep').innerText  = lang === 'en' ? 'Cancel' : 'Cancelar';
-      
-      document.getElementById('btnGenAssetRep').style.background = lang === 'en' ? '#2ea043' : '#1f6feb';
+      document.getElementById('assetModalTitle').innerText = lang === 'en' ? '📑 Select Assets'                                  : '📑 Seleccionar Activos';
+      document.getElementById('assetModalDesc').innerText  = lang === 'en' ? 'Choose the assets for your buy & sell history.'    : 'Elige los activos para tu reporte de compras y ventas.';
+      document.getElementById('lblAllAssets').innerText    = lang === 'en' ? 'Select All'                                        : 'Seleccionar Todos';
+      document.getElementById('btnGenAssetRep').innerText  = lang === 'en' ? 'Generate Report'                                   : 'Generar Reporte PDF';
+      document.getElementById('btnCanAssetRep').innerText  = lang === 'en' ? 'Cancel'                                            : 'Cancelar';
+      document.getElementById('btnGenAssetRep').style.background  = lang === 'en' ? '#2ea043' : '#1f6feb';
       document.getElementById('btnGenAssetRep').style.borderColor = lang === 'en' ? '#3fb950' : '#388bfd';
 
-      // Reseteamos la barra de búsqueda al abrir
       const searchInput = document.getElementById('searchAssetInput');
       searchInput.placeholder = lang === 'en' ? '🔍 Search asset...' : '🔍 Buscar activo...';
       searchInput.value = '';
 
-      // Extracción de activos y Wallets
+      // Build deduplicated asset map (stables include wallet label)
       const assetMap = new Map();
       [...SW, ...XT, ...CR].forEach(a => {
-          if (a && a.t) {
-              const t = String(a.t).toUpperCase();
-              let label = t;
-              // Añade la wallet visualmente solo a estables (USDT, USDC, EUSD)
-              if (['USDT', 'USDC', 'EUSD'].includes(t) && a.wallet) {
-                  label = `${t} (${a.wallet})`;
-              }
-              assetMap.set(label, t);
-          }
+        if (!a?.t) return;
+        const ticker = String(a.t).toUpperCase();
+        const label  = ['USDT', 'USDC', 'EUSD'].includes(ticker) && a.wallet ? `${ticker} (${a.wallet})` : ticker;
+        assetMap.set(label, ticker);
       });
-      
+
       const sortedLabels = Array.from(assetMap.keys()).sort();
-      
-      const container = document.getElementById('assetCheckboxes');
-      if (sortedLabels.length === 0) {
-        container.innerHTML = `<p style="color:var(--sub); font-size:0.8rem;">${lang === 'en' ? 'No assets found.' : 'No hay activos registrados.'}</p>`;
-      } else {
-        container.innerHTML = sortedLabels.map((label, i) => {
-          const t = assetMap.get(label);
-          return `
-          <div class="asset-item modal-asset-row">
-            <input type="checkbox" class="chk-asset-item" id="chk_${i}" value="${t}" checked>
-            <label for="chk_${i}">${label}</label>
-          </div>
-        `}).join('');
-      }
+      const container    = document.getElementById('assetCheckboxes');
+
+      container.innerHTML = sortedLabels.length === 0
+        ? `<p style="color:var(--sub);font-size:0.8rem">${lang === 'en' ? 'No assets found.' : 'No hay activos registrados.'}</p>`
+        : sortedLabels.map((label, i) => `
+            <div class="asset-item modal-asset-row">
+              <input type="checkbox" class="chk-asset-item" id="chk_${i}" value="${assetMap.get(label)}" checked>
+              <label for="chk_${i}">${label}</label>
+            </div>`).join('');
 
       document.getElementById('chkAllAssets').checked = true;
       document.getElementById('assetModal').style.display = 'flex';
     }
 
-    // Función para filtrar mientras escribes
     function filterAssets() {
-        const query = document.getElementById('searchAssetInput').value.toLowerCase();
-        const rows = document.querySelectorAll('.modal-asset-row');
-        rows.forEach(row => {
-            const label = row.querySelector('label').innerText.toLowerCase();
-            row.style.display = label.includes(query) ? 'flex' : 'none';
-        });
+      const query = document.getElementById('searchAssetInput').value.toLowerCase();
+      document.querySelectorAll('.modal-asset-row').forEach(row => {
+        row.style.display = row.querySelector('label').innerText.toLowerCase().includes(query) ? 'flex' : 'none';
+      });
     }
 
-    function closeAssetModal() { document.getElementById('assetModal').style.display = 'none'; }
+    function closeAssetModal() {
+      document.getElementById('assetModal').style.display = 'none';
+    }
 
-    // Selecciona/Deselecciona SOLO los que están visibles en la búsqueda
+    /** Toggle all visible (non-filtered) asset checkboxes */
     function toggleAllAssets(checked) {
-        const rows = document.querySelectorAll('.modal-asset-row');
-        rows.forEach(row => {
-            if (row.style.display !== 'none') {
-                row.querySelector('.chk-asset-item').checked = checked;
-            }
-        });
+      document.querySelectorAll('.modal-asset-row').forEach(row => {
+        if (row.style.display !== 'none') {
+          row.querySelector('.chk-asset-item').checked = checked;
+        }
+      });
     }
 
     async function pedirReporteHistorial() {
@@ -1908,13 +2146,17 @@
 
       try {
         const assetsParam = encodeURIComponent(selected.join(','));
-        await fetch(`${PDF_FUNCTION_URL}?lang=${repLang}&start=${repStart}&end=${repEnd}&assets=${assetsParam}`, { method: 'GET', mode: 'no-cors' });
-
+        await fetch(`${PDF_FUNCTION_URL}?lang=${repLang}&start=${repStart}&end=${repEnd}&assets=${assetsParam}`, {
+          method: 'GET',
+          mode: 'no-cors'
+        });
         setTimeout(() => {
           loadingScreen.style.display = 'none';
-          showToast(currentUiLang === 'en' ? `✅ Transaction Report is processing! Check Telegram.` : `✅ ¡Reporte de Transacciones en proceso! Llegará a Telegram.`);
+          showToast(currentUiLang === 'en'
+            ? '✅ Transaction Report is processing! Check Telegram.'
+            : '✅ ¡Reporte de Transacciones en proceso! Llegará a Telegram.');
         }, 2500);
-      } catch (error) {
+      } catch (e) {
         loadingScreen.style.display = 'none';
         showToast(currentUiLang === 'en' ? '❌ Network error.' : '❌ Error de red.');
       }
