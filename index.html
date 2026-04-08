@@ -2136,27 +2136,42 @@
       });
     }
 
-    async function pedirReporteHistorial() {
+   async function pedirReporteHistorial() {
       const selected = Array.from(document.querySelectorAll('.chk-asset-item:checked')).map(c => c.value);
-      if (selected.length === 0) { showToast(currentUiLang === 'en' ? '⚠️ Select at least one asset' : '⚠️ Selecciona al menos un activo'); return; }
+      const totalAvailable = document.querySelectorAll('.chk-asset-item').length;
+      
+      if (selected.length === 0) { 
+        showToast(currentUiLang === 'en' ? '⚠️ Select at least one asset' : '⚠️ Selecciona al menos un activo'); 
+        return; 
+      }
 
       closeAssetModal();
       const loadingScreen = document.getElementById('pdfLoading');
       loadingScreen.style.display = 'flex';
 
       try {
-        const assetsParam = encodeURIComponent(selected.join(','));
-        await fetch(`${PDF_FUNCTION_URL}?lang=${repLang}&start=${repStart}&end=${repEnd}&assets=${assetsParam}`, {
-          method: 'GET',
-          mode: 'no-cors'
-        });
+        // Si selecciona absolutamente todos los activos, no enviamos el filtro.
+        // Esto le indica al servidor que genere el Reporte Completo del Portafolio.
+        let url = `${PDF_FUNCTION_URL}?lang=${repLang}&start=${repStart}&end=${repEnd}`;
+        let isFullReport = true;
+
+        // Si desmarca al menos uno, enviamos la lista para generar solo el Historial de Transacciones.
+        if (selected.length < totalAvailable) {
+            const assetsParam = encodeURIComponent(selected.join(','));
+            url += `&assets=${assetsParam}`;
+            isFullReport = false;
+        }
+
+        await fetch(url, { method: 'GET', mode: 'no-cors' });
+
         setTimeout(() => {
           loadingScreen.style.display = 'none';
-          showToast(currentUiLang === 'en'
-            ? '✅ Transaction Report is processing! Check Telegram.'
-            : '✅ ¡Reporte de Transacciones en proceso! Llegará a Telegram.');
+          const msgFull = currentUiLang === 'en' ? '✅ Full Portfolio Report is processing!' : '✅ ¡Reporte Completo en proceso!';
+          const msgHist = currentUiLang === 'en' ? '✅ Transaction History is processing!' : '✅ ¡Historial de Transacciones en proceso!';
+          
+          showToast((isFullReport ? msgFull : msgHist) + (currentUiLang === 'en' ? ' Check Telegram.' : ' Revisa Telegram.'));
         }, 2500);
-      } catch (e) {
+      } catch (error) {
         loadingScreen.style.display = 'none';
         showToast(currentUiLang === 'en' ? '❌ Network error.' : '❌ Error de red.');
       }
