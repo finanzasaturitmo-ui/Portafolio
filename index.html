@@ -91,7 +91,10 @@
       z-index: 10000; overflow: hidden;
     }
     .drop-content.show { display: block; animation: fadeIn 0.2s ease; }
-    .date-form { padding: 12px; display: flex; flex-direction: column; gap: 10px; width: 190px; }
+    .date-form { padding: 12px; display: flex; flex-direction: column; gap: 10px; width: 230px; }
+    .asset-list { max-height: 200px; overflow-y: auto; background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 15px; }
+    .asset-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #e6edf3; font-size: 0.85rem; cursor: pointer; }
+    .asset-item input[type="checkbox"] { accent-color: var(--b); transform: scale(1.2); cursor: pointer; }
     .date-label { color: var(--sub); font-size: 0.75rem; font-weight: bold; margin-bottom: 3px; display: block; }
     .date-input { width: 100%; background: #0d1117; border: 1px solid var(--border); color: #e6edf3; padding: 6px; border-radius: 4px; outline: none; font-size: 0.8rem; }
     .date-input:focus { border-color: var(--b); }
@@ -368,23 +371,23 @@
       <div class="hdr-right">
         <!-- Dropdown ES -->
         <div class="dropdown">
-          <button class="btn-pdf" onclick="toggleDrop('es')">📥 <span class="hide-mob" style="margin-right:3px">Descargar </span>Reporte (ES) ▼</button>
+          <button class="btn-pdf" onclick="toggleDrop('es')">📥 <span class="hide-mob" style="margin-right:3px">Historial </span>Compra y Venta (ES) ▼</button>
           <div id="drop-es" class="drop-content">
             <div class="date-form">
               <div><label class="date-label">Desde:</label><input type="date" id="start-es" class="date-input"></div>
               <div><label class="date-label">Hasta:</label><input type="date" id="end-es" class="date-input"></div>
-              <button class="btn-gen-pdf btn-gen-es" onclick="pedirReporteRango('es')">Generar PDF</button>
+              <button class="btn-gen-pdf btn-gen-es" onclick="openAssetModal('es')">Elegir Activos ➔</button>
             </div>
           </div>
         </div>
         <!-- Dropdown EN -->
         <div class="dropdown">
-          <button class="btn-pdf" onclick="toggleDrop('en')" style="background:#2ea043;box-shadow:0 0 8px rgba(46,160,67,0.4)">📥 <span class="hide-mob" style="margin-right:3px">Descargar </span>Reporte (EN) ▼</button>
+          <button class="btn-pdf" onclick="toggleDrop('en')" style="background:#2ea043;box-shadow:0 0 8px rgba(46,160,67,0.4)">📥 <span class="hide-mob" style="margin-right:3px">History </span>Buy & Sell (EN) ▼</button>
           <div id="drop-en" class="drop-content">
             <div class="date-form">
               <div><label class="date-label">From:</label><input type="date" id="start-en" class="date-input"></div>
               <div><label class="date-label">To:</label><input type="date" id="end-en" class="date-input"></div>
-              <button class="btn-gen-pdf btn-gen-en" onclick="pedirReporteRango('en')">Generate PDF</button>
+              <button class="btn-gen-pdf btn-gen-en" onclick="openAssetModal('en')">Choose Assets ➔</button>
             </div>
           </div>
         </div>
@@ -587,6 +590,25 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════
+       MODAL — SELECCIONAR ACTIVOS PARA EL HISTORIAL
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="assetModal" onclick="if(event.target===this) closeAssetModal()">
+    <div class="modal">
+      <h2><span id="assetModalTitle">📑 Seleccionar Activos</span></h2>
+      <p style="color:var(--sub); font-size:0.8rem; margin-bottom:12px;" id="assetModalDesc">Elige los activos para tu reporte.</p>
+      
+      <div class="asset-item" style="border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:10px;">
+        <input type="checkbox" id="chkAllAssets" checked onchange="toggleAllAssets(this.checked)">
+        <label for="chkAllAssets" style="font-weight:bold; color:var(--b)" id="lblAllAssets">Seleccionar Todos</label>
+      </div>
+
+      <div class="asset-list" id="assetCheckboxes"></div>
+
+      <button class="modal-btn" style="background:#1f6feb; border-color:#388bfd;" onclick="pedirReporteHistorial()" id="btnGenAssetRep">Generar Reporte PDF</button>
+      <button class="modal-btn" style="background:transparent; border:1px solid var(--border); margin-top:8px" onclick="closeAssetModal()" id="btnCanAssetRep">Cancelar</button>
+    </div>
+  </div>
   <!-- TOAST (notificaciones temporales) -->
   <div class="toast" id="toast"></div>
 
@@ -1779,40 +1801,71 @@
       }
     };
 
-    // Nueva función que lee las fechas y llama a Firebase
-    async function pedirReporteRango(lang) {
+    let repLang = 'es', repStart = '', repEnd = '';
+
+    function openAssetModal(lang) {
       const start = document.getElementById(`start-${lang}`).value;
       const end = document.getElementById(`end-${lang}`).value;
       
-      if(!start || !end) { 
-        showToast(currentUiLang === 'en' ? '⚠️ Select both dates' : '⚠️ Selecciona ambas fechas'); 
-        return; 
-      }
-      if(new Date(start) > new Date(end)) { 
-        showToast(currentUiLang === 'en' ? '⚠️ Start must be before End' : '⚠️ La fecha de inicio debe ser antes del fin'); 
-        return; 
+      if(!start || !end) { showToast(currentUiLang === 'en' ? '⚠️ Select both dates' : '⚠️ Selecciona ambas fechas'); return; }
+      if(new Date(start) > new Date(end)) { showToast(currentUiLang === 'en' ? '⚠️ Start must be before End' : '⚠️ Inicio debe ser antes del fin'); return; }
+
+      repLang = lang; repStart = start; repEnd = end;
+      document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show'));
+
+      document.getElementById('assetModalTitle').innerText = lang === 'en' ? '📑 Select Assets' : '📑 Seleccionar Activos';
+      document.getElementById('assetModalDesc').innerText  = lang === 'en' ? 'Choose the assets for your buy & sell history.' : 'Elige los activos para tu reporte de compras y ventas.';
+      document.getElementById('lblAllAssets').innerText    = lang === 'en' ? 'Select All' : 'Seleccionar Todos';
+      document.getElementById('btnGenAssetRep').innerText  = lang === 'en' ? 'Generate Report' : 'Generar Reporte PDF';
+      document.getElementById('btnCanAssetRep').innerText  = lang === 'en' ? 'Cancel' : 'Cancelar';
+      
+      document.getElementById('btnGenAssetRep').style.background = lang === 'en' ? '#2ea043' : '#1f6feb';
+      document.getElementById('btnGenAssetRep').style.borderColor = lang === 'en' ? '#3fb950' : '#388bfd';
+
+      const allAssets = [...SW, ...XT, ...CR].filter(a => a && a.t).map(a => String(a.t).toUpperCase());
+      const uniqueAssets = [...new Set(allAssets)].sort();
+      
+      const container = document.getElementById('assetCheckboxes');
+      if (uniqueAssets.length === 0) {
+        container.innerHTML = `<p style="color:var(--sub); font-size:0.8rem;">${lang === 'en' ? 'No assets found.' : 'No hay activos registrados.'}</p>`;
+      } else {
+        container.innerHTML = uniqueAssets.map(t => `
+          <div class="asset-item">
+            <input type="checkbox" class="chk-asset-item" id="chk_${t}" value="${t}" checked>
+            <label for="chk_${t}">${t}</label>
+          </div>
+        `).join('');
       }
 
-      document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show'));
-      
+      document.getElementById('chkAllAssets').checked = true;
+      document.getElementById('assetModal').style.display = 'flex';
+    }
+
+    function closeAssetModal() { document.getElementById('assetModal').style.display = 'none'; }
+
+    function toggleAllAssets(checked) {
+      document.querySelectorAll('.chk-asset-item').forEach(chk => chk.checked = checked);
+    }
+
+    async function pedirReporteHistorial() {
+      const selected = Array.from(document.querySelectorAll('.chk-asset-item:checked')).map(c => c.value);
+      if (selected.length === 0) { showToast(currentUiLang === 'en' ? '⚠️ Select at least one asset' : '⚠️ Selecciona al menos un activo'); return; }
+
+      closeAssetModal();
       const loadingScreen = document.getElementById('pdfLoading');
       loadingScreen.style.display = 'flex';
 
       try {
-        await fetch(`${PDF_FUNCTION_URL}?lang=${lang}&start=${start}&end=${end}`, { method: 'GET', mode: 'no-cors' });
+        const assetsParam = encodeURIComponent(selected.join(','));
+        await fetch(`${PDF_FUNCTION_URL}?lang=${repLang}&start=${repStart}&end=${repEnd}&assets=${assetsParam}`, { method: 'GET', mode: 'no-cors' });
 
         setTimeout(() => {
           loadingScreen.style.display = 'none';
-          const langTexto = lang === 'en' ? 'Inglés' : 'Español';
-          const msg = currentUiLang === 'en'
-            ? `✅ Custom Report (${langTexto}) is processing! Check Telegram.`
-            : `✅ ¡Reporte personalizado (${langTexto}) en proceso! Llegará a Telegram.`;
-          showToast(msg);
+          showToast(currentUiLang === 'en' ? `✅ Transaction Report is processing! Check Telegram.` : `✅ ¡Reporte de Transacciones en proceso! Llegará a Telegram.`);
         }, 2500);
-
       } catch (error) {
         loadingScreen.style.display = 'none';
-        showToast(currentUiLang === 'en' ? '❌ Network error. Try via Telegram.' : '❌ Error de red. Intenta desde Telegram con /reporte');
+        showToast(currentUiLang === 'en' ? '❌ Network error.' : '❌ Error de red.');
       }
     }
 
