@@ -792,9 +792,10 @@
 
       <div class="asset-list" id="assetCheckboxes"></div>
 
-      <button class="modal-btn" style="margin-bottom:8px" onclick="pedirReporte('historial')" id="btnGenHistorial">Generar Historial (Solo Tablas)</button>
-      <button class="modal-btn" onclick="pedirReporte('completo')" id="btnGenCompleto">Generar Reporte Completo (IA + Gráficas)</button>
-      <button class="modal-btn" style="background:transparent; border:1px solid var(--border); margin-top:8px" onclick="closeAssetModal()" id="btnCanAssetRep">Cancelar</button>    </div>
+      <button class="modal-btn" style="background:#1f6feb; border-color:#388bfd; margin-bottom:8px" onclick="pedirReporte('historial')" id="btnGenHistorial">Generar Historial (Solo Tablas)</button>
+      <button class="modal-btn" style="background:#21262d; border-color:var(--border);" onclick="pedirReporte('completo')" id="btnGenCompleto">Generar Reporte Completo (IA + Gráficas)</button>
+      <button class="modal-btn" style="background:transparent; border:1px solid var(--border); margin-top:8px" onclick="closeAssetModal()" id="btnCanAssetRep">Cancelar</button>
+    </div>
   </div>
 
   <!-- Toast -->
@@ -904,7 +905,7 @@
 
     /** Apply the active language dictionary to all fixed-ID elements */
     function translateUI() {
-      const T = TRANSLATIONS;
+      const T = TRANSLATIONS[currentUiLang];
       document.getElementById('app-title').innerText           = T.app_title;
       document.getElementById('btnLogout').innerText            = T.btn_logout;
       document.getElementById('btn-tab-stocks').innerHTML       = T.tab_stocks;
@@ -936,32 +937,21 @@
       document.getElementById('lbl_loading_title').innerText    = T.loading_title;
       document.getElementById('lbl_loading_desc').innerText     = T.loading_desc;
       
-      // Traducciones del Botón principal y Calendario
+      // Traducciones del nuevo Botón y Calendario Unificado
       document.getElementById('lbl_btn_pdf_1').innerText = currentUiLang === 'en' ? 'Download ' : 'Descargar ';
       document.getElementById('lbl_btn_pdf_2').innerText = currentUiLang === 'en' ? 'Report ▼' : 'Reporte ▼';
       document.getElementById('lbl_date_start').innerText = currentUiLang === 'en' ? 'From:' : 'Desde:';
       document.getElementById('lbl_date_end').innerText = currentUiLang === 'en' ? 'To:' : 'Hasta:';
       document.getElementById('btn_choose_assets').innerText = currentUiLang === 'en' ? 'Choose Assets ➔' : 'Elegir Activos ➔';
-      
-      // Traducciones del Modal de Reportes
-      document.getElementById('assetModalTitle').innerText = currentUiLang === 'en' ? '📑 Select Assets' : '📑 Seleccionar Activos';
-      document.getElementById('assetModalDesc').innerText  = currentUiLang === 'en' ? 'Choose assets and select report type.' : 'Elige los activos y el tipo de reporte.';
-      document.getElementById('lblAllAssets').innerText    = currentUiLang === 'en' ? 'Select All' : 'Seleccionar Todos';
-      document.getElementById('lblRepLang').innerText      = currentUiLang === 'en' ? 'PDF Lang:' : 'Idioma PDF:';
-      document.getElementById('btnGenHistorial').innerText = currentUiLang === 'en' ? 'Generate History (Tables only)' : 'Generar Historial (Solo Tablas)';
-      document.getElementById('btnGenCompleto').innerText  = currentUiLang === 'en' ? 'Generate Full Report (AI + Charts)' : 'Generar Reporte Completo (IA + Gráficas)';
-      document.getElementById('btnCanAssetRep').innerText  = currentUiLang === 'en' ? 'Cancel' : 'Cancelar';
-      const searchInput = document.getElementById('searchAssetInput');
-      if(searchInput) searchInput.placeholder = currentUiLang === 'en' ? '🔍 Search asset...' : '🔍 Buscar activo...';
+      document.getElementById('lblRepLang').innerText = currentUiLang === 'en' ? 'PDF Lang:' : 'Idioma PDF:';
+    }
 
-      // COLORES INVERTIDOS DINÁMICOS
-      // 1. Botón Historial (ES: Azul, EN: Verde)
-      document.getElementById('btnGenHistorial').style.background = currentUiLang === 'en' ? '#2ea043' : '#1f6feb';
-      document.getElementById('btnGenHistorial').style.borderColor = currentUiLang === 'en' ? '#3fb950' : '#388bfd';
-
-      // 2. Botón Reporte Completo (ES: Verde, EN: Azul)
-      document.getElementById('btnGenCompleto').style.background = currentUiLang === 'en' ? '#1f6feb' : '#2ea043';
-      document.getElementById('btnGenCompleto').style.borderColor = currentUiLang === 'en' ? '#388bfd' : '#3fb950';
+    /** Toggle UI language ES ↔ EN and re-render everything */
+    function toggleLanguage() {
+      currentUiLang = currentUiLang === 'es' ? 'en' : 'es';
+      document.getElementById('btn-toggle-lang').innerHTML = currentUiLang === 'es' ? '🇺🇸 EN' : '🇨🇴 ES';
+      translateUI();
+      recalc(false);
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -2087,15 +2077,32 @@
       // Emparejar el selector de idioma del PDF con el idioma que estás usando en la página
       document.getElementById('repLangSelect').value = currentUiLang;
 
+      // Textos bilingües del modal
+      document.getElementById('assetModalTitle').innerText = currentUiLang === 'en' ? '📑 Select Assets' : '📑 Seleccionar Activos';
+      document.getElementById('assetModalDesc').innerText  = currentUiLang === 'en' ? 'Choose assets and select report type.' : 'Elige los activos y el tipo de reporte.';
+      document.getElementById('lblAllAssets').innerText    = currentUiLang === 'en' ? 'Select All' : 'Seleccionar Todos';
+      document.getElementById('btnGenHistorial').innerText = currentUiLang === 'en' ? 'Generate History (Tables only)' : 'Generar Historial (Solo Tablas)';
+      document.getElementById('btnGenCompleto').innerText  = currentUiLang === 'en' ? 'Generate Full Report (AI + Charts)' : 'Generar Reporte Completo (IA + Gráficas)';
+      document.getElementById('btnCanAssetRep').innerText  = currentUiLang === 'en' ? 'Cancel' : 'Cancelar';
+      
+      // 1. Botón Historial (ES: Azul, EN: Verde)
+      document.getElementById('btnGenHistorial').style.background = currentUiLang === 'en' ? '#2ea043' : '#1f6feb';
+      document.getElementById('btnGenHistorial').style.borderColor = currentUiLang === 'en' ? '#3fb950' : '#388bfd';
+
+      // 2. Botón Reporte Completo (ES: Verde, EN: Azul) - Colores invertidos
+      document.getElementById('btnGenCompleto').style.background = currentUiLang === 'en' ? '#1f6feb' : '#2ea043';
+      document.getElementById('btnGenCompleto').style.borderColor = currentUiLang === 'en' ? '#388bfd' : '#3fb950';
+
       const searchInput = document.getElementById('searchAssetInput');
+      searchInput.placeholder = currentUiLang === 'en' ? '🔍 Search asset...' : '🔍 Buscar activo...';
       searchInput.value = '';
 
       // Build deduplicated asset map (stables include wallet label)
       const assetMap = new Map();
-     .forEach(a => {
+      [...SW, ...XT, ...CR].forEach(a => {
         if (!a?.t) return;
         const ticker = String(a.t).toUpperCase();
-        const label  =.includes(ticker) && a.wallet ? `${ticker} (${a.wallet})` : ticker;
+        const label  = ['USDT', 'USDC', 'EUSD'].includes(ticker) && a.wallet ? `${ticker} (${a.wallet})` : ticker;
         assetMap.set(label, ticker);
       });
 
