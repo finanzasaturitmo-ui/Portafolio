@@ -560,7 +560,7 @@
       <div class="hdr-right">
 
         <!-- PDF Dropdown -->
-        <div class="dropdown">
+        <div class="dropdown" id="pdf-dropdown" style="display: none;">
           <button class="btn-pdf" onclick="toggleDrop()">
             📥 <span class="hide-mob" style="margin-right:3px" id="lbl_btn_pdf_1">Descargar </span><span id="lbl_btn_pdf_2">Reporte ▼</span>
           </button>
@@ -982,6 +982,17 @@
         currentUser = user;
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display  = 'block';
+        
+        // 🔥 FILTRO DE SEGURIDAD: Solo el admin ve el botón de PDF 🔥
+        const pdfDropdown = document.getElementById('pdf-dropdown');
+        if (pdfDropdown) {
+          if (user.email === 'finanzasaturitmo@gmail.com') {
+            pdfDropdown.style.display = 'inline-block'; // Lo mostramos
+          } else {
+            pdfDropdown.style.display = 'none'; // Lo mantenemos oculto
+          }
+        }
+        
         loadFromFirebase();
       } else {
         currentUser = null;
