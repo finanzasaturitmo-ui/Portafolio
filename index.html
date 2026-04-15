@@ -582,6 +582,7 @@
           </div>
         </div>
 
+        <button class="btn-lang" id="btn-privacy" onclick="togglePrivacy()" title="Ocultar/Mostrar Valores">👁️</button>
         <button class="btn-lang" id="btn-toggle-lang" onclick="toggleLanguage()" title="Cambiar Idioma">🇺🇸 EN</button>
         <button class="btn-logout" id="btnLogout" onclick="cerrarSesion()">Cerrar Sesión</button>
       </div>
@@ -850,6 +851,7 @@
     let oppCrypto = 20;             // Buy-opportunity threshold for crypto (%)
 
     let dChart = null, bChart = null, saveTimeout = null;
+    let isPrivacyMode = false; // 🔥 Nuevo estado para ocultar valores
 
     let sortState = {
       sw: { col: null, dir: 1 },
@@ -952,6 +954,12 @@
       document.getElementById('btn-toggle-lang').innerHTML = currentUiLang === 'es' ? '🇺🇸 EN' : '🇨🇴 ES';
       translateUI();
       recalc(false);
+    }
+    // 🔥 NUEVA FUNCIÓN: Ocultar o mostrar valores sensibles 🔥
+    function togglePrivacy() {
+      isPrivacyMode = !isPrivacyMode;
+      document.getElementById('btn-privacy').innerText = isPrivacyMode ? '🙈' : '👁️';
+      recalc(false); // Refrescamos las tarjetas sin guardar historial
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -1661,7 +1669,7 @@
         tPct     = tInv > 0 ? (tPnl / tInv) * 100 : 0;
         lblGlobal = D.lblS;
         valInvStr = '$' + f(tInv);
-        htmlSub   = `Brokers <span style="color:#e6edf3;font-weight:600">$${f(tCur - skUSD)}</span> · Skandia <span style="color:#e6edf3;font-weight:600">$${f(skUSD)}</span>`;
+        htmlSub   = `Brokers <span style="color:#e6edf3;font-weight:600">${isPrivacyMode ? '••••' : '$' + f(tCur - skUSD)}</span> · Skandia <span style="color:#e6edf3;font-weight:600">${isPrivacyMode ? '••••' : '$' + f(skUSD)}</span>`;
       } else {
         activeAssets = CR.map(calc).filter(x => x.qty > 0);
         tCur     = activeAssets.reduce((s, x) => s + x.cur, 0);
@@ -1670,7 +1678,7 @@
         tPct     = tInv > 0 ? (tPnl / tInv) * 100 : 0;
         lblGlobal = D.lblC;
         valInvStr = '$' + f(tInv);
-        htmlSub   = `${D.wallet} <span style="color:#e6edf3;font-weight:600">$${f(tCur)}</span>`;
+        htmlSub   = `${D.wallet} <span style="color:#e6edf3;font-weight:600">${isPrivacyMode ? '••••' : '$' + f(tCur)}</span>`;
       }
 
       const named = activeAssets.filter(x => x.t && !STABLECOINS.includes(String(x.t).toUpperCase()));
@@ -1680,23 +1688,26 @@
       const wCls  = worst && worst.gl >= 0 ? 'g' : 'r';
       const glSign = (n, v) => `${n >= 0 ? '+' : '-'}$${f(Math.abs(n), v)}`;
 
+      // 🔥 Ayudante para aplicar la máscara de privacidad solo a las 3 primeras tarjetas
+      const m = str => isPrivacyMode ? '••••' : str;
+
       document.getElementById('cards').innerHTML = `
         <div class="card" style="border-color:#58a6ff33">
           <div class="lbl">${lblGlobal}</div>
-          <div class="val b">$${f(tCur)}</div>
+          <div class="val b">${m('$' + f(tCur))}</div>
           <div class="s2" style="color:var(--sub);margin-top:3px">${htmlSub}</div>
-          <div class="s2" style="color:var(--green);margin-top:2px;font-weight:600">${fCOP(tCur * rt)}</div>
+          <div class="s2" style="color:var(--green);margin-top:2px;font-weight:600">${m(fCOP(tCur * rt))}</div>
         </div>
         <div class="card">
           <div class="lbl">${D.inv}</div>
-          <div class="val">${valInvStr}</div>
-          <div class="s2" style="color:var(--sub);margin-top:3px">${fCOP(tInv * rt)}</div>
+          <div class="val">${m(valInvStr)}</div>
+          <div class="s2" style="color:var(--sub);margin-top:3px">${m(fCOP(tInv * rt))}</div>
         </div>
         <div class="card" style="border-color:${tPnl >= 0 ? '#3fb95033' : '#f7816633'}">
           <div class="lbl">${D.ret}</div>
-          <div class="val ${tPnl >= 0 ? 'g' : 'r'}">${glSign(tPnl, 2)}</div>
-          <div class="s2 ${tPct >= 0 ? 'g' : 'r'}" style="margin-top:3px">${tPct >= 0 ? '+' : ''}${f(tPct, 1)} ${D.retSub}</div>
-          <div class="s2 ${tPnl >= 0 ? 'g' : 'r'}" style="margin-top:2px;font-weight:600">${tPnl >= 0 ? '+' : '-'} ${fCOP(Math.abs(tPnl) * rt)}</div>
+          <div class="val ${tPnl >= 0 ? 'g' : 'r'}">${m(glSign(tPnl, 2))}</div>
+          <div class="s2 ${tPct >= 0 ? 'g' : 'r'}" style="margin-top:3px">${m((tPct >= 0 ? '+' : '') + f(tPct, 1) + ' ' + D.retSub)}</div>
+          <div class="s2 ${tPnl >= 0 ? 'g' : 'r'}" style="margin-top:2px;font-weight:600">${m((tPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(tPnl) * rt))}</div>
         </div>
         <div class="card" style="border-color:#ffa65733">
           <div class="lbl">${D.trm}</div>
