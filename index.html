@@ -1485,6 +1485,7 @@
     function renderTable(data, tid) {
       const opp      = tid === 'cr' ? oppCrypto : oppStocks;
       const isCrypto = tid === 'cr';
+      const m = str => isPrivacyMode ? '••••' : str; // 🔥 Ayudante de privacidad
 
       const D = currentUiLang === 'en'
         ? { thAsset: 'Asset', thCoin: 'Coin', thQty: 'Qty.', thAvg: 'Avg Price', thPx: 'Current Price', thVal: 'Value USD', thInv: 'Invested USD', thGl: '% P/L', thPnl: 'Profit', next: 'next' }
@@ -1518,12 +1519,14 @@
           pxBadge = `<div style="font-size:0.65rem;font-weight:700;padding:1px 4px;border-radius:4px;margin-top:2px;background:${isPos ? '#3fb95022' : '#f7816622'}" class="${isPos ? 'g' : 'r'}">${isPos ? '▲' : '▼'} ${Math.abs(row.pxChange).toFixed(2)}%</div>`;
         }
 
-        // Quantity cell: editable if staking, formatted otherwise
+        // Quantity cell: editable if staking, formatted otherwise, masked if privacy mode
         let qtyCell = '';
-        if (isPend) {
+        if (isPrivacyMode) {
+            qtyCell = '••••';
+        } else if (isPend) {
           qtyCell = '<span style="color:var(--sub)">—</span>';
         } else if (isCrypto && row.staking) {
-          const formula = row.qtyExpr ? row.qtyExpr.replace(/'/g, "\\'") : row.qty; // 🔥 Rescatamos la fórmula si existe
+          const formula = row.qtyExpr ? row.qtyExpr.replace(/'/g, "\\'") : row.qty;
           qtyCell = `<input class="ci" style="width:75px;font-weight:bold;color:var(--blue);border-color:var(--green)" value="${row.qty}" title="Editar cantidad en Staking" onfocus="this.value='${formula}'" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()">`;
         } else {
           qtyCell = isCrypto ? row.qty : parseFloat(Number(row.qty).toFixed(4));
@@ -1550,10 +1553,10 @@
               ${pxBadge}
             </div>
           </td>
-          <td class="computed">${isPend ? dash : fU(row.cur)}</td>
-          <td class="computed" style="color:var(--blue)">${isPend ? dash : fU(row.inv)}</td>
+          <td class="computed">${isPend ? dash : m(fU(row.cur))}</td>
+          <td class="computed" style="color:var(--blue)">${isPend ? dash : m(fU(row.inv))}</td>
           <td class="computed">${isPend ? dash : fP(row.gl)}</td>
-          <td class="computed">${isPend ? dash : fGain(row.pnl)}</td>
+          <td class="computed">${isPend ? dash : (isPrivacyMode ? '••••' : fGain(row.pnl))}</td>
           <td class="action-btns">
             <button class="icon-btn" onmousedown="openSim('${tid}',${row.id})"  title="🛒">🛒</button>
             <button class="icon-btn" onmousedown="openSell('${tid}',${row.id})" title="💸">💸</button>
@@ -1737,6 +1740,7 @@
 
     function renderSummary() {
       const rt = rate();
+      const m = str => isPrivacyMode ? '••••' : str; // 🔥 Ayudante de privacidad
 
       const D = currentUiLang === 'en'
         ? { inv: 'Invested', act: 'Current', sk: '🇨🇴 Skandia BITCOIN Portfolio ₿',
@@ -1772,22 +1776,22 @@
               <div style="font-size:.65rem;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">🇺🇸 Schwab USA</div>
               <div style="display:flex;justify-content:space-between;margin-bottom:4px">
                 <span style="font-size:.75rem;color:var(--sub)">${D.inv}</span>
-                <span style="font-size:.8rem;font-weight:600">$${f(sI)}</span>
+                <span style="font-size:.8rem;font-weight:600">${m('$' + f(sI))}</span>
               </div>
               <div style="display:flex;justify-content:space-between">
                 <span style="font-size:.75rem;color:var(--sub)">${D.act}</span>
-                <span style="font-size:.8rem;font-weight:600" class="b">${fU(sC)}</span>
+                <span style="font-size:.8rem;font-weight:600" class="b">${m(fU(sC))}</span>
               </div>
             </div>
             <div class="sum-card">
               <div style="font-size:.65rem;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">🇪🇺 XTB Europe</div>
               <div style="display:flex;justify-content:space-between;margin-bottom:4px">
                 <span style="font-size:.75rem;color:var(--sub)">${D.inv}</span>
-                <span style="font-size:.8rem;font-weight:600">$${f(xI)}</span>
+                <span style="font-size:.8rem;font-weight:600">${m('$' + f(xI))}</span>
               </div>
               <div style="display:flex;justify-content:space-between">
                 <span style="font-size:.75rem;color:var(--sub)">${D.act}</span>
-                <span style="font-size:.8rem;font-weight:600" class="b">${fU(xC)}</span>
+                <span style="font-size:.8rem;font-weight:600" class="b">${m(fU(xC))}</span>
               </div>
             </div>
           </div>
@@ -1799,25 +1803,25 @@
                 <label style="font-size:.7rem;color:var(--sub)">${D.skCap}</label>
                 <div class="sk-edit-group">
                   <span class="sk-edit-badge">COP</span>
-                  <input class="sk-edit-input" id="skInv" value="${copFmt(skInvVal)}"
+                  <input class="sk-edit-input" id="skInv" value="${isPrivacyMode ? '••••' : copFmt(skInvVal)}" ${isPrivacyMode ? 'readonly' : ''}
                     onfocus="skFocus(this)" onblur="skBlur(this,'inv')" onkeyup="if(event.key==='Enter')this.blur()">
                 </div>
-                <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ $${f(skI_USD)} USD</div>
+                <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ ${m('$' + f(skI_USD))} USD</div>
               </div>
               <div>
                 <label style="font-size:.7rem;color:var(--sub)">${D.skCur}</label>
                 <div class="sk-edit-group">
                   <span class="sk-edit-badge">COP</span>
-                  <input class="sk-edit-input" id="skCur" value="${copFmt(skCurVal)}"
+                  <input class="sk-edit-input" id="skCur" value="${isPrivacyMode ? '••••' : copFmt(skCurVal)}" ${isPrivacyMode ? 'readonly' : ''}
                     onfocus="skFocus(this)" onblur="skBlur(this,'cur')" onkeyup="if(event.key==='Enter')this.blur()">
                 </div>
-                <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ ${fU(skC_USD)} USD</div>
+                <div style="font-size:.65rem;color:var(--sub);text-align:right;margin-top:3px">≈ ${m(fU(skC_USD))} USD</div>
               </div>
             </div>
             <div style="margin-top:12px;padding-top:12px;border-top:1px solid #3fb95022;display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:.7rem;color:var(--sub)">${D.skRet}</span>
               <span style="font-size:.8rem;font-weight:700" class="${skPnl >= 0 ? 'g' : 'r'}">
-                ${skPnl >= 0 ? '+' : '-'} ${fCOP(Math.abs(skPnl))} (${skRet >= 0 ? '+' : ''}${f(skRet, 2)}%)
+                ${isPrivacyMode ? '••••' : (skPnl >= 0 ? '+' : '-') + ' ' + fCOP(Math.abs(skPnl))} (${skRet >= 0 ? '+' : ''}${f(skRet, 2)}%)
               </span>
             </div>
           </div>
@@ -1826,22 +1830,22 @@
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
               <div>
                 <div style="font-size:.75rem;color:var(--sub);margin-bottom:2px">${D.tInv}</div>
-                <div style="font-size:1.15rem;font-weight:700;color:#e6edf3;letter-spacing:.5px">${fCOP(tI_COP)}</div>
+                <div style="font-size:1.15rem;font-weight:700;color:#e6edf3;letter-spacing:.5px">${m(fCOP(tI_COP))}</div>
               </div>
               <div style="text-align:right">
                 <div style="font-size:.7rem;color:var(--sub);margin-bottom:2px">${D.tEq}</div>
-                <div style="font-size:.9rem;font-weight:600;color:var(--sub)">$${f(tI_USD)}</div>
+                <div style="font-size:.9rem;font-weight:600;color:var(--sub)">${m('$' + f(tI_USD))}</div>
               </div>
             </div>
             <div style="border-top:1px solid var(--border);margin:12px 0"></div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div>
                 <div style="font-size:.8rem;color:var(--green);font-weight:700;margin-bottom:2px">${D.tCurCOP}</div>
-                <div style="font-size:1.5rem;font-weight:800;color:var(--green);letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(tC_COP)}</div>
+                <div style="font-size:1.5rem;font-weight:800;color:var(--green);letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${m(fCOP(tC_COP))}</div>
               </div>
               <div style="text-align:right">
                 <div style="font-size:.75rem;color:var(--blue);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div>
-                <div style="font-size:1.2rem;font-weight:800;color:var(--blue)">$${f(tC_USD)}</div>
+                <div style="font-size:1.2rem;font-weight:800;color:var(--blue)">${m('$' + f(tC_USD))}</div>
               </div>
             </div>
           </div>`;
@@ -1857,11 +1861,11 @@
               <div style="font-size:.65rem;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">${D.crInv}</div>
               <div style="display:flex;justify-content:space-between;margin-bottom:4px">
                 <span style="font-size:.75rem;color:var(--sub)">${D.inv}</span>
-                <span style="font-size:.8rem;font-weight:600">$${f(cI)}</span>
+                <span style="font-size:.8rem;font-weight:600">${m('$' + f(cI))}</span>
               </div>
               <div style="display:flex;justify-content:space-between">
                 <span style="font-size:.75rem;color:var(--sub)">${D.act}</span>
-                <span style="font-size:.8rem;font-weight:600" class="b">${fU(cC)}</span>
+                <span style="font-size:.8rem;font-weight:600" class="b">${m(fU(cC))}</span>
               </div>
             </div>
           </div>
@@ -1870,22 +1874,22 @@
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
               <div>
                 <div style="font-size:.75rem;color:var(--sub);margin-bottom:2px">${D.tInvCr}</div>
-                <div style="font-size:1.15rem;font-weight:700;color:#e6edf3;letter-spacing:.5px">${fCOP(cI * rt)}</div>
+                <div style="font-size:1.15rem;font-weight:700;color:#e6edf3;letter-spacing:.5px">${m(fCOP(cI * rt))}</div>
               </div>
               <div style="text-align:right">
                 <div style="font-size:.7rem;color:var(--sub);margin-bottom:2px">${D.tEq}</div>
-                <div style="font-size:.9rem;font-weight:600;color:var(--sub)">$${f(cI)}</div>
+                <div style="font-size:.9rem;font-weight:600;color:var(--sub)">${m('$' + f(cI))}</div>
               </div>
             </div>
             <div style="border-top:1px solid var(--border);margin:12px 0"></div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div>
                 <div style="font-size:.8rem;color:var(--green);font-weight:700;margin-bottom:2px">${D.tCurCOP}</div>
-                <div style="font-size:1.5rem;font-weight:800;color:var(--green);letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${fCOP(cC * rt)}</div>
+                <div style="font-size:1.5rem;font-weight:800;color:var(--green);letter-spacing:.5px;text-shadow:0 0 10px rgba(63,185,80,0.2)">${m(fCOP(cC * rt))}</div>
               </div>
               <div style="text-align:right">
                 <div style="font-size:.75rem;color:var(--blue);font-weight:600;margin-bottom:2px">${D.tCurUSD}</div>
-                <div style="font-size:1.2rem;font-weight:800;color:var(--blue)">$${f(cC)}</div>
+                <div style="font-size:1.2rem;font-weight:800;color:var(--blue)">${m('$' + f(cC))}</div>
               </div>
             </div>
           </div>`;
