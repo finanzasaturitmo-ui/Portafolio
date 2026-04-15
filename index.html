@@ -1515,7 +1515,8 @@
         if (isPend) {
           qtyCell = '<span style="color:var(--sub)">—</span>';
         } else if (isCrypto && row.staking) {
-          qtyCell = `<input class="ci" style="width:75px;font-weight:bold;color:var(--blue);border-color:var(--green)" value="${row.qty}" title="Editar cantidad en Staking" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()">`;
+          const formula = row.qtyExpr ? row.qtyExpr.replace(/'/g, "\\'") : row.qty; // 🔥 Rescatamos la fórmula si existe
+          qtyCell = `<input class="ci" style="width:75px;font-weight:bold;color:var(--blue);border-color:var(--green)" value="${row.qty}" title="Editar cantidad en Staking" onfocus="this.value='${formula}'" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()">`;
         } else {
           qtyCell = isCrypto ? row.qty : parseFloat(Number(row.qty).toFixed(4));
         }
@@ -1587,7 +1588,10 @@
       if      (field === 't')       row[field] = String(val).toUpperCase().trim();
       else if (field === 'wallet')  row[field] = String(val).trim();
       else if (field === 'staking') row[field] = val;
-      else if (field === 'qty')     row[field] = evalMath(val); // 🔥 AQUÍ INTEGRAMOS LA NUEVA FUNCIÓN 🔥
+      else if (field === 'qty') {
+        row.qtyExpr = String(val).trim(); // 🔥 Memoria: Guardamos la fórmula original (ej: "100+34")
+        row[field] = evalMath(val);       // 🔥 Resultado: Guardamos el valor calculado (ej: 134)
+      }
       else                          row[field] = rv(val);
       recalc();
     }
