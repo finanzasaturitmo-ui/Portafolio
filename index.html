@@ -963,8 +963,22 @@
     const fU    = (n, d = 2) => (n < 0 ? '-' : '') + '$' + f(Math.abs(n), d);
     const fGain = (n, d = 2) => `<span class="${n >= 0 ? 'g' : 'r'}">${n >= 0 ? '+' : '-'}$${f(Math.abs(n), d)}</span>`;
     const fP    = n          => `<span class="${n >= 0 ? 'g' : 'r'}">${n >= 0 ? '+' : ''}${f(n, 2)}%</span>`;
-    const rv    = s          => parseFloat(String(s).replace(/[^0-9.\-]/g, '')) || 0;
+  const rv    = s          => parseFloat(String(s).replace(/[^0-9.\-]/g, '')) || 0;
     const rate  = ()         => rv(document.getElementById('rateInput').value) || 4180;
+
+    // 🔥 NUEVA FUNCIÓN: Evalúa matemáticas simples (ej: 100+34) 🔥
+    function evalMath(val) {
+      try {
+        // Cambia comas por puntos y limpia todo lo que no sea número o símbolo matemático
+        let str = String(val).replace(/,/g, '.');
+        let sanitized = str.replace(/[^0-9+\-*/.\s]/g, '');
+        // Calcula el resultado de la expresión
+        let result = new Function("return " + sanitized)();
+        return isNaN(result) ? 0 : parseFloat(result);
+      } catch (e) {
+        return rv(val); // Si hay un error al escribir, usa el formato normal
+      }
+    }
 
     function showToast(message) {
       const t = document.getElementById('toast');
@@ -1573,6 +1587,7 @@
       if      (field === 't')       row[field] = String(val).toUpperCase().trim();
       else if (field === 'wallet')  row[field] = String(val).trim();
       else if (field === 'staking') row[field] = val;
+      else if (field === 'qty')     row[field] = evalMath(val); // 🔥 AQUÍ INTEGRAMOS LA NUEVA FUNCIÓN 🔥
       else                          row[field] = rv(val);
       recalc();
     }
