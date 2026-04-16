@@ -684,6 +684,36 @@
           <div class="box-title" id="lbl-summary">📋 Resumen Consolidado de Acciones</div>
           <div id="sum-content"></div>
         </div>
+        
+        <div class="sum-box" id="sub-accounts-panel" style="display: none; margin-top: 15px;">
+          <div class="box-title">👥 Sub-Cuentas Cripto (Aisladas)</div>
+          <div class="tbl-wrap">
+            <table id="tbl-sub">
+              <thead>
+                <tr>
+                  <th style="text-align: left; padding-left: 10px;">Usuario</th>
+                  <th>USD Invertido</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="sub-tbody">
+                </tbody>
+              <tfoot>
+                <tr style="background: var(--cardAlt); font-weight: bold;">
+                  <td style="text-align: left; padding-left: 10px; color: var(--sub);">TOTAL USD USERS</td>
+                  <td style="color: var(--blue);" id="sub-total-users">$0.00</td>
+                  <td></td>
+                </tr>
+                <tr style="background: var(--bg); font-weight: bold;">
+                  <td style="text-align: left; padding-left: 10px; color: var(--sub);">TOTAL USD CRISTH <br><span style="font-size: 0.65rem; font-weight: normal;">(Stablecoins - Users)</span></td>
+                  <td style="color: var(--green);" id="sub-total-cristh">$0.00</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <button class="btn btn-add" style="margin-top: 10px;" onclick="addSubAccount()">+ Añadir Usuario</button>
+        </div>
       </div>
 
     </main>
@@ -842,6 +872,7 @@
     let currentUiLang = 'es';       // 'es' | 'en'
 
     let SW = [], XT = [], CR = [];  // Schwab, XTB, Crypto positions
+    let SUB_USERS = [];
     let TRADES = [];                // Trade history (buys & sells)
     let nid = 1;                    // Auto-increment row ID
 
@@ -1047,6 +1078,11 @@
             XT     = (d.XT || []).filter(Boolean);
             CR     = (d.CR || []).filter(Boolean);
             TRADES = d.transactions || d.trades || [];
+            SUB_USERS = d.sub_users || [
+              { id: 1, name: 'Cosi', usd: 11317 }, { id: 2, name: 'Zura', usd: 8235 },
+              { id: 3, name: 'Zuro', usd: 1357 },  { id: 4, name: 'Criski', usd: 238 },
+              { id: 5, name: 'Mile', usd: 527 }
+            ]; // Datos por defecto si no existen
 
             // Normalize field types
             const cleanRow = row => {
@@ -1122,8 +1158,9 @@
 
     function saveDataToFirebase() {
       if (!currentUser) return;
-      db.ref('users/' + currentUser.uid).set({
+db.ref('users/' + currentUser.uid).set({
         SW, XT, CR,
+        sub_users: SUB_USERS, // 🔥 Guardamos los sub-usuarios
         transactions: TRADES,
         rate:      document.getElementById('rateInput').value,
         oppStocks, oppCrypto,
@@ -1632,7 +1669,96 @@
       renderTable(CR, 'cr');
       renderCards();
       renderSummary();
+      // ════════════════════════════════════════════════════════════════
+    // SUB-ACCOUNTS PANEL (ISOLATED)
+    // ════════════════════════════════════════════════════════════════
+
+    function renderSubAccounts() {
+      const panel = document.getElementById('sub-accounts-panel');
+      
+      // Solo mostrar en la pestaña de Crypto
+      if (currentView !== 'crypto') {
+        panel.style.display = 'none';
+        return;
+      }
+      panel.style.display = 'block';
+
+      const m = str => isPrivacyMode ? '••••' : str; // Privacidad (Ojito)
+
+      // 1. Llenar la tabla de usuarios
+      const tbody = document.getElementById('sub-tbody');
+      let totalUsersUSD = 0;
+
+      tbody.innerHTML = SUB_USERS.map(u => {
+        totalUsersUSD += parseFloat(u.usd) || 0;
+        const usdVal = isPrivacyMode ? '••••' : u.usd;
+        return `
+          <tr>
+            <td style="text-align: left; padding-left: 10px;">
+              <input class="ci" style="width:100px; text-align:left; font-weight:bold; border:none; background:transparent;" value="${u.name}" onblur="updSub(${u.id}, 'name', this.value)" onkeyup="if(event.key==='Enter')this.blur()">
+            </td>
+            <td>
+              <input type="text" class="ci" style="width:100px; font-weight:bold; color:var(--blue);" value="${usdVal}" ${isPrivacyMode ? 'readonly' : ''} onblur="updSub(${u.id}, 'usd', this.value)" onfocus="if(!isPrivacyMode) this.value='${u.usd}'" onkeyup="if(event.key==='Enter')this.blur()">
+            </td>
+            <td>
+              <button class="icon-btn btn-del" onmousedown="delSub(${u.id})" title="Eliminar">✕</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('sub-total-users').innerText = m('$' + f(totalUsersUSD));
+
+      // 2. Calcular la bolsa de Stablecoins específicas (Nexo, Blend, Pionex, etc.)
+      const allowedStables = [
+        'USDT', 'USDC', 'EUSD', // Tickers permitidos
+      ];
+      
+      let totalStableUSD = 0;
+      CR.forEach(asset => {
+        // Solo sumamos si el ticker está en la lista de estables Y la cantidad es mayor a 0
+        if (allowedStables.includes(String(asset.t).toUpperCase()) && asset.qty > 0) {
+           // Si quieres filtrar por nombre de wallet específico, descomenta la siguiente línea y ajusta los nombres
+           // if (['NEXO', 'BLEND', 'UGLYCASH', 'PIONEX', 'BITUNIX'].some(w => String(asset.wallet).toUpperCase().includes(w))) {
+              totalStableUSD += (asset.qty * (asset.px || 1));
+           // }
+        }
+      });
+
+      // 3. Matemáticas finales: Total de Estables - Total de Usuarios
+      const totalCristh = totalStableUSD - totalUsersUSD;
+      const tCristhEl = document.getElementById('sub-total-cristh');
+      tCristhEl.innerText = m('$' + f(totalCristh));
+      tCristhEl.style.color = totalCristh >= 0 ? 'var(--green)' : 'var(--red)';
+    }
+
+    // Funciones CRUD para los Sub-Usuarios
+    function updSub(id, field, val) {
+      if (isPrivacyMode) return; // Bloquear edición si el ojito está cerrado
+      const user = SUB_USERS.find(u => u.id === id);
+      if (!user) return;
+      
+      if (field === 'name') {
+        user.name = val;
+      } else if (field === 'usd') {
+        user.usd = evalMath(val); // Reutilizamos tu función de sumar 100+34
+      }
+      recalc();
+    }
+
+    function addSubAccount() {
+      const newId = SUB_USERS.length > 0 ? Math.max(...SUB_USERS.map(u => u.id)) + 1 : 1;
+      SUB_USERS.push({ id: newId, name: 'Nuevo', usd: 0 });
+      recalc();
+    }
+
+    function delSub(id) {
+      if (!confirm('¿Eliminar este usuario?')) return;
+      SUB_USERS = SUB_USERS.filter(u => u.id !== id);
+      recalc();
+    }
       renderCharts();
+      renderSubAccounts(); // 🔥 Nueva llamada
       if (pushToHistory) saveStateToHistory();
       else updateUndoRedoButtons();
       clearTimeout(saveTimeout);
