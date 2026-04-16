@@ -519,10 +519,21 @@
     @media (max-width: 480px) {
       .cards { grid-template-columns: 1fr; }
     }
+    
+    /* ─── Sub-Accounts Stables Dropdown ─────────────────────────── */
+    .stables-dropdown-container { position: relative; display: inline-block; vertical-align: middle; margin-left: 10px; }
+    .btn-choose-stables { background: #21262d; border: 1px solid var(--border); color: var(--sub); font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
+    .btn-choose-stables:hover { background: #30363d; color: #e6edf3; }
+    .stables-menu { display: none; position: absolute; bottom: 120%; left: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-width: 200px; box-shadow: 0 -8px 20px rgba(0,0,0,0.6); z-index: 100; max-height: 250px; overflow-y: auto; }
+    .stables-menu.show { display: flex; flex-direction: column; gap: 6px; animation: fadeIn 0.2s ease; }
+    .stable-option { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: #e6edf3; cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.15s; }
+    .stable-option:hover { background: #1f2328; }
+    .stable-option input[type="checkbox"] { accent-color: var(--green); transform: scale(1.1); cursor: pointer; }
+    .stable-empty { font-size: 0.7rem; color: var(--sub); font-style: italic; }
+    
   </style>
 </head>
 <body>
-
   <!-- ─── Login Screen ──────────────────────────────────────────── -->
   <div id="login-screen">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="80" height="80" style="margin-bottom:20px">
@@ -873,6 +884,7 @@
 
     let SW = [], XT = [], CR = [];  // Schwab, XTB, Crypto positions
     let SUB_USERS = [];
+    let SELECTED_STABLES = [];      // 🔥 Memoria para los chulitos del panel
     let TRADES = [];                // Trade history (buys & sells)
     let nid = 1;                    // Auto-increment row ID
 
@@ -1078,6 +1090,7 @@
             XT     = (d.XT || []).filter(Boolean);
             CR     = (d.CR || []).filter(Boolean);
             TRADES = d.transactions || d.trades || [];
+            SELECTED_STABLES = d.selected_stables || []; // 🔥 Cargamos los chulitos guardados
             SUB_USERS = d.sub_users || [
               { id: 1, name: 'Cosi', usd: 11317 }, { id: 2, name: 'Zura', usd: 8235 },
               { id: 3, name: 'Zuro', usd: 1357 },  { id: 4, name: 'Criski', usd: 238 },
@@ -1160,7 +1173,8 @@
       if (!currentUser) return;
 db.ref('users/' + currentUser.uid).set({
         SW, XT, CR,
-        sub_users: SUB_USERS, // 🔥 Guardamos los sub-usuarios
+        sub_users: SUB_USERS, 
+        selected_stables: SELECTED_STABLES, // 🔥 Guardamos los chulitos
         transactions: TRADES,
         rate:      document.getElementById('rateInput').value,
         oppStocks, oppCrypto,
@@ -1669,21 +1683,29 @@ db.ref('users/' + currentUser.uid).set({
       renderTable(CR, 'cr');
       renderCards();
       renderSummary();
-      // ════════════════════════════════════════════════════════════════
+      renderCharts();
+      renderSubAccounts(); // 🔥 Llamada correcta a la sub-cuenta
+
+      if (pushToHistory) saveStateToHistory();
+      else updateUndoRedoButtons();
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(saveDataToFirebase, 1500);
+    }
+
+    // ════════════════════════════════════════════════════════════════
     // SUB-ACCOUNTS PANEL (ISOLATED)
     // ════════════════════════════════════════════════════════════════
 
     function renderSubAccounts() {
       const panel = document.getElementById('sub-accounts-panel');
       
-      // Solo mostrar en la pestaña de Crypto
       if (currentView !== 'crypto') {
         panel.style.display = 'none';
         return;
       }
       panel.style.display = 'block';
 
-      const m = str => isPrivacyMode ? '••••' : str; // Privacidad (Ojito)
+      const m = str => isPrivacyMode ? '••••' : str; 
 
       // 1. Llenar la tabla de usuarios
       const tbody = document.getElementById('sub-tbody');
@@ -1709,40 +1731,91 @@ db.ref('users/' + currentUser.uid).set({
 
       document.getElementById('sub-total-users').innerText = m('$' + f(totalUsersUSD));
 
-      // 2. Calcular la bolsa de Stablecoins específicas (Nexo, Blend, Pionex, etc.)
-      const allowedStables = [
-        'USDT', 'USDC', 'EUSD', // Tickers permitidos
-      ];
+      // 2. Construir el Menú de Selección de Criptos
+      const allCryptoItems = CR.filter(a => a.t && a.qty > 0);
       
+      const currentCryptoIds = allCryptoItems.map(a => String(a.id));
+      SELECTED_STABLES = SELECTED_STABLES.filter(id => currentCryptoIds.includes(String(id)));
+
+      let dropdownHtml = '';
+      if (allCryptoItems.length === 0) {
+          dropdownHtml = '<div class="stable-empty">No hay criptomonedas activas.</div>';
+      } else {
+          dropdownHtml = allCryptoItems.map(a => {
+              const isChecked = SELECTED_STABLES.includes(String(a.id)) ? 'checked' : '';
+              const displayName = `${a.t} ${a.wallet ? `(${a.wallet})` : ''}`;
+              return `
+                <label class="stable-option">
+                  <input type="checkbox" ${isChecked} onchange="toggleStableSelection('${a.id}', this.checked)">
+                  ${displayName} - <span style="color:var(--green)">$${f(a.qty * (a.px || 1))}</span>
+                </label>
+              `;
+          }).join('');
+      }
+
+      // 3. Calcular suma
       let totalStableUSD = 0;
-      CR.forEach(asset => {
-        // Solo sumamos si el ticker está en la lista de estables Y la cantidad es mayor a 0
-        if (allowedStables.includes(String(asset.t).toUpperCase()) && asset.qty > 0) {
-           // Si quieres filtrar por nombre de wallet específico, descomenta la siguiente línea y ajusta los nombres
-           // if (['NEXO', 'BLEND', 'UGLYCASH', 'PIONEX', 'BITUNIX'].some(w => String(asset.wallet).toUpperCase().includes(w))) {
-              totalStableUSD += (asset.qty * (asset.px || 1));
-           // }
+      allCryptoItems.forEach(asset => {
+        if (SELECTED_STABLES.includes(String(asset.id))) {
+            totalStableUSD += (asset.qty * (asset.px || 1));
         }
       });
 
-      // 3. Matemáticas finales: Total de Estables - Total de Usuarios
+      // 4. Matemáticas finales
       const totalCristh = totalStableUSD - totalUsersUSD;
-      const tCristhEl = document.getElementById('sub-total-cristh');
-      tCristhEl.innerText = m('$' + f(totalCristh));
-      tCristhEl.style.color = totalCristh >= 0 ? 'var(--green)' : 'var(--red)';
+
+      // 5. Inyectar Pie de tabla
+      const tfoot = document.querySelector('#tbl-sub tfoot');
+      tfoot.innerHTML = `
+        <tr style="background: var(--cardAlt); font-weight: bold;">
+          <td style="text-align: left; padding-left: 10px; color: var(--sub);">TOTAL USD USERS</td>
+          <td style="color: var(--blue);" id="sub-total-users">${m('$' + f(totalUsersUSD))}</td>
+          <td></td>
+        </tr>
+        <tr style="background: var(--bg); font-weight: bold;">
+          <td style="text-align: left; padding-left: 10px; color: var(--sub);">
+            TOTAL USD CRISTH 
+            <span style="font-size: 0.65rem; font-weight: normal; color: var(--sub); display: block;">(Respaldos - Usuarios)</span>
+          </td>
+          <td style="color: ${totalCristh >= 0 ? 'var(--green)' : 'var(--red)'};">
+            ${m('$' + f(totalCristh))}
+            <div class="stables-dropdown-container">
+              <button class="btn-choose-stables" onclick="document.getElementById('stables-menu-list').classList.toggle('show')">⚙️ Fondos</button>
+              <div id="stables-menu-list" class="stables-menu">
+                  <div style="font-size: 0.7rem; color: var(--sub); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 6px;">Selecciona los fondos de respaldo:</div>
+                  ${dropdownHtml}
+              </div>
+            </div>
+          </td>
+          <td></td>
+        </tr>
+      `;
     }
 
-    // Funciones CRUD para los Sub-Usuarios
+    // Funciones Controladoras
+    window.addEventListener('click', function(e) {
+      if (!e.target.closest('.stables-dropdown-container')) {
+        const menu = document.getElementById('stables-menu-list');
+        if (menu && menu.classList.contains('show')) menu.classList.remove('show');
+      }
+    });
+
+    function toggleStableSelection(idStr, isChecked) {
+      if (isChecked) {
+          if (!SELECTED_STABLES.includes(idStr)) SELECTED_STABLES.push(idStr);
+      } else {
+          SELECTED_STABLES = SELECTED_STABLES.filter(id => id !== idStr);
+      }
+      recalc();
+    }
+
     function updSub(id, field, val) {
-      if (isPrivacyMode) return; // Bloquear edición si el ojito está cerrado
+      if (isPrivacyMode) return;
       const user = SUB_USERS.find(u => u.id === id);
       if (!user) return;
       
-      if (field === 'name') {
-        user.name = val;
-      } else if (field === 'usd') {
-        user.usd = evalMath(val); // Reutilizamos tu función de sumar 100+34
-      }
+      if (field === 'name') user.name = val;
+      else if (field === 'usd') user.usd = evalMath(val);
       recalc();
     }
 
@@ -1753,16 +1826,9 @@ db.ref('users/' + currentUser.uid).set({
     }
 
     function delSub(id) {
-      if (!confirm('¿Eliminar este usuario?')) return;
+      if (!confirm(currentUiLang === 'en' ? 'Delete user?' : '¿Eliminar usuario?')) return;
       SUB_USERS = SUB_USERS.filter(u => u.id !== id);
       recalc();
-    }
-      renderCharts();
-      renderSubAccounts(); // 🔥 Nueva llamada
-      if (pushToHistory) saveStateToHistory();
-      else updateUndoRedoButtons();
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(saveDataToFirebase, 1500);
     }
 
     // ════════════════════════════════════════════════════════════════
