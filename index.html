@@ -1885,9 +1885,15 @@ db.ref('users/' + currentUser.uid).set({
       } else {
         activeAssets = CR.map(calc).filter(x => x.qty > 0);
         tCur     = activeAssets.reduce((s, x) => s + x.cur, 0);
-        tInv     = activeAssets.reduce((s, x) => s + x.inv, 0);
-        tPnl     = tCur - tInv;
-        tPct     = tInv > 0 ? (tPnl / tInv) * 100 : 0;
+        const tInvRaw = activeAssets.reduce((s, x) => s + x.inv, 0); // Inversión total (con usuarios)
+        
+        // 🔥 Calcular dinero de usuarios para restarlo del capital invertido
+        const totalUsersUSD = SUB_USERS.reduce((s, u) => s + (parseFloat(u.usd) || 0), 0);
+        tInv = tInvRaw - totalUsersUSD; // Mi capital real invertido
+        
+        tPnl     = tCur - tInvRaw; // La ganancia en $ se calcula con el total crudo (usuarios = 0 profit)
+        tPct     = tInv > 0 ? (tPnl / tInv) * 100 : 0; // 🔥 % de ganancia calculado sobre MI capital real
+        
         lblGlobal = D.lblC;
         valInvStr = '$' + f(tInv);
         htmlSub   = `${D.wallet} <span style="color:#e6edf3;font-weight:600">${isPrivacyMode ? '••••' : '$' + f(tCur)}</span>`;
@@ -2067,7 +2073,9 @@ db.ref('users/' + currentUser.uid).set({
 
       } else {
         const cA  = CR.map(calc).filter(x => x.qty > 0);
-        const cI  = cA.reduce((s, x) => s + x.inv, 0);
+        const totalUsersUSD = SUB_USERS.reduce((s, u) => s + (parseFloat(u.usd) || 0), 0); // Suma de usuarios
+        
+        const cI  = cA.reduce((s, x) => s + x.inv, 0) - totalUsersUSD; // 🔥 Restamos usuarios a la inversión total
         const cC  = cA.reduce((s, x) => s + x.cur, 0);
 
         document.getElementById('sum-content').innerHTML = `
