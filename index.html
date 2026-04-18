@@ -1291,9 +1291,26 @@ db.ref('users/' + currentUser.uid).set({
       }
     }
 
-    // Keyboard shortcuts: Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y
+    // 🔥 Memoria temporal para cancelar ediciones con la tecla ESC 🔥
+    let lastFocusedValue = "";
+    document.addEventListener('focusin', e => {
+      if (e.target.tagName === 'INPUT') {
+        // Guardamos el valor original una fracción de segundo después del clic 
+        // para asegurarnos de capturar tus fórmulas (ej: 100+30) y no solo el total.
+        setTimeout(() => lastFocusedValue = e.target.value, 10);
+      }
+    });
+
+    // Keyboard shortcuts: Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y / Escape
     document.addEventListener('keydown', e => {
-      if (document.activeElement?.tagName === 'INPUT') return;
+      if (document.activeElement?.tagName === 'INPUT') {
+        if (e.key === 'Escape') {
+          e.target.value = lastFocusedValue; // Restauramos el valor exacto que tenía al entrar
+          e.target.blur(); // Quitamos el foco (te saca del cuadro)
+          showToast(currentUiLang === 'en' ? '🚫 Edit cancelled' : '🚫 Edición cancelada');
+        }
+        return; // Evita activar atajos de deshacer/rehacer mientras escribes
+      }
       if (e.ctrlKey || e.metaKey) {
         if (e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
         if (e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
