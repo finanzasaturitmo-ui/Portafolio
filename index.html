@@ -879,7 +879,7 @@
     // ════════════════════════════════════════════════════════════════
 
     let currentUser   = null;
-    let currentView   = 'stocks';   // 'stocks' | 'crypto'
+    let currentView   = localStorage.getItem('lastTab') || 'stocks';   // 🔥 Busca la última pestaña guardada
     let currentUiLang = 'es';       // 'es' | 'en'
 
     let SW = [], XT = [], CR = [];  // Schwab, XTB, Crypto positions
@@ -1158,11 +1158,13 @@
             nid    = 50;
           }
 
-          fetchRealTimeData();
+                    fetchRealTimeData();
           translateUI();
-          recalc(true);
+          switchTab(currentView); // 🔥 Cambia visualmente a la pestaña guardada
+          saveStateToHistory();   // 🔥 Inicializa el historial (reemplaza a recalc(true))
 
         } catch (err) { console.error('Error loading data:', err); }
+
       }).catch(e => {
         console.error(e);
         showToast(currentUiLang === 'en' ? '❌ Cloud sync error' : '❌ Error al descargar de la nube');
@@ -1195,10 +1197,12 @@ db.ref('users/' + currentUser.uid).set({
       document.getElementById('view-tabs').classList.toggle('open');
     }
 
-    function switchTab(tabId) {
+        function switchTab(tabId) {
       currentView = tabId;
+      localStorage.setItem('lastTab', tabId); // 🔥 Guarda tu elección en la memoria del navegador
 
       document.querySelectorAll('.view-tab').forEach(t    => t.classList.remove('active'));
+
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('btn-tab-' + tabId).classList.add('active');
       document.getElementById('content-' + tabId).classList.add('active');
