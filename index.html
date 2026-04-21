@@ -1602,19 +1602,21 @@
 
     const m = str => isPrivacyMode ? '••••' : str;
 
-    // Build user rows
+        // Build user rows
     const tbody = document.getElementById('sub-tbody');
     let totalUsersUSD = 0;
     tbody.innerHTML = SUB_USERS.map(u => {
       totalUsersUSD += parseFloat(u.usd) || 0;
       const usdVal = isPrivacyMode ? '••••' : u.usd;
+      const formula = u.usdExpr ? u.usdExpr.replace(/'/g, "\\'") : u.usd; // 🔥 Rescatamos la fórmula
+      
       return `
         <tr>
           <td style="text-align:left;padding-left:10px">
             <input class="ci" style="width:100px;text-align:left;font-weight:bold;border:none;background:transparent" value="${u.name}" onblur="updSub(${u.id},'name',this.value)" onkeyup="if(event.key==='Enter')this.blur()">
           </td>
           <td>
-            <input type="text" class="ci" style="width:100px;font-weight:bold;color:var(--blue)" value="${usdVal}" ${isPrivacyMode ? 'readonly' : ''} onblur="updSub(${u.id},'usd',this.value)" onfocus="if(!isPrivacyMode) this.value='${u.usd}'" onkeyup="if(event.key==='Enter')this.blur()">
+            <input type="text" class="ci" style="width:100px;font-weight:bold;color:var(--blue)" value="${usdVal}" ${isPrivacyMode ? 'readonly' : ''} onblur="updSub(${u.id},'usd',this.value)" onfocus="if(!isPrivacyMode) this.value='${formula}'" onkeyup="if(event.key==='Enter')this.blur()">
           </td>
           <td><button class="icon-btn btn-del" onmousedown="delSub(${u.id})" title="Eliminar">✕</button></td>
         </tr>`;
@@ -1685,12 +1687,17 @@
     recalc();
   }
 
-  function updSub(id, field, val) {
+    function updSub(id, field, val) {
     if (isPrivacyMode) return;
     const user = SUB_USERS.find(u => u.id === id);
     if (!user) return;
-    if (field === 'name') user.name = val;
-    else if (field === 'usd') user.usd = evalMath(val);
+    
+    if (field === 'name') {
+      user.name = val;
+    } else if (field === 'usd') {
+      user.usdExpr = String(val).trim(); // 🔥 Memoria: guarda la fórmula (ej: "100+30")
+      user.usd = evalMath(val);          // 🔥 Resultado: guarda el cálculo (ej: 130)
+    }
     recalc();
   }
 
