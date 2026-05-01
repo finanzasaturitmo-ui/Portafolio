@@ -1131,14 +1131,65 @@
     if (tblSw) tblSw.innerHTML = thead + buildTbody('STOCKS');
     if (tblCr) tblCr.innerHTML = thead + buildTbody('CR');
   }
-      // 🔥 NUEVA FUNCIÓN: Eliminar transacción del historial 🔥
+   // 🔥 FUNCIÓN ACTUALIZADA: Eliminar transacción y revertir saldos 🔥
   function deleteTrade(tradeId) {
-    const msg = currentUiLang === 'en' ? 'Delete this transaction?' : '¿Eliminar esta transacción del historial?';
+    const msg = currentUiLang === 'en' ? 'Delete this transaction and restore balance?' : '¿Eliminar esta transacción y restaurar el saldo en el portafolio?';
     if (!confirm(msg)) return;
     
-    saveStateToHistory(); // Guardamos el estado por si te arrepientes y usas "Deshacer"
-    TRADES = TRADES.filter(t => t.id !== tradeId); // Filtramos para quitar esa transacción
-    recalc(); // Recalculamos todo (esto también guarda en Firebase automáticamente)
+    // 1. Encontrar la transacción ANTES de borrarla
+    const tradeToDel = TRADES.find(t => t.id === tradeId);
+    if (!tradeToDel) return;
+
+    saveStateToHistory(); // Guardar estado para poder usar "Deshacer"
+
+    // 2. Determinar si fue Compra o Venta
+    const rawType = String(tradeToDel.type || '').toUpperCase();
+    const isBuy = rawType === 'BUY' || rawType === 'COMPRA';
+
+    // 3. Buscar el activo correspondiente en los portafolios (SW, XT o CR)
+    const targetSymbol = tradeToDel.symbol || tradeToDel.asset;
+    const targetWallet = tradeToDel.wallet || '';
+    
+    let foundAsset = null;
+    const findAsset = (arr) => arr.find(a => a.t === targetSymbol && (a.wallet || '') === targetWallet);
+
+    if (tradeToDel.assetType === 'CR' || targetWallet !== '') {
+      foundAsset = findAsset(CR); // Buscar en Cripto
+    } else {
+      foundAsset = findAsset(SW) || findAsset(XT); // Buscar en Acciones
+    }
+
+    // 4. Revertir la operación matemática en el portafolio
+    if (foundAsset) {
+      const tQty = parseFloat(tradeToDel.qty) || 0;
+      const tInv = parseFloat(tradeToDel.inv) || 0; // Usamos el 'inv' exacto que se guardó al confirmar
+
+      if (isBuy) {
+        // Revertir Compra: Quitar las acciones que habían entrado
+        foundAsset.qty = (foundAsset.qty || 0) - tQty;
+        foundAsset.inv = (foundAsset.inv || 0) - tInv;
+      } else {
+        // Revertir Venta: Devolver las acciones que habían salido
+        foundAsset.qty = (foundAsset.qty || 0) + tQty;
+        foundAsset.inv = (foundAsset.inv || 0) + tInv;
+      }
+
+      // Limpieza de seguridad: evitar saldos negativos microscópicos por decimales
+      if (foundAsset.qty < 0.000001) {
+        foundAsset.qty = 0;
+        foundAsset.inv = 0;
+        foundAsset.p = true; // (Opcional) Vuelve a poner la etiqueta "next" si queda en 0
+      }
+    }
+
+    // 5. Borrar el registro del historial
+    TRADES = TRADES.filter(t => t.id !== tradeId); 
+    
+    // 6. Recalcular todo (esto actualiza visuales y guarda en Firebase)
+    recalc(); 
+    
+    const toastMsg = currentUiLang === 'en' ? '✅ Trade deleted & balance restored' : '✅ Historial borrado y saldo restaurado';
+    showToast(toastMsg);
   }
 
   function renderSubAccounts() {
