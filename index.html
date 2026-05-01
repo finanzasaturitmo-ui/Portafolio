@@ -1012,7 +1012,11 @@
           SW               = (d.SW || []).filter(Boolean);
           XT               = (d.XT || []).filter(Boolean);
           CR               = (d.CR || []).filter(Boolean);
-          TRADES           = d.transactions || d.trades || [];
+          
+          // 🔥 BLINDAJE: Forzamos a que el historial sea siempre una lista pura y descartamos datos corruptos
+          let rawTrades    = d.transactions || d.trades || [];
+          TRADES           = (Array.isArray(rawTrades) ? rawTrades : Object.values(rawTrades)).filter(t => t && t.date);
+          
           SELECTED_STABLES = d.selected_stables || [];
           SUB_USERS        = d.sub_users || [
             { id: 1, name: 'Cosi',   usd: 11317 },
@@ -1618,7 +1622,7 @@
     saveTimeout = setTimeout(saveDataToFirebase, 1500);
   }
 
-  // ══════════════════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════════════════
   // 14.5 RENDER HISTORY TABLES (Navegación Mensual - Año en Curso)
   // ══════════════════════════════════════════════════════════════════════
 
@@ -1658,32 +1662,47 @@
     </tr></thead>`;
 
     const buildTbody = (assetTypeFilter) => {
-      // Filtramos por el Año actual, por el mes que estamos viendo, y por Acciones o Cripto
+      // Filtrar y ordenar de forma segura
       const filtered = TRADES.filter(t => {
+        if (!t || !t.date) return false;
         const d = new Date(t.date);
-        return d.getFullYear() === currentYear && d.getMonth() === viewedHistoryMonth && t.assetType === assetTypeFilter;
-      }).sort((a, b) => new Date(b.date) - new Date(a.date)); // Las nuevas arriba
+        
+        // Detección automática por si hay transacciones muy viejas sin categoría "CR" o "STOCKS"
+        let isCripto = t.assetType === 'CR' || String(t.type || '').toUpperCase() === 'CR' || String(t.type || '').toUpperCase() === 'CRIPTO';
+        if (!t.assetType && CR.some(c => c.t === (t.symbol || t.asset))) isCripto = true;
+        
+        const matchesFilter = assetTypeFilter === 'CR' ? isCripto : !isCripto;
+
+        return d.getFullYear() === currentYear && d.getMonth() === viewedHistoryMonth && matchesFilter;
+      }).sort((a, b) => new Date(b.date) - new Date(a.date));
 
       if (filtered.length === 0) return `<tbody><tr><td colspan="6" style="padding:15px; color:var(--sub)">${D.empty}</td></tr></tbody>`;
 
       return '<tbody>' + filtered.map(t => {
-        const isBuy = String(t.type).toUpperCase() === 'BUY';
+        const rawType = String(t.type || '').toUpperCase();
+        const isBuy = rawType === 'BUY' || rawType === 'COMPRA';
         const typeStr = isBuy ? (currentUiLang === 'en' ? 'BUY' : 'COMPRA') : (currentUiLang === 'en' ? 'SELL' : 'VENTA');
         const typeColor = isBuy ? 'var(--green)' : 'var(--red)';
-        const dateStr = new Date(t.date).toLocaleDateString(currentUiLang === 'en' ? 'en-US' : 'es-CO');
+        
+        let dateStr = "—";
+        try { dateStr = new Date(t.date).toLocaleDateString(currentUiLang === 'en' ? 'en-US' : 'es-CO'); } catch(e){}
+
+        // Rescatar montos antiguos si no están guardados igual
+        const px = t.price || t.px || 0;
+        const amount = t.amount !== undefined ? t.amount : (isBuy ? -(t.qty * px) : (t.qty * px));
 
         return `<tr>
           <td style="text-align:left; padding-left:10px; font-size:0.75rem; color:var(--sub)">${dateStr}</td>
           <td style="font-weight:bold; color:${typeColor}">${typeStr}</td>
-          <td style="font-weight:bold; color:var(--blue)">${t.symbol}</td>
+          <td style="font-weight:bold; color:var(--blue)">${t.symbol || t.asset || '—'}</td>
           <td>${m(fQty(t.qty))}</td>
-          <td>${m(fU(t.price))}</td>
-          <td style="font-weight:bold; color:${t.amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(t.amount))}</td>
+          <td>${m(fU(px))}</td>
+          <td style="font-weight:bold; color:${amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(amount))}</td>
         </tr>`;
       }).join('') + '</tbody>';
     };
 
-    // Inyectar en los paneles HTML de Acciones y Cripto respectivamente
+    // Inyectar en los paneles HTML correspondientes
     const tblSw = document.getElementById('tbl-hist-sw');
     const tblCr = document.getElementById('tbl-hist-cr');
     if (tblSw) tblSw.innerHTML = thead + buildTbody('STOCKS');
