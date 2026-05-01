@@ -1601,11 +1601,11 @@
     recalc();
   }
 
-  // ══════════════════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════════════════
   // 14. MASTER RECALC — rebuilds the entire UI in one pass
   // ══════════════════════════════════════════════════════════════════════
 
-      function recalc(pushToHistory = true) {
+  function recalc(pushToHistory = true) {
     renderTable(SW, 'sw');
     renderTable(XT, 'xt');
     renderTable(CR, 'cr');
@@ -1613,7 +1613,7 @@
     renderSummary();
     renderCharts();
     renderSubAccounts();
-    renderHistoryTables(); // 🔥 Ahora sí, llamamos al dibujo de las tablas
+    renderHistoryTables(); // 🔥 Llamada limpia al historial
 
     if (pushToHistory) saveStateToHistory();
     else updateUndoRedoButtons();
@@ -1622,99 +1622,21 @@
     saveTimeout = setTimeout(saveDataToFirebase, 1500);
   }
 
-        // ══════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════
   // 14.5 RENDER HISTORY TABLES (Navegación Mensual - Año en Curso)
   // ══════════════════════════════════════════════════════════════════════
 
   function changeHistoryMonth(offset) {
-    viewedHistoryMonth += offset; // 🔥 Sin el 'window.', usa la memoria global correctamente
-    
+    viewedHistoryMonth += offset;
     // Topamos en Enero (0) y Diciembre (11)
     if (viewedHistoryMonth < 0) viewedHistoryMonth = 0;   
     if (viewedHistoryMonth > 11) viewedHistoryMonth = 11; 
-    
-    renderHistoryTables(); // Redibuja las tablas al instante
+    renderHistoryTables();
   }
 
   function renderHistoryTables() {
     const currentYear = new Date().getFullYear();
     const m = str => isPrivacyMode ? '••••' : str; // Ojito de privacidad
-
-    // Traducir los meses
-    const monthNamesEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    const monthNamesEn = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const monthName = currentUiLang === 'en' ? monthNamesEn[viewedHistoryMonth] : monthNamesEs[viewedHistoryMonth];
-
-    // Actualizar el Texto del Mes en medio de las flechas
-    document.querySelectorAll('.hist-month-label').forEach(el => el.innerText = `${monthName} ${currentYear}`);
-    
-    // Actualizar el título principal
-    const titleText = currentUiLang === 'en' ? 'Transaction History' : 'Historial de Transacciones';
-    document.querySelectorAll('.lbl-hist-title').forEach(el => el.innerText = titleText);
-
-    const D = currentUiLang === 'en'
-      ? { date: 'Date', type: 'Type', asset: 'Asset', qty: 'Qty.', px: 'Price', total: 'Total', empty: 'No transactions this month.' }
-      : { date: 'Fecha', type: 'Tipo', asset: 'Activo', qty: 'Cant.', px: 'Precio', total: 'Total', empty: 'No hay transacciones este mes.' };
-
-    const thead = `<thead><tr>
-      <th style="text-align:left; padding-left:10px">${D.date}</th>
-      <th>${D.type}</th>
-      <th>${D.asset}</th>
-      <th>${D.qty}</th>
-      <th>${D.px}</th>
-      <th>${D.total}</th>
-    </tr></thead>`;
-
-    const buildTbody = (assetTypeFilter) => {
-      // Filtrar y ordenar de forma segura
-      const filtered = TRADES.filter(t => {
-        if (!t || !t.date) return false;
-        const d = new Date(t.date);
-        
-        // Detección automática de tipo de activo
-        let isCripto = t.assetType === 'CR' || String(t.type || '').toUpperCase() === 'CR' || String(t.type || '').toUpperCase() === 'CRIPTO';
-        if (!t.assetType && CR.some(c => c.t === (t.symbol || t.asset))) isCripto = true;
-        
-        const matchesFilter = assetTypeFilter === 'CR' ? isCripto : !isCripto;
-
-        // 🔥 MAGIA: Comparamos el año actual y el MES que estás viendo en la pantalla
-        return d.getFullYear() === currentYear && d.getMonth() === viewedHistoryMonth && matchesFilter;
-      }).sort((a, b) => new Date(b.date) - new Date(a.date));
-
-      if (filtered.length === 0) return `<tbody><tr><td colspan="6" style="padding:15px; color:var(--sub)">${D.empty}</td></tr></tbody>`;
-
-      return '<tbody>' + filtered.map(t => {
-        const rawType = String(t.type || '').toUpperCase();
-        const isBuy = rawType === 'BUY' || rawType === 'COMPRA';
-        const typeStr = isBuy ? (currentUiLang === 'en' ? 'BUY' : 'COMPRA') : (currentUiLang === 'en' ? 'SELL' : 'VENTA');
-        const typeColor = isBuy ? 'var(--green)' : 'var(--red)';
-        
-        let dateStr = "—";
-        try { dateStr = new Date(t.date).toLocaleDateString(currentUiLang === 'en' ? 'en-US' : 'es-CO'); } catch(e){}
-
-        // Rescatar montos
-        const px = t.price || t.px || 0;
-        const amount = t.amount !== undefined ? t.amount : (isBuy ? -(t.qty * px) : (t.qty * px));
-        
-        const formatQty = parseFloat(Number(t.qty).toFixed(6));
-
-        return `<tr>
-          <td style="text-align:left; padding-left:10px; font-size:0.75rem; color:var(--sub)">${dateStr}</td>
-          <td style="font-weight:bold; color:${typeColor}">${typeStr}</td>
-          <td style="font-weight:bold; color:var(--blue)">${t.symbol || t.asset || '—'}</td>
-          <td>${m(formatQty)}</td>
-          <td>${m(fU(px))}</td>
-          <td style="font-weight:bold; color:${amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(amount))}</td>
-        </tr>`;
-      }).join('') + '</tbody>';
-    };
-
-    // Inyectar en los paneles HTML correspondientes
-    const tblSw = document.getElementById('tbl-hist-sw');
-    const tblCr = document.getElementById('tbl-hist-cr');
-    if (tblSw) tblSw.innerHTML = thead + buildTbody('STOCKS');
-    if (tblCr) tblCr.innerHTML = thead + buildTbody('CR');
-  }
 
     // Traducir los meses
     const monthNamesEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -1744,7 +1666,6 @@
         if (!t || !t.date) return false;
         const d = new Date(t.date);
         
-        // Detección automática por si hay transacciones muy viejas sin categoría "CR" o "STOCKS"
         let isCripto = t.assetType === 'CR' || String(t.type || '').toUpperCase() === 'CR' || String(t.type || '').toUpperCase() === 'CRIPTO';
         if (!t.assetType && CR.some(c => c.t === (t.symbol || t.asset))) isCripto = true;
         
@@ -1764,15 +1685,15 @@
         let dateStr = "—";
         try { dateStr = new Date(t.date).toLocaleDateString(currentUiLang === 'en' ? 'en-US' : 'es-CO'); } catch(e){}
 
-        // Rescatar montos antiguos si no están guardados igual
         const px = t.price || t.px || 0;
         const amount = t.amount !== undefined ? t.amount : (isBuy ? -(t.qty * px) : (t.qty * px));
+        const formatQty = parseFloat(Number(t.qty).toFixed(6));
 
         return `<tr>
           <td style="text-align:left; padding-left:10px; font-size:0.75rem; color:var(--sub)">${dateStr}</td>
           <td style="font-weight:bold; color:${typeColor}">${typeStr}</td>
           <td style="font-weight:bold; color:var(--blue)">${t.symbol || t.asset || '—'}</td>
-          <td>${m(fQty(t.qty))}</td>
+          <td>${m(formatQty)}</td>
           <td>${m(fU(px))}</td>
           <td style="font-weight:bold; color:${amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(amount))}</td>
         </tr>`;
@@ -1784,64 +1705,6 @@
     const tblCr = document.getElementById('tbl-hist-cr');
     if (tblSw) tblSw.innerHTML = thead + buildTbody('STOCKS');
     if (tblCr) tblCr.innerHTML = thead + buildTbody('CR');
-  }
-
-  // ══════════════════════════════════════════════════════════════════════
-  // 14.5 RENDER HISTORY TABLES (Solo año actual)
-  // ══════════════════════════════════════════════════════════════════════
-
-  function renderHistoryTables() {
-    const currentYear = new Date().getFullYear();
-    const m = str => isPrivacyMode ? '••••' : str; // Respeta el modo privacidad
-
-    // Textos bilingües
-    const D = currentUiLang === 'en'
-      ? { date: 'Date', type: 'Type', asset: 'Asset', qty: 'Qty.', px: 'Price', total: 'Total', empty: 'No transactions this year.' }
-      : { date: 'Fecha', type: 'Tipo', asset: 'Activo', qty: 'Cant.', px: 'Precio', total: 'Total', empty: 'No hay transacciones este año.' };
-
-    // Títulos dinámicos con el año
-    const titleText = currentUiLang === 'en' ? `📄 Transaction History (${currentYear})` : `📄 Historial de Transacciones (${currentYear})`;
-    document.getElementById('lbl-hist-stocks').innerText = titleText;
-    document.getElementById('lbl-hist-crypto').innerText = titleText;
-
-    const thead = `<thead><tr>
-      <th style="text-align:left; padding-left:10px">${D.date}</th>
-      <th>${D.type}</th>
-      <th>${D.asset}</th>
-      <th>${D.qty}</th>
-      <th>${D.px}</th>
-      <th>${D.total}</th>
-    </tr></thead>`;
-
-    // Función constructora de las filas filtrando por "año actual" y "tipo de activo"
-    const buildTbody = (assetTypeFilter) => {
-      const filtered = TRADES.filter(t => {
-        if (new Date(t.date).getFullYear() !== currentYear) return false; // Borra visualmente lo de años anteriores
-        return t.assetType === assetTypeFilter;
-      }).sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordena la más reciente arriba
-
-      if (filtered.length === 0) return `<tbody><tr><td colspan="6" style="padding:15px; color:var(--sub)">${D.empty}</td></tr></tbody>`;
-
-      return '<tbody>' + filtered.map(t => {
-        const isBuy = String(t.type).toUpperCase() === 'BUY';
-        const typeStr = isBuy ? (currentUiLang === 'en' ? 'BUY' : 'COMPRA') : (currentUiLang === 'en' ? 'SELL' : 'VENTA');
-        const typeColor = isBuy ? 'var(--green)' : 'var(--red)';
-        const dateStr = new Date(t.date).toLocaleDateString(currentUiLang === 'en' ? 'en-US' : 'es-CO');
-
-        return `<tr>
-          <td style="text-align:left; padding-left:10px; font-size:0.75rem; color:var(--sub)">${dateStr}</td>
-          <td style="font-weight:bold; color:${typeColor}">${typeStr}</td>
-          <td style="font-weight:bold; color:var(--blue)">${t.symbol}</td>
-          <td>${m(fQty(t.qty))}</td>
-          <td>${m(fU(t.price))}</td>
-          <td style="font-weight:bold; color:${t.amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(t.amount))}</td>
-        </tr>`;
-      }).join('') + '</tbody>';
-    };
-
-    // Inyectar en los paneles HTML correspondientes
-    document.getElementById('tbl-hist-sw').innerHTML = thead + buildTbody('STOCKS');
-    document.getElementById('tbl-hist-cr').innerHTML = thead + buildTbody('CR');
   }
 
   // ══════════════════════════════════════════════════════════════════════
