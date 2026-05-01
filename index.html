@@ -1420,7 +1420,8 @@
       id: Date.now(), date: new Date().toISOString(), type: 'Buy',
       symbol: activeSimRow.t, assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
       qty: buyQty, price: buyPx, amount: -buyInv,
-      asset: activeSimRow.t, px: buyPx, inv: buyInv
+      asset: activeSimRow.t, px: buyPx, inv: buyInv,
+      wallet: activeSimRow.wallet || '' // 🔥 GUARDAMOS LA BILLETERA
     });
 
     recalc(false);
@@ -1451,7 +1452,8 @@
       id: Date.now(), date: new Date().toISOString(), type: 'Sell',
       symbol: activeSimRow.t, assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
       qty: sellQty, price: sellPx, amount: sellQty * sellPx, pnl,
-      asset: activeSimRow.t, px: sellPx, inv: sellQty * avg
+      asset: activeSimRow.t, px: sellPx, inv: sellQty * avg,
+      wallet: activeSimRow.wallet || '' // 🔥 GUARDAMOS LA BILLETERA
     });
 
     recalc(false);
@@ -1685,20 +1687,35 @@
         let dateStr = "—";
         try { dateStr = new Date(t.date).toLocaleDateString(currentUiLang === 'en' ? 'en-US' : 'es-CO'); } catch(e){}
 
+                // Rescatar montos
         const px = t.price || t.px || 0;
         const amount = t.amount !== undefined ? t.amount : (isBuy ? -(t.qty * px) : (t.qty * px));
         const formatQty = parseFloat(Number(t.qty).toFixed(6));
 
+        // 🔥 LÓGICA NUEVA PARA MOSTRAR LA BILLETERA 🔥
+        let walletStr = t.wallet || '';
+        
+        // Respaldo inteligente: si la transacción es vieja y no tenía guardada la wallet, 
+        // intenta buscarla en tu tabla actual de criptos para que no quede vacía.
+        if (!walletStr && assetTypeFilter === 'CR') {
+          const foundAsset = CR.find(c => c.t === (t.symbol || t.asset));
+          if (foundAsset && foundAsset.wallet) walletStr = foundAsset.wallet;
+        }
+        
+        let displaySymbol = t.symbol || t.asset || '—';
+        if (assetTypeFilter === 'CR' && walletStr) {
+          displaySymbol += ` <span style="font-size:0.7rem; color:var(--sub); font-weight:normal;">(${walletStr})</span>`;
+        }
+
         return `<tr>
           <td style="text-align:left; padding-left:10px; font-size:0.75rem; color:var(--sub)">${dateStr}</td>
           <td style="font-weight:bold; color:${typeColor}">${typeStr}</td>
-          <td style="font-weight:bold; color:var(--blue)">${t.symbol || t.asset || '—'}</td>
+          <td style="font-weight:bold; color:var(--blue)">${displaySymbol}</td>
           <td>${m(formatQty)}</td>
           <td>${m(fU(px))}</td>
           <td style="font-weight:bold; color:${amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(amount))}</td>
         </tr>`;
       }).join('') + '</tbody>';
-    };
 
     // Inyectar en los paneles HTML correspondientes
     const tblSw = document.getElementById('tbl-hist-sw');
