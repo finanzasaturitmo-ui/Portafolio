@@ -1076,7 +1076,7 @@
       ? { date: 'Date', type: 'Type', asset: 'Asset', qty: 'Qty.', px: 'Price', total: 'Total', empty: 'No transactions this month.' }
       : { date: 'Fecha', type: 'Tipo', asset: 'Activo', qty: 'Cant.', px: 'Precio', total: 'Total', empty: 'No hay transacciones este mes.' };
 
-    const thead = `<thead><tr><th style="text-align:left; padding-left:10px">${D.date}</th><th>${D.type}</th><th>${D.asset}</th><th>${D.qty}</th><th>${D.px}</th><th>${D.total}</th></tr></thead>`;
+        const thead = `<thead><tr> <th style="text-align:left; padding-left:10px">${D.date}</th> <th>${D.type}</th> <th>${D.asset}</th> <th>${D.qty}</th> <th>${D.px}</th> <th>${D.total}</th> <th></th> </tr></thead>`;
 
     const buildTbody = (assetTypeFilter) => {
       const filtered = TRADES.filter(t => {
@@ -1118,9 +1118,10 @@
           <td style="text-align:left; padding-left:10px; font-size:0.75rem; color:var(--sub)">${dateStr}</td>
           <td style="font-weight:bold; color:${typeColor}">${typeStr}</td>
           <td style="font-weight:bold; color:var(--blue)">${displaySymbol}</td>
-          <td>${m(fQty(t.qty))}</td>
+          <td>${m(formatQty)}</td>
           <td>${m(fU(px))}</td>
           <td style="font-weight:bold; color:${amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(amount))}</td>
+          <td><button class="icon-btn btn-del" onmousedown="deleteTrade(${t.id})" title="Eliminar Transacción">✕</button></td>
         </tr>`;
       }).join('') + '</tbody>';
     };
@@ -1128,6 +1129,15 @@
     const tblSw = document.getElementById('tbl-hist-sw'); const tblCr = document.getElementById('tbl-hist-cr');
     if (tblSw) tblSw.innerHTML = thead + buildTbody('STOCKS');
     if (tblCr) tblCr.innerHTML = thead + buildTbody('CR');
+  }
+      // 🔥 NUEVA FUNCIÓN: Eliminar transacción del historial 🔥
+  function deleteTrade(tradeId) {
+    const msg = currentUiLang === 'en' ? 'Delete this transaction?' : '¿Eliminar esta transacción del historial?';
+    if (!confirm(msg)) return;
+    
+    saveStateToHistory(); // Guardamos el estado por si te arrepientes y usas "Deshacer"
+    TRADES = TRADES.filter(t => t.id !== tradeId); // Filtramos para quitar esa transacción
+    recalc(); // Recalculamos todo (esto también guarda en Firebase automáticamente)
   }
 
   function renderSubAccounts() {
