@@ -587,6 +587,13 @@
           <div class="tbl-wrap"><table id="tbl-xt"></table></div>
         </div>
 
+        <div class="broker" style="margin-top: 15px;">
+          <div class="bhdr" style="background: var(--cardAlt); color: var(--sub);">
+            <span id="lbl-hist-stocks">📄 Historial de Transacciones (Este Año)</span>
+          </div>
+          <div class="tbl-wrap"><table id="tbl-hist-sw"></table></div>
+        </div>
+
       </div><!-- /content-stocks -->
 
       <!-- ══════════════════════════════════════════════════════════
@@ -610,6 +617,14 @@
           </div>
           <div class="tbl-wrap"><table id="tbl-cr"></table></div>
         </div>
+
+        <div class="broker" style="margin-top: 15px;">
+          <div class="bhdr" style="background: var(--cardAlt); color: var(--sub);">
+            <span id="lbl-hist-crypto">📄 Historial de Transacciones (Este Año)</span>
+          </div>
+          <div class="tbl-wrap"><table id="tbl-hist-cr"></table></div>
+        </div>
+
       </div><!-- /content-crypto -->
 
       <!-- ── CONSOLIDATED SUMMARY ──────────────────────────────────── -->
@@ -1575,7 +1590,7 @@
   // 14. MASTER RECALC — rebuilds the entire UI in one pass
   // ══════════════════════════════════════════════════════════════════════
 
-  function recalc(pushToHistory = true) {
+    function recalc(pushToHistory = true) {
     renderTable(SW, 'sw');
     renderTable(XT, 'xt');
     renderTable(CR, 'cr');
@@ -1583,12 +1598,71 @@
     renderSummary();
     renderCharts();
     renderSubAccounts();
+    renderHistoryTables(); // 🔥 Llamada a la nueva función del historial
 
     if (pushToHistory) saveStateToHistory();
     else updateUndoRedoButtons();
 
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(saveDataToFirebase, 1500);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // 14.5 RENDER HISTORY TABLES (Solo año actual)
+  // ══════════════════════════════════════════════════════════════════════
+
+  function renderHistoryTables() {
+    const currentYear = new Date().getFullYear();
+    const m = str => isPrivacyMode ? '••••' : str; // Respeta el modo privacidad
+
+    // Textos bilingües
+    const D = currentUiLang === 'en'
+      ? { date: 'Date', type: 'Type', asset: 'Asset', qty: 'Qty.', px: 'Price', total: 'Total', empty: 'No transactions this year.' }
+      : { date: 'Fecha', type: 'Tipo', asset: 'Activo', qty: 'Cant.', px: 'Precio', total: 'Total', empty: 'No hay transacciones este año.' };
+
+    // Títulos dinámicos con el año
+    const titleText = currentUiLang === 'en' ? `📄 Transaction History (${currentYear})` : `📄 Historial de Transacciones (${currentYear})`;
+    document.getElementById('lbl-hist-stocks').innerText = titleText;
+    document.getElementById('lbl-hist-crypto').innerText = titleText;
+
+    const thead = `<thead><tr>
+      <th style="text-align:left; padding-left:10px">${D.date}</th>
+      <th>${D.type}</th>
+      <th>${D.asset}</th>
+      <th>${D.qty}</th>
+      <th>${D.px}</th>
+      <th>${D.total}</th>
+    </tr></thead>`;
+
+    // Función constructora de las filas filtrando por "año actual" y "tipo de activo"
+    const buildTbody = (assetTypeFilter) => {
+      const filtered = TRADES.filter(t => {
+        if (new Date(t.date).getFullYear() !== currentYear) return false; // Borra visualmente lo de años anteriores
+        return t.assetType === assetTypeFilter;
+      }).sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordena la más reciente arriba
+
+      if (filtered.length === 0) return `<tbody><tr><td colspan="6" style="padding:15px; color:var(--sub)">${D.empty}</td></tr></tbody>`;
+
+      return '<tbody>' + filtered.map(t => {
+        const isBuy = String(t.type).toUpperCase() === 'BUY';
+        const typeStr = isBuy ? (currentUiLang === 'en' ? 'BUY' : 'COMPRA') : (currentUiLang === 'en' ? 'SELL' : 'VENTA');
+        const typeColor = isBuy ? 'var(--green)' : 'var(--red)';
+        const dateStr = new Date(t.date).toLocaleDateString(currentUiLang === 'en' ? 'en-US' : 'es-CO');
+
+        return `<tr>
+          <td style="text-align:left; padding-left:10px; font-size:0.75rem; color:var(--sub)">${dateStr}</td>
+          <td style="font-weight:bold; color:${typeColor}">${typeStr}</td>
+          <td style="font-weight:bold; color:var(--blue)">${t.symbol}</td>
+          <td>${m(fQty(t.qty))}</td>
+          <td>${m(fU(t.price))}</td>
+          <td style="font-weight:bold; color:${t.amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(t.amount))}</td>
+        </tr>`;
+      }).join('') + '</tbody>';
+    };
+
+    // Inyectar en los paneles HTML correspondientes
+    document.getElementById('tbl-hist-sw').innerHTML = thead + buildTbody('STOCKS');
+    document.getElementById('tbl-hist-cr').innerHTML = thead + buildTbody('CR');
   }
 
   // ══════════════════════════════════════════════════════════════════════
