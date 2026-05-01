@@ -587,9 +587,14 @@
           <div class="tbl-wrap"><table id="tbl-xt"></table></div>
         </div>
 
-        <div class="broker" style="margin-top: 15px;">
+                <div class="broker" style="margin-top: 15px;">
           <div class="bhdr" style="background: var(--cardAlt); color: var(--sub);">
-            <span id="lbl-hist-stocks">📄 Historial de Transacciones (Este Año)</span>
+            <span>📄 <span class="lbl-hist-title">Historial de Transacciones</span></span>
+            <div class="bhdr-controls">
+              <button class="icon-btn" onclick="changeHistoryMonth(-1)" style="font-size: 1.2rem;">◀</button>
+              <span class="hist-month-label" style="font-size: 0.8rem; font-weight: bold; color: #e6edf3; min-width: 90px; text-align: center;">Mes</span>
+              <button class="icon-btn" onclick="changeHistoryMonth(1)" style="font-size: 1.2rem;">▶</button>
+            </div>
           </div>
           <div class="tbl-wrap"><table id="tbl-hist-sw"></table></div>
         </div>
@@ -618,9 +623,14 @@
           <div class="tbl-wrap"><table id="tbl-cr"></table></div>
         </div>
 
-        <div class="broker" style="margin-top: 15px;">
+              <div class="broker" style="margin-top: 15px;">
           <div class="bhdr" style="background: var(--cardAlt); color: var(--sub);">
-            <span id="lbl-hist-crypto">📄 Historial de Transacciones (Este Año)</span>
+            <span>📄 <span class="lbl-hist-title">Historial de Transacciones</span></span>
+            <div class="bhdr-controls">
+              <button class="icon-btn" onclick="changeHistoryMonth(-1)" style="font-size: 1.2rem;">◀</button>
+              <span class="hist-month-label" style="font-size: 0.8rem; font-weight: bold; color: #e6edf3; min-width: 90px; text-align: center;">Mes</span>
+              <button class="icon-btn" onclick="changeHistoryMonth(1)" style="font-size: 1.2rem;">▶</button>
+            </div>
           </div>
           <div class="tbl-wrap"><table id="tbl-hist-cr"></table></div>
         </div>
@@ -816,8 +826,9 @@
   let oppStocks = 10;       // Buy-opportunity threshold for stocks (%)
   let oppCrypto = 20;       // Buy-opportunity threshold for crypto (%)
 
-  let dChart = null, bChart = null, saveTimeout = null;
+    let dChart = null, bChart = null, saveTimeout = null;
   let isPrivacyMode = false;
+  let viewedHistoryMonth = new Date().getMonth(); // 🔥 Inicia en el mes actual (0 = Enero)
 
   let sortState = {
     sw: { col: null, dir: 1 },
@@ -1590,7 +1601,7 @@
   // 14. MASTER RECALC — rebuilds the entire UI in one pass
   // ══════════════════════════════════════════════════════════════════════
 
-    function recalc(pushToHistory = true) {
+      function recalc(pushToHistory = true) {
     renderTable(SW, 'sw');
     renderTable(XT, 'xt');
     renderTable(CR, 'cr');
@@ -1598,13 +1609,85 @@
     renderSummary();
     renderCharts();
     renderSubAccounts();
-    renderHistoryTables(); // 🔥 Llamada a la nueva función del historial
+    renderHistoryTables(); // 🔥 Ahora sí, llamamos al dibujo de las tablas
 
     if (pushToHistory) saveStateToHistory();
     else updateUndoRedoButtons();
 
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(saveDataToFirebase, 1500);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // 14.5 RENDER HISTORY TABLES (Navegación Mensual - Año en Curso)
+  // ══════════════════════════════════════════════════════════════════════
+
+  // Función para las flechas de los meses
+  function changeHistoryMonth(offset) {
+    viewedHistoryMonth += offset;
+    // Topamos en Enero (0) y Diciembre (11) para no salirnos de este año
+    if (viewedHistoryMonth < 0) viewedHistoryMonth = 0;   
+    if (viewedHistoryMonth > 11) viewedHistoryMonth = 11; 
+    renderHistoryTables();
+  }
+
+  function renderHistoryTables() {
+    const currentYear = new Date().getFullYear();
+    const m = str => isPrivacyMode ? '••••' : str; // Ojito de privacidad
+
+    // Traducir los meses
+    const monthNamesEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const monthNamesEn = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthName = currentUiLang === 'en' ? monthNamesEn[viewedHistoryMonth] : monthNamesEs[viewedHistoryMonth];
+
+    // Actualizar Títulos y Nombre del Mes
+    document.querySelectorAll('.hist-month-label').forEach(el => el.innerText = `${monthName} ${currentYear}`);
+    document.querySelectorAll('.lbl-hist-title').forEach(el => el.innerText = currentUiLang === 'en' ? 'Transaction History' : 'Historial de Transacciones');
+
+    const D = currentUiLang === 'en'
+      ? { date: 'Date', type: 'Type', asset: 'Asset', qty: 'Qty.', px: 'Price', total: 'Total', empty: 'No transactions this month.' }
+      : { date: 'Fecha', type: 'Tipo', asset: 'Activo', qty: 'Cant.', px: 'Precio', total: 'Total', empty: 'No hay transacciones este mes.' };
+
+    const thead = `<thead><tr>
+      <th style="text-align:left; padding-left:10px">${D.date}</th>
+      <th>${D.type}</th>
+      <th>${D.asset}</th>
+      <th>${D.qty}</th>
+      <th>${D.px}</th>
+      <th>${D.total}</th>
+    </tr></thead>`;
+
+    const buildTbody = (assetTypeFilter) => {
+      // Filtramos por el Año actual, por el mes que estamos viendo, y por Acciones o Cripto
+      const filtered = TRADES.filter(t => {
+        const d = new Date(t.date);
+        return d.getFullYear() === currentYear && d.getMonth() === viewedHistoryMonth && t.assetType === assetTypeFilter;
+      }).sort((a, b) => new Date(b.date) - new Date(a.date)); // Las nuevas arriba
+
+      if (filtered.length === 0) return `<tbody><tr><td colspan="6" style="padding:15px; color:var(--sub)">${D.empty}</td></tr></tbody>`;
+
+      return '<tbody>' + filtered.map(t => {
+        const isBuy = String(t.type).toUpperCase() === 'BUY';
+        const typeStr = isBuy ? (currentUiLang === 'en' ? 'BUY' : 'COMPRA') : (currentUiLang === 'en' ? 'SELL' : 'VENTA');
+        const typeColor = isBuy ? 'var(--green)' : 'var(--red)';
+        const dateStr = new Date(t.date).toLocaleDateString(currentUiLang === 'en' ? 'en-US' : 'es-CO');
+
+        return `<tr>
+          <td style="text-align:left; padding-left:10px; font-size:0.75rem; color:var(--sub)">${dateStr}</td>
+          <td style="font-weight:bold; color:${typeColor}">${typeStr}</td>
+          <td style="font-weight:bold; color:var(--blue)">${t.symbol}</td>
+          <td>${m(fQty(t.qty))}</td>
+          <td>${m(fU(t.price))}</td>
+          <td style="font-weight:bold; color:${t.amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(t.amount))}</td>
+        </tr>`;
+      }).join('') + '</tbody>';
+    };
+
+    // Inyectar en los paneles HTML de Acciones y Cripto respectivamente
+    const tblSw = document.getElementById('tbl-hist-sw');
+    const tblCr = document.getElementById('tbl-hist-cr');
+    if (tblSw) tblSw.innerHTML = thead + buildTbody('STOCKS');
+    if (tblCr) tblCr.innerHTML = thead + buildTbody('CR');
   }
 
   // ══════════════════════════════════════════════════════════════════════
