@@ -1622,21 +1622,18 @@
     saveTimeout = setTimeout(saveDataToFirebase, 1500);
   }
 
-      // ══════════════════════════════════════════════════════════════════════
+        // ══════════════════════════════════════════════════════════════════════
   // 14.5 RENDER HISTORY TABLES (Navegación Mensual - Año en Curso)
   // ══════════════════════════════════════════════════════════════════════
 
-  // 🔥 Variables globales y controladoras del mes aseguradas 🔥
-  if (typeof viewedHistoryMonth === 'undefined') {
-    window.viewedHistoryMonth = new Date().getMonth();
-  }
-
   function changeHistoryMonth(offset) {
-    window.viewedHistoryMonth += offset;
+    viewedHistoryMonth += offset; // 🔥 Sin el 'window.', usa la memoria global correctamente
+    
     // Topamos en Enero (0) y Diciembre (11)
-    if (window.viewedHistoryMonth < 0) window.viewedHistoryMonth = 0;   
-    if (window.viewedHistoryMonth > 11) window.viewedHistoryMonth = 11; 
-    renderHistoryTables();
+    if (viewedHistoryMonth < 0) viewedHistoryMonth = 0;   
+    if (viewedHistoryMonth > 11) viewedHistoryMonth = 11; 
+    
+    renderHistoryTables(); // Redibuja las tablas al instante
   }
 
   function renderHistoryTables() {
@@ -1646,11 +1643,14 @@
     // Traducir los meses
     const monthNamesEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     const monthNamesEn = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const monthName = currentUiLang === 'en' ? monthNamesEn[window.viewedHistoryMonth] : monthNamesEs[window.viewedHistoryMonth];
+    const monthName = currentUiLang === 'en' ? monthNamesEn[viewedHistoryMonth] : monthNamesEs[viewedHistoryMonth];
 
-    // Actualizar Títulos y Nombre del Mes
+    // Actualizar el Texto del Mes en medio de las flechas
     document.querySelectorAll('.hist-month-label').forEach(el => el.innerText = `${monthName} ${currentYear}`);
-    document.querySelectorAll('.lbl-hist-title').forEach(el => el.innerText = currentUiLang === 'en' ? 'Transaction History' : 'Historial de Transacciones');
+    
+    // Actualizar el título principal
+    const titleText = currentUiLang === 'en' ? 'Transaction History' : 'Historial de Transacciones';
+    document.querySelectorAll('.lbl-hist-title').forEach(el => el.innerText = titleText);
 
     const D = currentUiLang === 'en'
       ? { date: 'Date', type: 'Type', asset: 'Asset', qty: 'Qty.', px: 'Price', total: 'Total', empty: 'No transactions this month.' }
@@ -1677,7 +1677,8 @@
         
         const matchesFilter = assetTypeFilter === 'CR' ? isCripto : !isCripto;
 
-        return d.getFullYear() === currentYear && d.getMonth() === window.viewedHistoryMonth && matchesFilter;
+        // 🔥 MAGIA: Comparamos el año actual y el MES que estás viendo en la pantalla
+        return d.getFullYear() === currentYear && d.getMonth() === viewedHistoryMonth && matchesFilter;
       }).sort((a, b) => new Date(b.date) - new Date(a.date));
 
       if (filtered.length === 0) return `<tbody><tr><td colspan="6" style="padding:15px; color:var(--sub)">${D.empty}</td></tr></tbody>`;
@@ -1695,7 +1696,6 @@
         const px = t.price || t.px || 0;
         const amount = t.amount !== undefined ? t.amount : (isBuy ? -(t.qty * px) : (t.qty * px));
         
-        // 🔥 ELIMINAMOS LA FUNCIÓN INEXISTENTE Y FORMATEAMOS SEGURO 🔥
         const formatQty = parseFloat(Number(t.qty).toFixed(6));
 
         return `<tr>
