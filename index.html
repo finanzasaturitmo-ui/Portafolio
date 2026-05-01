@@ -1400,33 +1400,37 @@
     }
   }
 
-  /** Confirm buy: update position and push trade to history */
-  function confirmBuy() {
+    /** Confirm sell: update position, calculate P&L, push trade to history */
+  function confirmSell() {
     if (!activeSimRow) return;
-    const buyQty   = parseFloat(document.getElementById('simInpQty').value) || 0;
-    const buyPx    = parseFloat(document.getElementById('simInpPx').value)  || 0;
-    const isStable = STABLECOINS.includes(String(activeSimRow.t).toUpperCase());
+    const sellQty = parseFloat(document.getElementById('sellInpQty').value) || 0;
+    const sellPx  = parseFloat(document.getElementById('sellInpPx').value)  || 0;
 
-    if (buyQty <= 0)            { alert(currentUiLang === 'en' ? 'Invalid Quantity.'      : 'Cantidad inválida.'); return; }
-    if (buyPx <= 0 && !isStable){ alert(currentUiLang === 'en' ? 'Invalid Price.'         : 'Precio de compra inválido.'); return; }
+    if (sellQty <= 0 || sellQty > activeSimRow.qty) {
+      alert(currentUiLang === 'en' ? 'Invalid quantity or exceeds funds.' : 'Cantidad inválida o supera fondos.');
+      return;
+    }
+    if (sellPx <= 0) { alert(currentUiLang === 'en' ? 'Invalid sell price.' : 'Precio de venta inválido.'); return; }
 
     saveStateToHistory();
-    const buyInv     = buyQty * buyPx;
-    activeSimRow.qty = (activeSimRow.qty || 0) + buyQty;
-    activeSimRow.inv = (activeSimRow.inv || 0) + buyInv;
-    activeSimRow.p   = false;
+    const avg  = activeSimRow.inv / activeSimRow.qty;
+    const pnl  = (sellPx - avg) * sellQty;
+    activeSimRow.qty -= sellQty;
+    activeSimRow.inv -= sellQty * avg;
+    if (activeSimRow.qty < 0.000001) { activeSimRow.qty = 0; activeSimRow.inv = 0; }
 
     TRADES.push({
-      id: Date.now(), date: new Date().toISOString(), type: 'Buy',
+      id: Date.now(), date: new Date().toISOString(), type: 'Sell',
       symbol: activeSimRow.t, assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
-      qty: buyQty, price: buyPx, amount: -buyInv,
-      asset: activeSimRow.t, px: buyPx, inv: buyInv,
-      wallet: activeSimRow.wallet || '' // 🔥 GUARDAMOS LA BILLETERA
+      qty: sellQty, price: sellPx, amount: sellQty * sellPx, pnl,
+      asset: activeSimRow.t, px: sellPx, inv: sellQty * avg,
+      wallet: activeSimRow.wallet || '' // 🔥 Recuperamos el guardado de la billetera
     });
 
     recalc(false);
-    closeSim('buy');
-    showToast((currentUiLang === 'en' ? '✅ Buy registered: ' : '✅ Compra registrada: ') + activeSimRow.t);
+    closeSim('sell');
+    const glLabel = pnl >= 0 ? (currentUiLang === 'en' ? 'Profit' : 'Ganancia') : (currentUiLang === 'en' ? 'Loss' : 'Pérdida');
+    showToast(`✅ ${currentUiLang === 'en' ? 'Sell registered' : 'Venta registrada'}. ${glLabel}: $${f(Math.abs(pnl))} USD`);
   }
 
   /** Confirm sell: update position, calculate P&L, push trade to history */
@@ -1678,7 +1682,7 @@
 
       if (filtered.length === 0) return `<tbody><tr><td colspan="6" style="padding:15px; color:var(--sub)">${D.empty}</td></tr></tbody>`;
 
-      return '<tbody>' + filtered.map(t => {
+            return '<tbody>' + filtered.map(t => {
         const rawType = String(t.type || '').toUpperCase();
         const isBuy = rawType === 'BUY' || rawType === 'COMPRA';
         const typeStr = isBuy ? (currentUiLang === 'en' ? 'BUY' : 'COMPRA') : (currentUiLang === 'en' ? 'SELL' : 'VENTA');
@@ -1691,13 +1695,8 @@
         const amount = t.amount !== undefined ? t.amount : (isBuy ? -(t.qty * px) : (t.qty * px));
         const formatQty = parseFloat(Number(t.qty).toFixed(6));
 
-        // 🔥 LÓGICA PARA MOSTRAR LA BILLETERA 🔥
+        // 🔥 Mostrar la billetera EXACTA que se guardó, SIN intentar adivinarla 🔥
         let walletStr = t.wallet || '';
-        
-        if (!walletStr && assetTypeFilter === 'CR') {
-          const foundAsset = CR.find(c => c.t === (t.symbol || t.asset));
-          if (foundAsset && foundAsset.wallet) walletStr = foundAsset.wallet;
-        }
         
         let displaySymbol = t.symbol || t.asset || '—';
         if (assetTypeFilter === 'CR' && walletStr) {
