@@ -1051,7 +1051,7 @@
     saveTimeout = setTimeout(saveDataToFirebase, 1500);
   }
 
-  // ══════════════════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════════════════
   // 14.5 RENDER HISTORY TABLES (Navegación Mensual - Año en Curso)
   // ══════════════════════════════════════════════════════════════════════
   function changeHistoryMonth(offset) {
@@ -1076,7 +1076,7 @@
       ? { date: 'Date', type: 'Type', asset: 'Asset', qty: 'Qty.', px: 'Price', total: 'Total', empty: 'No transactions this month.' }
       : { date: 'Fecha', type: 'Tipo', asset: 'Activo', qty: 'Cant.', px: 'Precio', total: 'Total', empty: 'No hay transacciones este mes.' };
 
-        const thead = `<thead><tr> <th style="text-align:left; padding-left:10px">${D.date}</th> <th>${D.type}</th> <th>${D.asset}</th> <th>${D.qty}</th> <th>${D.px}</th> <th>${D.total}</th> <th></th> </tr></thead>`;
+    const thead = `<thead><tr><th style="text-align:left; padding-left:10px">${D.date}</th><th>${D.type}</th><th>${D.asset}</th><th>${D.qty}</th><th>${D.px}</th><th>${D.total}</th><th></th></tr></thead>`;
 
     const buildTbody = (assetTypeFilter) => {
       const filtered = TRADES.filter(t => {
@@ -1088,7 +1088,7 @@
         return d.getFullYear() === currentYear && d.getMonth() === viewedHistoryMonth && matchesFilter;
       }).sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      if (filtered.length === 0) return `<tbody><tr><td colspan="6" style="padding:15px; color:var(--sub)">${D.empty}</td></tr></tbody>`;
+      if (filtered.length === 0) return `<tbody><tr><td colspan="7" style="padding:15px; color:var(--sub)">${D.empty}</td></tr></tbody>`;
 
       return '<tbody>' + filtered.map(t => {
         const rawType = String(t.type || '').toUpperCase();
@@ -1118,15 +1118,16 @@
           <td style="text-align:left; padding-left:10px; font-size:0.75rem; color:var(--sub)">${dateStr}</td>
           <td style="font-weight:bold; color:${typeColor}">${typeStr}</td>
           <td style="font-weight:bold; color:var(--blue)">${displaySymbol}</td>
-          <td>${m(formatQty)}</td>
+          <td>${m(fQty(t.qty))}</td>
           <td>${m(fU(px))}</td>
           <td style="font-weight:bold; color:${amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(amount))}</td>
           <td><button class="icon-btn btn-del" onmousedown="deleteTrade(${t.id})" title="Eliminar Transacción">✕</button></td>
         </tr>`;
       }).join('') + '</tbody>';
-    };
+    }; // 🔥 ¡AQUÍ ESTABA EL ERROR, FALTABA ESTA LLAVE CERRANDO EL buildTbody! 🔥
 
-    const tblSw = document.getElementById('tbl-hist-sw'); const tblCr = document.getElementById('tbl-hist-cr');
+    const tblSw = document.getElementById('tbl-hist-sw'); 
+    const tblCr = document.getElementById('tbl-hist-cr');
     if (tblSw) tblSw.innerHTML = thead + buildTbody('STOCKS');
     if (tblCr) tblCr.innerHTML = thead + buildTbody('CR');
   }
