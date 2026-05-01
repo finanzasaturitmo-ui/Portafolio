@@ -1603,7 +1603,7 @@
     recalc();
   }
 
-    // ══════════════════════════════════════════════════════════════════════
+      // ══════════════════════════════════════════════════════════════════════
   // 14. MASTER RECALC — rebuilds the entire UI in one pass
   // ══════════════════════════════════════════════════════════════════════
 
@@ -1687,16 +1687,13 @@
         let dateStr = "—";
         try { dateStr = new Date(t.date).toLocaleDateString(currentUiLang === 'en' ? 'en-US' : 'es-CO'); } catch(e){}
 
-                // Rescatar montos
         const px = t.price || t.px || 0;
         const amount = t.amount !== undefined ? t.amount : (isBuy ? -(t.qty * px) : (t.qty * px));
         const formatQty = parseFloat(Number(t.qty).toFixed(6));
 
-        // 🔥 LÓGICA NUEVA PARA MOSTRAR LA BILLETERA 🔥
+        // 🔥 LÓGICA PARA MOSTRAR LA BILLETERA 🔥
         let walletStr = t.wallet || '';
         
-        // Respaldo inteligente: si la transacción es vieja y no tenía guardada la wallet, 
-        // intenta buscarla en tu tabla actual de criptos para que no quede vacía.
         if (!walletStr && assetTypeFilter === 'CR') {
           const foundAsset = CR.find(c => c.t === (t.symbol || t.asset));
           if (foundAsset && foundAsset.wallet) walletStr = foundAsset.wallet;
@@ -1716,6 +1713,7 @@
           <td style="font-weight:bold; color:${amount < 0 ? 'var(--red)' : 'var(--green)'}">${m(fU(amount))}</td>
         </tr>`;
       }).join('') + '</tbody>';
+    }; // 🔥 ¡AQUÍ ESTÁ LA LLAVE QUE FALTABA Y ROMPÍA TODO! 🔥
 
     // Inyectar en los paneles HTML correspondientes
     const tblSw = document.getElementById('tbl-hist-sw');
