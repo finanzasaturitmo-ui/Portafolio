@@ -1361,14 +1361,55 @@
       } catch (e) { console.error('Stock price error:', row.t, e); }
     };
 
-    const fetchCryptoPrice = async row => {
-      const ticker = String(row.t).toUpperCase(); if (STABLECOINS.includes(ticker)) { row.px = 1.00; row.pxChange = null; return; }
+        const fetchCryptoPrice = async row => {
+      const ticker = String(row.t).toUpperCase().trim();
+      if (!ticker) return;
+      if (STABLECOINS.includes(ticker)) { row.px = 1.00; row.pxChange = null; return; }
+      
+      // 1. Binance
       try {
         const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${ticker}USDT`);
         if (res.ok) { const data = await res.json(); if (data.lastPrice) { row.px = parseFloat(data.lastPrice); row.pxChange = parseFloat(data.priceChangePercent); return; } }
-        throw new Error('Not on Binance');
-      } catch {
-        try { const res = await fetch(`https://api.mexc.com/api/v3/ticker/24hr?symbol=${ticker}USDT`); if (res.ok) { const data = await res.json(); if (data.lastPrice) { row.px = parseFloat(data.lastPrice); row.pxChange = parseFloat(data.priceChangePercent) * 100; } } } catch (e) {}
+      } catch (e) {}
+
+      // 2. MEXC
+      try { 
+        const res = await fetch(`https://api.mexc.com/api/v3/ticker/24hr?symbol=${ticker}USDT`); 
+        if (res.ok) { const data = await res.json(); if (data.lastPrice) { row.px = parseFloat(data.lastPrice); row.pxChange = parseFloat(data.priceChangePercent) * 100; return; } } 
+      } catch (e) {}
+
+      // 3. Gate.io (Excelente para micro-caps y gemas)
+      try {
+        const res = await fetch(`https://api.gateio.ws/api/v4/spot/tickers?currency_pair=${ticker}_USDT`);
+        if (res.ok) { const data = await res.json(); if (data.length > 0 && data[0].last) { row.px = parseFloat(data[0].last); row.pxChange = parseFloat(data[0].change_percentage); return; } }
+      } catch (e) {}
+
+      // 4. KuCoin
+      try {
+        const res = await fetch(`https://api.kucoin.com/api/v1/market/stats?symbol=${ticker}-USDT`);
+        if (res.ok) { const json = await res.json(); if (json.data && json.data.last) { row.px = parseFloat(json.data.last); row.pxChange = parseFloat(json.data.changeRate) * 100; return; } }
+      } catch (e) {}
+
+      // 5. CoinGecko Fallback (Busca globalmente por ticker o por el nombre completo si no está en exchanges)
+      try {
+        const searchRes = await fetch(`https://api.coingecko.com/api/v3/search?query=${ticker}`);
+        if (searchRes.ok) {
+            const searchData = await searchRes.json();
+            if (searchData.coins && searchData.coins.length > 0) {
+                const coinId = searchData.coins[0].id; // Toma el ID oficial interno de CoinGecko
+                const priceRes = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true`);
+                if (priceRes.ok) {
+                    const priceData = await priceRes.json();
+                    if (priceData[coinId] && priceData[coinId].usd) {
+                        row.px = parseFloat(priceData[coinId].usd);
+                        row.pxChange = parseFloat(priceData[coinId].usd_24h_change || 0);
+                        return;
+                    }
+                }
+            }
+        }
+      } catch (e) {
+         console.warn('No se pudo encontrar precio en ninguna API para:', ticker);
       }
     };
 
