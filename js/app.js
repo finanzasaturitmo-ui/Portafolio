@@ -834,10 +834,10 @@
 
   function renderCharts() {
     document.getElementById('lbl-bar').textContent = currentUiLang === 'en' ? 'Performance % P/L' : 'Rendimiento % G/L';
-    const rawData = currentView === 'stocks' ? [...SW.map(calc), ...XT.map(calc)] : [...CR.map(calc)];
+    const rawData = currentView === 'stocks' ? [...SW.map(calc), ...XT.map(x => { const c = calc(x); c.isXT = true; return c; })] : [...CR.map(calc)];
     const all = rawData.filter(x => x.qty > 0 && x.t);
     const STABLES = ['USDT','USDC','EUSD'];
-    const labels = all.map(x => { let name = String(x.t); if (STABLES.includes(name.toUpperCase()) && x.wallet) name += ` (${x.wallet})`; return name; });
+    const labels = all.map(x => { let name = String(x.t); if (STABLES.includes(name.toUpperCase()) && x.wallet) name += ` (${x.wallet})`; if (x.isXT) name += ' (XTB)'; return name; });
     const values = all.map(x => x.cur); const gls = all.map(x => x.gl); const total = values.reduce((a, b) => a + b, 0); const isMob = window.innerWidth <= 768;
     const labelsPct = labels.map((t, i) => `${t} (${total > 0 ? (values[i] / total * 100).toFixed(1) : 0}%)`);
 
