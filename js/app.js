@@ -849,7 +849,8 @@
       const legendBoxWidth = labels.length > 16 ? 8 : 10;
       const donutHeight = isMob ? Math.max(280, legendRows * 22 + 180) : Math.max(200, legendRows * (legendFontSize + legendPadding + 2));
       document.getElementById('donut-wrap').style.height = donutHeight + 'px';
-      dChart = new Chart(document.getElementById('donut'), { type: 'doughnut', data: { labels: labelsPct, datasets: [{ data: values, backgroundColor: CHART_COLORS.slice(0, labels.length), borderWidth: 2, borderColor: '#161b22' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: isMob ? 'bottom' : 'right', labels: { color: '#e6edf3', font: { size: legendFontSize }, boxWidth: legendBoxWidth, padding: legendPadding } } } } });
+      const donutPctPlugin = { id: 'donutPct', afterDraw: chart => { const ctx = chart.ctx; chart.data.datasets.forEach((ds, i) => { const meta = chart.getDatasetMeta(i); if (!meta.hidden) { meta.data.forEach((el, j) => { const pct = (ds.data[j] / total * 100); if (pct >= 4) { ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 3; const pos = el.tooltipPosition(); ctx.fillText(pct.toFixed(1) + '%', pos.x, pos.y); ctx.shadowBlur = 0; } }); } }); } };
+      dChart = new Chart(document.getElementById('donut'), { type: 'doughnut', data: { labels: labelsPct, datasets: [{ data: values, backgroundColor: CHART_COLORS.slice(0, labels.length), borderWidth: 2, borderColor: '#161b22' }] }, plugins: [donutPctPlugin], options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: isMob ? 'bottom' : 'right', labels: { color: '#e6edf3', font: { size: legendFontSize }, boxWidth: legendBoxWidth, padding: legendPadding } } } } });
     }
 
     if (bChart) bChart.destroy();
