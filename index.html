@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mi Portafolio Pro | Sincronizado</title>
+  <meta name="description" content="Portafolio de inversiones sincronizado en la nube. Acciones, ETFs y criptomonedas con precios en tiempo real, historial de transacciones y reportes inteligentes." />
+  <meta property="og:title" content="Mi Portafolio Pro" />
+  <meta property="og:description" content="Gestión profesional de portafolio de inversiones con Firebase y precios en tiempo real." />
+  <meta property="og:type" content="website" />
 
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpolyline points='5,26 12,18 18,22 27,8' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21,8 L27,8 L27,14' fill='none' stroke='%233fb950' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='16' y='23' font-family='Segoe UI, sans-serif' font-weight='900' font-size='20' fill='%2358a6ff' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E" />
 
@@ -655,8 +659,20 @@
 
   function evalMath(val) {
     try {
-      const sanitized = String(val).replace(/,/g, '.').replace(/[^0-9+\-*/.\s]/g, '');
-      const result    = new Function('return ' + sanitized)();
+      const sanitized = String(val).replace(/,/g, '.').replace(/[^0-9+\-*/.\s]/g, '').trim();
+      if (!sanitized) return 0;
+      // Safe math parser — no eval/new Function
+      const tokens = sanitized.match(/(\d+\.?\d*)|([+\-*/])/g);
+      if (!tokens || tokens.length === 0) return 0;
+      let result = parseFloat(tokens[0]) || 0;
+      for (let i = 1; i < tokens.length - 1; i += 2) {
+        const op = tokens[i];
+        const next = parseFloat(tokens[i + 1]) || 0;
+        if (op === '+') result += next;
+        else if (op === '-') result -= next;
+        else if (op === '*') result *= next;
+        else if (op === '/' && next !== 0) result /= next;
+      }
       return isNaN(result) ? 0 : parseFloat(result);
     } catch (e) { return rv(val); }
   }
@@ -759,7 +775,13 @@
     db.ref('users/' + currentUser.uid).set({
       SW, XT, CR, sub_users: SUB_USERS, selected_stables: SELECTED_STABLES, transactions: TRADES,
       rate: document.getElementById('rateInput').value, oppStocks, oppCrypto, skInv: skInvVal, skCur: skCurVal, ts: new Date().toISOString()
-    }).then(() => { document.getElementById('lastSaved').textContent = (currentUiLang === 'en' ? 'Cloud synced: ' : 'Nube sincronizada: ') + new Date().toLocaleTimeString('es-CO'); });
+    }).then(() => {
+      document.getElementById('lastSaved').textContent = (currentUiLang === 'en' ? 'Cloud synced: ' : 'Nube sincronizada: ') + new Date().toLocaleTimeString('es-CO');
+    }).catch(err => {
+      console.error('Firebase save error:', err);
+      document.getElementById('lastSaved').textContent = (currentUiLang === 'en' ? '❌ Save error' : '❌ Error al guardar');
+      showToast(currentUiLang === 'en' ? '❌ Cloud save failed' : '❌ Error al guardar en la nube');
+    });
   }
 
   function toggleFab() { document.getElementById('view-tabs').classList.toggle('open'); }
@@ -1420,7 +1442,7 @@
   setInterval(fetchRealTimeData, 60_000);
 
   function toggleDrop() { document.getElementById('drop-pdf').classList.toggle('show'); }
-  window.onclick = e => { if (!e.target.closest('.dropdown')) document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show')); };
+  window.addEventListener('click', e => { if (!e.target.closest('.dropdown')) document.querySelectorAll('.drop-content').forEach(d => d.classList.remove('show')); });
   let repStart = '', repEnd = '';
 
   function openAssetModal() {
