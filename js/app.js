@@ -842,7 +842,15 @@
     const labelsPct = labels.map((t, i) => `${t} (${total > 0 ? (values[i] / total * 100).toFixed(1) : 0}%)`);
 
     if (dChart) dChart.destroy();
-    if (labels.length) dChart = new Chart(document.getElementById('donut'), { type: 'doughnut', data: { labels: labelsPct, datasets: [{ data: values, backgroundColor: CHART_COLORS.slice(0, labels.length), borderWidth: 2, borderColor: '#161b22' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: isMob ? 'bottom' : 'right', labels: { color: '#e6edf3', font: { size: 11 }, boxWidth: 10, padding: 8 } } } } });
+    if (labels.length) {
+      const legendRows = Math.ceil(labels.length / 2);
+      const legendFontSize = labels.length > 16 ? 9 : labels.length > 10 ? 10 : 11;
+      const legendPadding = labels.length > 16 ? 4 : labels.length > 10 ? 6 : 8;
+      const legendBoxWidth = labels.length > 16 ? 8 : 10;
+      const donutHeight = isMob ? Math.max(280, legendRows * 22 + 180) : Math.max(200, legendRows * (legendFontSize + legendPadding + 2));
+      document.getElementById('donut-wrap').style.height = donutHeight + 'px';
+      dChart = new Chart(document.getElementById('donut'), { type: 'doughnut', data: { labels: labelsPct, datasets: [{ data: values, backgroundColor: CHART_COLORS.slice(0, labels.length), borderWidth: 2, borderColor: '#161b22' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: isMob ? 'bottom' : 'right', labels: { color: '#e6edf3', font: { size: legendFontSize }, boxWidth: legendBoxWidth, padding: legendPadding } } } } });
+    }
 
     if (bChart) bChart.destroy();
     if (labels.length) {
