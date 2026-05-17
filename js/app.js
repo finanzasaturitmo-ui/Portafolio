@@ -836,7 +836,8 @@
     document.getElementById('lbl-bar').textContent = currentUiLang === 'en' ? 'Performance % P/L' : 'Rendimiento % G/L';
     const rawData = currentView === 'stocks' ? [...SW.map(calc), ...XT.map(calc)] : [...CR.map(calc)];
     const all = rawData.filter(x => x.qty > 0 && x.t);
-    const labels = all.map(x => { let name = String(x.t); if (['USDT','USDC'].includes(name.toUpperCase()) && x.wallet) name += ` (${x.wallet})`; return name; });
+    const STABLES = ['USDT','USDC','EUSD'];
+    const labels = all.map(x => { let name = String(x.t); if (STABLES.includes(name.toUpperCase()) && x.wallet) name += ` (${x.wallet})`; return name; });
     const values = all.map(x => x.cur); const gls = all.map(x => x.gl); const total = values.reduce((a, b) => a + b, 0); const isMob = window.innerWidth <= 768;
     const labelsPct = labels.map((t, i) => `${t} (${total > 0 ? (values[i] / total * 100).toFixed(1) : 0}%)`);
 
@@ -845,9 +846,10 @@
 
     if (bChart) bChart.destroy();
     if (labels.length) {
-      document.getElementById('bar-wrap').style.height = isMob ? Math.max(280, labels.length * 40) + 'px' : '200px';
+      const barHeight = isMob ? Math.max(280, labels.length * 40) : Math.max(200, labels.length * 18 + 80);
+      document.getElementById('bar-wrap').style.height = barHeight + 'px';
       const pctPlugin = { id: 'pct', afterDraw: chart => { const ctx = chart.ctx; const isH = chart.options.indexAxis === 'y'; chart.data.datasets.forEach((ds, i) => { const meta = chart.getDatasetMeta(i); if (!meta.hidden) { meta.data.forEach((el, j) => { ctx.fillStyle = ds.borderColor[j]; const v = ds.data[j]; const text = (v >= 0 ? '+' : '') + f(v, 1) + '%'; if (isMob && isH) { ctx.font = 'bold 11px sans-serif'; ctx.textBaseline = 'middle'; const zeroX = chart.scales.x.getPixelForValue(0); ctx.textAlign = v >= 0 ? 'right' : 'left'; ctx.fillText(`${chart.data.labels[j]} (${text})`, zeroX + (v >= 0 ? -8 : 8), el.y); } else { ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = v >= 0 ? 'bottom' : 'top'; ctx.fillText(text, el.x, el.y + (v >= 0 ? -6 : 6)); } }); } }); } };
-      bChart = new Chart(document.getElementById('bar'), { type: 'bar', data: { labels, datasets: [{ label: currentUiLang === 'en' ? 'Performance' : 'Rendimiento', data: gls, backgroundColor: gls.map(g => g >= 0 ? '#3fb95055' : '#f7816655'), borderColor: gls.map(g => g >= 0 ? '#3fb950' : '#f78166'), borderWidth: 1 }] }, plugins: [pctPlugin], options: { responsive: true, maintainAspectRatio: false, indexAxis: isMob ? 'y' : 'x', layout: { padding: { top: isMob ? 0 : 25, bottom: isMob ? 0 : 25, left: isMob ? 120 : 0, right: isMob ? 120 : 0 } }, plugins: { legend: { display: false } }, scales: { x: { display: !isMob, ticks: { color: '#e6edf3', font: { size: 10 } }, grid: { color: '#21262d' } }, y: { display: !isMob, ticks: { color: '#8b949e', callback: v => v + '%' }, grid: { color: '#21262d' } } } } });
+      bChart = new Chart(document.getElementById('bar'), { type: 'bar', data: { labels, datasets: [{ label: currentUiLang === 'en' ? 'Performance' : 'Rendimiento', data: gls, backgroundColor: gls.map(g => g >= 0 ? '#3fb95055' : '#f7816655'), borderColor: gls.map(g => g >= 0 ? '#3fb950' : '#f78166'), borderWidth: 1 }] }, plugins: [pctPlugin], options: { responsive: true, maintainAspectRatio: false, indexAxis: isMob ? 'y' : 'x', layout: { padding: { top: isMob ? 0 : 25, bottom: isMob ? 0 : 10, left: isMob ? 120 : 0, right: isMob ? 120 : 0 } }, plugins: { legend: { display: false } }, scales: { x: { display: !isMob, ticks: { color: '#e6edf3', font: { size: 9 }, maxRotation: 55, minRotation: 35, autoSkip: false }, grid: { color: '#21262d' } }, y: { display: !isMob, ticks: { color: '#8b949e', callback: v => v + '%' }, grid: { color: '#21262d' } } } } });
     }
   }
 
