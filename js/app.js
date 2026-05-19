@@ -767,10 +767,10 @@
       tInv = bInv + skIUSD; tCur += skUSD; tPnl = tCur - tInv; tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
       lblGlobal = D.lblS; valInvStr = '$' + f(tInv); htmlSub = `Brokers <span style="color:#e6edf3;font-weight:600">${isPrivacyMode ? '••••' : '$' + f(tCur - skUSD)}</span> · Skandia <span style="color:#e6edf3;font-weight:600">${isPrivacyMode ? '••••' : '$' + f(skUSD)}</span>`;
     } else {
-      activeAssets = CR.map(calc).filter(x => x.qty > 0); tCur = activeAssets.reduce((s, x) => s + x.cur, 0); const tInvRaw = activeAssets.reduce((s, x) => s + x.inv, 0);
+      activeAssets = CR.map(calc).filter(x => x.qty > 0); const tCurRaw = activeAssets.reduce((s, x) => s + x.cur, 0); const tInvRaw = activeAssets.reduce((s, x) => s + x.inv, 0);
       const totalUsersUSD = SUB_USERS.reduce((s, u) => s + (parseFloat(u.usd) || 0), 0);
-      tInv = tInvRaw - totalUsersUSD; tPnl = tCur - tInvRaw; tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
-      lblGlobal = D.lblC; valInvStr = '$' + f(tInv); htmlSub = `${D.wallet} <span style="color:#e6edf3;font-weight:600">${isPrivacyMode ? '••••' : '$' + f(tCur)}</span>`;
+      tInv = tInvRaw - totalUsersUSD; tCur = tCurRaw - totalUsersUSD; tPnl = tCur - tInv; tPct = tInv > 0 ? (tPnl / tInv) * 100 : 0;
+      lblGlobal = D.lblC; valInvStr = '$' + f(tInv); htmlSub = `${D.wallet} <span style="color:#e6edf3;font-weight:600">${isPrivacyMode ? '••••' : '$' + f(tCurRaw)}</span>`;
     }
 
     const named = activeAssets.filter(x => x.t && !STABLECOINS.includes(String(x.t).toUpperCase()));
@@ -822,7 +822,7 @@
     } else {
       const cA = CR.map(calc).filter(x => x.qty > 0);
       const totalUsersUSD = SUB_USERS.reduce((s, u) => s + (parseFloat(u.usd) || 0), 0);
-      const cI = cA.reduce((s, x) => s + x.inv, 0) - totalUsersUSD; const cC = cA.reduce((s, x) => s + x.cur, 0);
+      const cI = cA.reduce((s, x) => s + x.inv, 0) - totalUsersUSD; const cC = cA.reduce((s, x) => s + x.cur, 0) - totalUsersUSD;
       document.getElementById('sum-content').innerHTML = `
         <div class="sum-grid"><div class="sum-card" style="border-color:#f3ba2f44"><div style="font-size:.65rem;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">${D.crInv}</div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.75rem;color:var(--sub)">${D.inv}</span><span style="font-size:.8rem;font-weight:600">${m('$' + f(cI))}</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:.75rem;color:var(--sub)">${D.act}</span><span style="font-size:.8rem;font-weight:600" class="b">${m(fU(cC))}</span></div></div></div>
         <div class="totals-panel">
