@@ -618,6 +618,10 @@
         let displaySymbol = t.symbol || t.asset || '—';
         if (assetTypeFilter === 'CR' && walletStr) {
           displaySymbol += ` <span style="font-size:0.7rem; color:var(--sub); font-weight:normal;">(${walletStr})</span>`;
+        } else if (assetTypeFilter !== 'CR') {
+          const sym = t.symbol || t.asset || '';
+          const brokerTag = XT.some(x => x.t === sym) ? 'XTB' : SW.some(x => x.t === sym) ? 'Schwab' : '';
+          if (brokerTag) displaySymbol += ` <span style="font-size:0.7rem; color:var(--sub); font-weight:normal;">(${brokerTag})</span>`;
         }
 
         return `<tr>
