@@ -434,8 +434,9 @@
     TRADES.push({
       id: Date.now(), date: new Date().toISOString(), type: 'Buy',
       symbol: activeSimRow.t, assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
+      broker: activeSimTid === 'xt' ? 'XTB' : activeSimTid === 'sw' ? 'Schwab' : '',
       qty: buyQty, price: buyPx, amount: -buyInv, asset: activeSimRow.t, px: buyPx, inv: buyInv,
-      wallet: activeSimRow.wallet || '' // 🔥 GUARDAMOS LA BILLETERA
+      wallet: activeSimRow.wallet || ''
     });
     recalc(false); closeSim('buy'); showToast((currentUiLang === 'en' ? '✅ Buy registered: ' : '✅ Compra registrada: ') + activeSimRow.t);
   }
@@ -455,8 +456,9 @@
     TRADES.push({
       id: Date.now(), date: new Date().toISOString(), type: 'Sell',
       symbol: activeSimRow.t, assetType: activeSimTid === 'cr' ? 'CR' : 'STOCKS',
+      broker: activeSimTid === 'xt' ? 'XTB' : activeSimTid === 'sw' ? 'Schwab' : '',
       qty: sellQty, price: sellPx, amount: sellQty * sellPx, pnl, asset: activeSimRow.t, px: sellPx, inv: sellQty * avg,
-      wallet: activeSimRow.wallet || '' // 🔥 GUARDAMOS LA BILLETERA
+      wallet: activeSimRow.wallet || ''
     });
     recalc(false); closeSim('sell');
     const glLabel = pnl >= 0 ? (currentUiLang === 'en' ? 'Profit' : 'Ganancia') : (currentUiLang === 'en' ? 'Loss' : 'Pérdida');
@@ -620,7 +622,7 @@
           displaySymbol += ` <span style="font-size:0.7rem; color:var(--sub); font-weight:normal;">(${walletStr})</span>`;
         } else if (assetTypeFilter !== 'CR') {
           const sym = t.symbol || t.asset || '';
-          const brokerTag = XT.some(x => x.t === sym) ? 'XTB' : SW.some(x => x.t === sym) ? 'Schwab' : '';
+          const brokerTag = t.broker || (XT.some(x => x.t === sym) && !SW.some(x => x.t === sym) ? 'XTB' : SW.some(x => x.t === sym) && !XT.some(x => x.t === sym) ? 'Schwab' : '');
           if (brokerTag) displaySymbol += ` <span style="font-size:0.7rem; color:var(--sub); font-weight:normal;">(${brokerTag})</span>`;
         }
 
