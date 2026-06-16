@@ -745,7 +745,7 @@
       <tr style="background:var(--cardAlt);font-weight:bold"><td style="text-align:left;padding-left:10px;color:var(--sub)">TOTAL USD USERS</td><td style="color:var(--blue)">${m('$' + f(totalUsersUSD))}</td><td></td></tr>
       <tr style="background:var(--bg);font-weight:bold"><td style="text-align:left;padding-left:10px;color:var(--sub)">TOTAL USD CRISTH<span style="font-size:0.65rem;font-weight:normal;color:var(--sub);display:block">(Respaldos - Usuarios)</span></td><td style="color:${totalCristh >= 0 ? 'var(--green)' : 'var(--red)'}">${m('$' + f(totalCristh))}
           <div class="stables-dropdown-container">
-            <button class="btn-choose-stables" onclick="document.getElementById('stables-menu-list').classList.toggle('show')">⚙️ Fondos</button>
+            <button class="btn-choose-stables" onclick="toggleFondosMenu(this)">⚙️ Fondos</button>
             <div id="stables-menu-list" class="stables-menu">
               <div style="font-size:0.7rem;color:var(--sub);border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">Selecciona los fondos de respaldo:</div>${dropdownHtml}
             </div>
@@ -753,6 +753,17 @@
         </td><td></td></tr>`;
   }
 
+  function toggleFondosMenu(btn) {
+    const menu = document.getElementById('stables-menu-list');
+    if (!menu) return;
+    menu.classList.toggle('show');
+    if (menu.classList.contains('show')) {
+      const r = btn.getBoundingClientRect();
+      menu.style.left = r.left + 'px';
+      menu.style.bottom = (window.innerHeight - r.top + 8) + 'px';
+      menu.style.top = 'auto';
+    }
+  }
   window.addEventListener('click', e => { if (!e.target.closest('.stables-dropdown-container')) { const menu = document.getElementById('stables-menu-list'); if (menu && menu.classList.contains('show')) menu.classList.remove('show'); } });
   function toggleStableSelection(idStr, isChecked) { if (isChecked) { if (!SELECTED_STABLES.includes(idStr)) SELECTED_STABLES.push(idStr); } else { SELECTED_STABLES = SELECTED_STABLES.filter(id => id !== idStr); } recalc(); }
   function updSub(id, field, val) { if (isPrivacyMode) return; const user = SUB_USERS.find(u => u.id === id); if (!user) return; if (field === 'name') { user.name = val; } else if (field === 'usd') { user.usdExpr = String(val).trim(); user.usd = evalMath(val); } recalc(); }
