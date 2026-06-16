@@ -185,8 +185,8 @@
     .stables-dropdown-container { position: relative; display: inline-block; vertical-align: middle; margin-left: 10px; }
     .btn-choose-stables { background: #21262d; border: 1px solid var(--border); color: var(--sub); font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
     .btn-choose-stables:hover { background: #30363d; color: #e6edf3; }
-    .stables-menu { display: none; position: absolute; bottom: 120%; left: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-width: 300px; box-shadow: 0 -8px 20px rgba(0,0,0,0.6); z-index: 100; max-height: 60vh; overflow-y: auto; }
-    .stables-menu.show { display: flex; flex-direction: column; gap: 6px; animation: fadeIn 0.2s ease; }
+    .stables-menu { display: none; position: absolute; bottom: 120%; left: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-width: 300px; box-shadow: 0 -8px 20px rgba(0,0,0,0.6); z-index: 100; }
+    .stables-menu.show { display: flex; flex-direction: column; gap: 6px; animation: fadeIn 0.2s ease; max-height: 60vh; overflow-y: auto; }
     .stable-option { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: #e6edf3; cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.15s; }
     .stable-option:hover { background: #1f2328; }
     .stable-option input[type="checkbox"] { accent-color: var(--green); transform: scale(1.1); cursor: pointer; }
