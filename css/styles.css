@@ -134,7 +134,7 @@
     .sortable-drag { background: var(--card); box-shadow: 0 15px 25px rgba(0,0,0,0.8); opacity: 1 !important; }
 
     .opp-mini { display: flex; align-items: center; background: var(--card); border: 1px solid #21262d; padding: 3px 6px; border-radius: 5px; font-size: 0.7rem; color: var(--sub); margin-right: 4px; }
-    .opp-mini input { width: 30px; text-align: center; background: transparent; border: none; color: var(--green); font-weight: bold; outline: none; font-size: 0.75rem; -moz-appearance: textfield; }
+    .opp-mini input { width: 30px; text-align: center; background: transparent; border: none; color: var(--green); font-weight: bold; outline: none; font-size: 0.75rem; -moz-appearance: textfield; appearance: textfield; }
     .opp-mini input::-webkit-outer-spin-button, .opp-mini input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
     .badge { display: inline-block; background: #21262d; color: var(--sub); font-size: 0.62rem; padding: 1px 5px; border-radius: 9px; margin-left: 4px; vertical-align: middle; }
