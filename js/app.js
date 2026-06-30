@@ -508,7 +508,7 @@
         <td class="computed ${isOpp ? 'opp-glow' : ''}" style="font-weight:700;vertical-align:middle"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center"><span>${row.px || 0}</span>${pxBadge}</div></td>
         <td class="computed">${isPend ? dash : m(fU(row.cur))}</td><td class="computed" style="color:var(--blue)">${isPend ? dash : m(fU(row.inv))}</td>
         <td class="computed">${isPend ? dash : fP(row.gl)}</td><td class="computed">${isPend ? dash : (isPrivacyMode ? '••••' : fGain(row.pnl))}</td>
-        <td class="action-btns"><button class="icon-btn" onmousedown="openSim('${tid}',${row.id})" title="🛒">🛒</button><button class="icon-btn" onmousedown="openSell('${tid}',${row.id})" title="💸">💸</button><button class="icon-btn btn-del" onmousedown="delRow('${tid}',${row.id})" title="✕">✕</button></td>
+        <td><div class="action-btns"><button class="icon-btn" onmousedown="openSim('${tid}',${row.id})" title="🛒">🛒</button><button class="icon-btn" onmousedown="openSell('${tid}',${row.id})" title="💸">💸</button><button class="icon-btn btn-del" onmousedown="delRow('${tid}',${row.id})" title="✕">✕</button></div></td>
       </tr>`;
     }).join('');
 
