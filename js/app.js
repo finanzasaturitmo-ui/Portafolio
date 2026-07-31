@@ -492,7 +492,9 @@
       }
 
       let qtyCell = '';
-      if (isPrivacyMode) { qtyCell = '••••'; } else if (isPend) { qtyCell = '<span style="color:var(--sub)">—</span>'; } else if (isCrypto && row.staking) {
+      if (isPrivacyMode) { qtyCell = '••••'; } else if (isPend) {
+        qtyCell = `<input class="ci" style="width:75px;font-weight:bold;color:var(--sub)" value="${row.qty || ''}" placeholder="0" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()">`;
+      } else if (isCrypto && row.staking) {
         const formula = row.qtyExpr ? row.qtyExpr.replace(/'/g, "\\'") : row.qty;
         qtyCell = `<input class="ci" style="width:75px;font-weight:bold;color:var(--blue);border-color:var(--green)" value="${row.qty}" title="Editar cantidad en Staking" onfocus="this.value='${formula}'" onblur="upd('${tid}',${row.id},'qty',this.value)" onkeyup="if(event.key==='Enter')this.blur()">`;
       } else { qtyCell = isCrypto ? parseFloat(Number(row.qty).toFixed(4)) : fQty(row.qty); }
