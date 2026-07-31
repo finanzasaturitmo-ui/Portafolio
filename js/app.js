@@ -533,7 +533,7 @@
     if      (field === 't')       row[field] = String(val).toUpperCase().trim();
     else if (field === 'wallet')  row[field] = String(val).trim();
     else if (field === 'staking') row[field] = val;
-    else if (field === 'qty') { row.qtyExpr = String(val).trim(); row[field] = evalMath(val); }
+    else if (field === 'qty') { row.qtyExpr = String(val).trim(); row[field] = evalMath(val); if (row.p && row[field] > 0) row.p = false; }
     else row[field] = rv(val);
     recalc();
   }
