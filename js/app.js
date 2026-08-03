@@ -256,7 +256,7 @@
 
   function saveDataToFirebase() {
     if (!currentUser) return;
-    db.ref('users/' + currentUser.uid).set({
+    db.ref('users/' + currentUser.uid).update({
       SW, XT, CR, sub_users: SUB_USERS, selected_stables: SELECTED_STABLES, transactions: TRADES,
       rate: document.getElementById('rateInput').value, oppStocks, oppCrypto, skInv: skInvVal, skCur: skCurVal, ts: new Date().toISOString()
     }).then(() => {
